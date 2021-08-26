@@ -1,1 +1,1 @@
-Sitemap: https://strickvl.github.io/ml-blog/sitemap.xml
+Sitemap: http://mlops.systems/blog/sitemap.xml
