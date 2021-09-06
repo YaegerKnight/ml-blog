@@ -40,7 +40,7 @@
   
       ,"page1": {
           "title": "About Me",
-          "content": "Hi, I’m Alex. . I am a software engineer based in London, UK. I recently built Ekko, an open-source framework allowing developers to easily add realtime infrastructure and in-transit message processing to web applications. . I have multiple years of experience in the Ruby and JavaScript ecosystems and am comfortable working with Go, PostgreSQL, AWS cloud infrastructure and Docker. . I have a PhD in History and authored several books based on my research work in Afghanistan. .",
+          "content": "Hi, I’m Alex. . I am a software engineer based in London, UK. I recently built Ekko, an open-source framework allowing developers to easily add realtime infrastructure and in-transit message processing to web applications. . I have multiple years of experience in the Ruby and JavaScript ecosystems and am comfortable working with Go, PostgreSQL, AWS cloud infrastructure and Docker. . I have a PhD in History and authored several books based on my research work in Afghanistan. . I have a long-standing blog that I will combine with this one at some point, but for now I intend to post technical posts here. .",
           "url": "https://www.mlops.systems/about/",
           "relUrl": "/about/",
           "date": ""
