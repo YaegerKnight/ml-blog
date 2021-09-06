@@ -3,6 +3,7 @@ layout: post
 description: Testing my first push
 categories: [delft]
 title: A Test Post from Delft
+hide: true
 ---
 
 # Test title
