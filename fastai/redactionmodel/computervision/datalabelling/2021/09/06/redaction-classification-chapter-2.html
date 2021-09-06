@@ -80,7 +80,7 @@ window.onload = wrap_img;
        • <span class="read-time" title="Estimated read time">
     
     
-      1 min read
+      5 min read
     
 </span></p>
 
@@ -107,9 +107,7 @@ window.onload = wrap_img;
   <div class="post-content e-content" itemprop="articleBody">
     <ul class="section-nav">
 <li class="toc-entry toc-h2"><a href="#the-problem-domain-image-redaction">The Problem Domain: Image Redaction</a></li>
-<li class="toc-entry toc-h2"><a href="#summary-of-chapters-1-and-2">Summary of chapters 1 and 2</a></li>
-<li class="toc-entry toc-h2"><a href="#the-whole-pipeline">The Whole Pipeline</a></li>
-<li class="toc-entry toc-h2"><a href="#importing-images-with-ddg-import-tool">Importing images with ddg import tool</a></li>
+<li class="toc-entry toc-h2"><a href="#getting-the-data">Getting the Data</a></li>
 <li class="toc-entry toc-h2"><a href="#labelling-data-with-prodigy">Labelling data with Prodigy</a></li>
 <li class="toc-entry toc-h2"><a href="#transferring-the-data-to-paperspace-with-magic-wormhole">Transferring the data to Paperspace with magic-wormhole</a></li>
 <li class="toc-entry toc-h2"><a href="#using-the-labelled-data-in-our-training">Using the labelled data in our training</a></li>
@@ -136,24 +134,68 @@ window.onload = wrap_img;
 
 <p><img src="/images/redacted_sample.png" alt="" title="A name and an email address have been redacted here"></p>
 
-<h2 id="summary-of-chapters-1-and-2">
-<a class="anchor" href="#summary-of-chapters-1-and-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>Summary of chapters 1 and 2</h2>
+<p>Knowing that this practice exists, I thought it might be interesting to train a model that could recognise whether a particular page contained some kind of redaction. This wasn’t completely in line with what we covered during the first two chapters; I wasn’t sure if the pre-trained model we used would work for this data set and use case.</p>
 
-<h2 id="the-whole-pipeline">
-<a class="anchor" href="#the-whole-pipeline" aria-hidden="true"><span class="octicon octicon-link"></span></a>The Whole Pipeline</h2>
+<p>It could be useful to have such a tool, because FOIA responses can sometimes contain lots of data. In order to prepare a request for more data, you might want to be able to show that even though you were sent thousands of pages, most of those pages contained redactions and so were effectively useless.</p>
 
-<p>ingestion
-pdf processing</p>
+<p>In the ideal vision of this tool and how it would work, you could run a programme out of a particular directory and it would tell you how many pages (and what proportion) of your PDF files were redacted.</p>
 
-<h2 id="importing-images-with-ddg-import-tool">
-<a class="anchor" href="#importing-images-with-ddg-import-tool" aria-hidden="true"><span class="octicon octicon-link"></span></a>Importing images with ddg import tool</h2>
+<h2 id="getting-the-data">
+<a class="anchor" href="#getting-the-data" aria-hidden="true"><span class="octicon octicon-link"></span></a>Getting the Data</h2>
+
+<p>The first thing I did to gather my data was to download the PDF documents available on <a href="https://www.esd.whs.mil/FOIA/Reading-Room/Reading-Room-List_2/">this site</a>. I knew that they contained examples of redactions in FOIA documents. I used <a href="https://support.apple.com/en-gb/guide/automator/welcome/mac">Automator</a> to split the PDF files up into individual images.<sup id="fnref:3" role="doc-noteref"><a href="#fn:3" class="footnote" rel="footnote">3</a></sup> My Automator script did some downsampling of the images as part of the process, so the images were resized to something that wasn’t prohibitively large to use for training.</p>
+
+<p>Note that this stage and the next was done on my local machine. A CPU was enough for my purposes at this point, though probably I’ll want to eventually port the entire process over to a single cloud machine to handle things end-to-end.</p>
+
+<p>At the end of the splitting-and-resizing process, I had a little over 67,000 images (of individual pages) to train with.</p>
 
 <h2 id="labelling-data-with-prodigy">
 <a class="anchor" href="#labelling-data-with-prodigy" aria-hidden="true"><span class="octicon octicon-link"></span></a>Labelling data with Prodigy</h2>
 
+<p>I had used Explosion.ai’s <a href="https://prodi.gy">Prodigy data labelling tool</a> in the past and so already had a license. The UI is clean and everything works pretty much as you’d hope. I had some teething issues getting it all working, but <a href="https://support.prodi.gy/t/labelling-a-set-of-images-classification/4608/1">Ines helped me work through those queries</a> and I was up and running pretty quickly.</p>
+
+<p><img src="/images/prodigy-interface.png" alt="" title="The interface for image classification looked like this"></p>
+
+<p>It took about three hours to annotate some 4600+ images. Then I could export a <code class="language-plaintext highlighter-rouge">.jsonl</code> file that contained the individual annotations for whether a particular image contained a redaction or not:</p>
+
+<p><img src="/images/annotations_jsonl.png" alt=""></p>
+
+<p>From that point it was pretty trivial to parse the file (using <a href="https://pypi.org/project/json-lines/"><code class="language-plaintext highlighter-rouge">json-lines</code> package</a>), and to resize the images down further in order to separate redacted from unredacted:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">json_lines</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="k">def</span> <span class="nf">save_resized_image_file</span><span class="p">(</span><span class="n">location_path</span><span class="p">):</span>
+    <span class="n">basewidth</span> <span class="o">=</span> <span class="mi">800</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="p">.</span><span class="nb">open</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="s">'image'</span><span class="p">])</span>
+    <span class="n">wpercent</span> <span class="o">=</span> <span class="p">(</span><span class="n">basewidth</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">img</span><span class="p">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">hsize</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="nb">float</span><span class="p">(</span><span class="n">img</span><span class="p">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">wpercent</span><span class="p">)))</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="p">.</span><span class="n">resize</span><span class="p">((</span><span class="n">basewidth</span><span class="p">,</span> <span class="n">hsize</span><span class="p">),</span> <span class="n">Image</span><span class="p">.</span><span class="n">ANTIALIAS</span><span class="p">)</span>
+    <span class="n">img</span><span class="p">.</span><span class="n">save</span><span class="p">(</span><span class="n">location_path</span><span class="p">)</span>
+
+<span class="n">path</span> <span class="o">=</span> <span class="s">'/my_projects_directory/redaction-model'</span>
+
+<span class="n">redacted_path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">+</span> <span class="s">"/redaction_training_data/"</span> <span class="o">+</span> <span class="s">"redacted"</span>
+<span class="n">unredacted_path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">+</span> <span class="s">"/redaction_training_data/"</span> <span class="o">+</span> <span class="s">"unredacted"</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s">"/"</span> <span class="o">+</span> <span class="s">"annotations.jsonl"</span><span class="p">,</span> <span class="s">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span> <span class="c1"># opening file in binary(rb) mode    
+</span>    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">json_lines</span><span class="p">.</span><span class="n">reader</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">record</span><span class="p">[</span><span class="s">"answer"</span><span class="p">]</span> <span class="o">==</span> <span class="s">"accept"</span><span class="p">:</span>
+            <span class="n">save_resized_image_file</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">redacted_path</span> <span class="o">+</span> <span class="s">"/"</span> <span class="o">+</span> <span class="n">record</span><span class="p">[</span><span class="s">'meta'</span><span class="p">][</span><span class="s">'file'</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">save_resized_image_file</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">unredacted_path</span> <span class="o">+</span> <span class="s">"/"</span> <span class="o">+</span> <span class="n">record</span><span class="p">[</span><span class="s">'meta'</span><span class="p">][</span><span class="s">'file'</span><span class="p">]))</span>
+</code></pre></div></div>
+
 <h2 id="transferring-the-data-to-paperspace-with-magic-wormhole">
 <a class="anchor" href="#transferring-the-data-to-paperspace-with-magic-wormhole" aria-hidden="true"><span class="octicon octicon-link"></span></a>Transferring the data to Paperspace with <code class="language-plaintext highlighter-rouge">magic-wormhole</code>
 </h2>
+
+<p>Once I had the two directories filled with the two sets of images, I zipped them up since I knew I’d want to use them on a GPU-enabled computer.</p>
+
+<p>I used <a href="https://magic-wormhole.readthedocs.io"><code class="language-plaintext highlighter-rouge">magic-wormhole</code></a> to transfer the files over to my <a href="https://gradient.paperspace.com">Paperspace Gradient</a> machine. The files were only about 400MB in size so it took less than a minute to transfer the data.</p>
+
+<p>Again, ideally I wouldn’t have this step of doing things locally first. I could certainly have done everything on the Paperspace machine from the very start, but it would have taken a bit of extra time to figure out how to process the data programatically.</p>
 
 <h2 id="using-the-labelled-data-in-our-training">
 <a class="anchor" href="#using-the-labelled-data-in-our-training" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using the labelled data in our training</h2>
@@ -190,6 +232,9 @@ pdf processing</p>
     </li>
     <li id="fn:2" role="doc-endnote">
       <p>Other countries have variations of this law, like <a href="https://www.gov.uk/make-a-freedom-of-information-request">this</a> from the United Kingdom. <a href="#fnref:2" class="reversefootnote" role="doc-backlink">↩</a></p>
+    </li>
+    <li id="fn:3" role="doc-endnote">
+      <p>I realise that there is a programatic way to do this. At this early stage in the project, I was more eager to get going with the labelling, so I took the easy path by using Automator. <a href="#fnref:3" class="reversefootnote" role="doc-backlink">↩</a></p>
     </li>
   </ol>
 </div>
