@@ -3,7 +3,7 @@ toc: true
 layout: post
 description: Explanation of how I trained a model to detect redactions in FOIA requests.
 categories: [fastai, redactionmodel, computervision, datalabelling]
-comments: false
+comments: true
 author: Alex Strick van Linschoten
 title: Training a classifier to detect redacted documents with fastai
 ---

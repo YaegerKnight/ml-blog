@@ -15,3 +15,6 @@ infrastructure and Docker.
 
 I have a PhD in History and authored [several books](https://app.thestorygraph.com/authors/54a432af-7151-490e-a2fd-61798ea14e94) based on my
 research work in Afghanistan.
+
+I have [a long-standing blog](https://www.alexstrick.com/blog) that I will combine with this one at some
+point, but for now I intend to post technical posts here.
