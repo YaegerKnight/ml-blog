@@ -37,9 +37,9 @@ Note that this stage and the next was done on my local machine. A CPU was enough
 
 At the end of the splitting-and-resizing process, I had a little over 67,000 images (of individual pages) to train with.
 
-## Labelling data with Prodigy
+## Labelling the images with Prodigy
 
-I had used Explosion.ai's [Prodigy data labelling tool](https://prodi.gy) in the past and so already had a license. The UI is clean and everything works pretty much as you'd hope. I had some teething issues getting it all working, but [Ines helped me work through those queries](https://support.prodi.gy/t/labelling-a-set-of-images-classification/4608/1) and I was up and running pretty quickly.
+I had used Explosion.ai's [Prodigy data labelling tool](https://prodi.gy) in the past and so already had a license. The interface is clean and everything works pretty much as you'd hope. I had some teething issues getting it all working, but [Prodigy co-creator Ines](https://twitter.com/_inesmontani) helped me [work through those queries](https://support.prodi.gy/t/labelling-a-set-of-images-classification/4608/1) and I was up and running pretty quickly.
 
 ![]({{ site.baseurl }}/images/prodigy-interface.png "The interface for image classification looked like this")
 
@@ -47,7 +47,7 @@ It took about three hours to annotate some 4600+ images. Then I could export a `
 
 ![]({{ site.baseurl }}/images/annotations_jsonl.png)
 
-From that point it was pretty trivial to parse the file (using [`json-lines` package](https://pypi.org/project/json-lines/)), and to resize the images down further in order to separate redacted from unredacted:
+From that point it was pretty trivial to parse the file (using the [`json-lines` package](https://pypi.org/project/json-lines/)), and to resize the images down further in order to separate redacted from unredacted:
 
 ```python
 import json_lines
@@ -67,7 +67,7 @@ path = '/my_projects_directory/redaction-model'
 redacted_path = path + "/redaction_training_data/" + "redacted"
 unredacted_path = path + "/redaction_training_data/" + "unredacted"
 
-with open(path + "/" + "annotations.jsonl", "rb") as f: # opening file in binary(rb) mode    
+with open(path + "/" + "annotations.jsonl", "rb") as f:
     for record in json_lines.reader(f):
         if record["answer"] == "accept":
             save_resized_image_file(Path(redacted_path + "/" + record['meta']['file']))
@@ -81,9 +81,11 @@ Once I had the two directories filled with the two sets of images, I zipped them
 
 I used [`magic-wormhole`](https://magic-wormhole.readthedocs.io) to transfer the files over to my [Paperspace Gradient](https://gradient.paperspace.com) machine. The files were only about 400MB in size so it took less than a minute to transfer the data.
 
-Again, ideally I wouldn't have this step of doing things locally first. I could certainly have done everything on the Paperspace machine from the very start, but it would have taken a bit of extra time to figure out how to process the data programatically.
+Again, ideally I wouldn't have this step of doing things locally first. I could certainly have done everything on the Paperspace machine from the very start, but it would have taken a bit of extra time to figure out how to process the data programatically. Moreover if I was using JupyterLab I could then [use Prodigy from within my notebooks](https://prodi.gy/docs/install#jupyterlab).
 
 ## Using the labelled data in our training
+
+
 
 ## Initial results
 
