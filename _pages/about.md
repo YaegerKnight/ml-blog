@@ -3,9 +3,15 @@ layout: page
 title: About Me
 permalink: /about/
 ---
+Hi, I'm Alex.
 
-This website is powered by **[fastpages](https://github.com/fastai/fastpages)** [^1].
+I am a software engineer based in London, UK. I recently built [Ekko](https://ekko-realtime.com),
+an open-source framework allowing developers to easily add realtime
+infrastructure and in-transit message processing to web applications.
 
+I have multiple years of experience in the Ruby and JavaScript
+ecosystems and am comfortable working with Go, PostgreSQL, AWS cloud
+infrastructure and Docker.
 
-
-[^1]:a blogging platform that natively supports Jupyter notebooks in addition to other formats.
+I have a PhD in History and authored [several books](https://app.thestorygraph.com/authors/54a432af-7151-490e-a2fd-61798ea14e94) based on my
+research work in Afghanistan.
