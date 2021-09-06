@@ -6,7 +6,7 @@ categories: [fastai, redactionmodel, computervision, datalabelling]
 comments: true
 author: Alex Strick van Linschoten
 title: Training a classifier to detect redacted documents with fastai
-image: "images/prodigy_interface.png"
+image: images/prodigy-interface.png
 ---
 
 I am working my way through [the fastai course](https://course.fast.ai) as part of an [online meetup group](https://www.meetup.com/delft-fast-ai-study-group) I host.[^1]
