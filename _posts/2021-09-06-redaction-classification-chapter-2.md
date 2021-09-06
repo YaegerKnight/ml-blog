@@ -8,7 +8,7 @@ author: Alex Strick van Linschoten
 title: Training a classifier to detect redacted documents with fastai
 ---
 # Test
-I am working my way through [the fastai course](https://course.fast.ai) as part of an [online meetup group](https://www.meetup.com/delft-fast-ai-study-group) I host.[^You can find our thread in the fastai forum [here](https://forums.fast.ai/t/virtual-study-group-delft-the-netherlands-europe-time-zone/90521).]
+I am working my way through [the fastai course](https://course.fast.ai) as part of an [online meetup group](https://www.meetup.com/delft-fast-ai-study-group) I host.[^1]
 
 This week we finished the first and second chapters of the book, during which you train a model that can recognise if an image contains a cat or a dog. Later on, you train another model that distinguishes between different types of bears ('grizzly', 'black' and 'teddy').
 
@@ -18,7 +18,7 @@ I decided to work on something adjacent to my previous life / work, where I knew
 
 ## The Problem Domain: Image Redaction
 
-Under the [Freedom of Information Act](https://en.wikipedia.org/wiki/Freedom_of_Information_Act_(United_States)) (FOIA), individuals can request records and information from the US government.[^Other countries have variations of this law, like [this](https://www.gov.uk/make-a-freedom-of-information-request) from the United Kingdom.] This is [one collection](https://www.esd.whs.mil/FOIA/Reading-Room/Reading-Room-List_2/) of some of the responses to this requests, sorted into various categories. You can read, for example, responses relating to UFOs and alien visits [here](https://www.esd.whs.mil/FOIA/Reading-Room/Reading-Room-List/UFO/).
+Under the [Freedom of Information Act](https://en.wikipedia.org/wiki/Freedom_of_Information_Act_(United_States)) (FOIA), individuals can request records and information from the US government.[^2] This is [one collection](https://www.esd.whs.mil/FOIA/Reading-Room/Reading-Room-List_2/) of some of the responses to this requests, sorted into various categories. You can read, for example, responses relating to UFOs and alien visits [here](https://www.esd.whs.mil/FOIA/Reading-Room/Reading-Room-List/UFO/).
 
 Quite often, however, these images are censored or redacted.
 
@@ -55,104 +55,7 @@ pdf processing
 - different types of redaction (handwritten vs computer) and a way to combine?
 - segmentation model?
 
-
-
-
-
-
-
-# Example Markdown Post
-
-## Basic setup
-
-Jekyll requires blog post files to be named according to the following format:
-
-`YEAR-MONTH-DAY-filename.md`
-
-Where `YEAR` is a four-digit number, `MONTH` and `DAY` are both two-digit numbers, and `filename` is whatever file name you choose, to remind yourself what this post is about. `.md` is the file extension for markdown files.
-
-The first line of the file should start with a single hash character, then a space, then your title. This is how you create a "*level 1 heading*" in markdown. Then you can create level 2, 3, etc headings as you wish but repeating the hash character, such as you see in the line `## File names` above.
-
-## Basic formatting
-
-You can use *italics*, **bold**, `code font text`, and create [links](https://www.markdownguide.org/cheat-sheet/). Here's a footnote [^1]. Here's a horizontal rule:
-
----
-
-## Lists
-
-Here's a list:
-
-- item 1
-- item 2
-
-And a numbered list:
-
-1. item 1
-1. item 2
-
-## Boxes and stuff
-
-> This is a quotation
-
-{% include alert.html text="You can include alert boxes" %}
-
-...and...
-
-{% include info.html text="You can include info boxes" %}
-
-## Images
-
-![]({{ site.baseurl }}/images/logo.png "fast.ai's logo")
-
-## Code
-
-You can format text and code per usual
-
-General preformatted text:
-
-    # Do a thing
-    do_thing()
-
-Python code and output:
-
-```python
-# Prints '2'
-print(1+1)
-```
-
-    2
-
-Formatting text as shell commands:
-
-```shell
-echo "hello world"
-./some_script.sh --option "value"
-wget https://example.com/cat_photo1.png
-```
-
-Formatting text as YAML:
-
-```yaml
-key: value
-- another_key: "another value"
-```
-
-
-## Tables
-
-| Column 1 | Column 2 |
-|-|-|
-| A thing | Another thing |
-
-
-## Tweetcards
-
-{% twitter https://twitter.com/jakevdp/status/1204765621767901185?s=20 %}
-
-
 ## Footnotes
 
-
-
-[^1]: This is the footnote.
+[^1]: You can find our thread in the fastai forum [here](https://forums.fast.ai/t/virtual-study-group-delft-the-netherlands-europe-time-zone/90521).
+[^2]: Other countries have variations of this law, like [this](https://www.gov.uk/make-a-freedom-of-information-request) from the United Kingdom.
