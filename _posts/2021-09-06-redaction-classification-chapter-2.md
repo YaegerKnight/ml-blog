@@ -7,7 +7,7 @@ comments: true
 author: Alex Strick van Linschoten
 title: Training a classifier to detect redacted documents with fastai
 ---
-# Test
+
 I am working my way through [the fastai course](https://course.fast.ai) as part of an [online meetup group](https://www.meetup.com/delft-fast-ai-study-group) I host.[^1]
 
 This week we finished the first and second chapters of the book, during which you train a model that can recognise if an image contains a cat or a dog. Later on, you train another model that distinguishes between different types of bears ('grizzly', 'black' and 'teddy').
