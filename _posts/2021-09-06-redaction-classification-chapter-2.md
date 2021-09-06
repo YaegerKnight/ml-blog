@@ -134,7 +134,7 @@ Chapter two of the course book goes into a decent amount of detail of some of th
 
 Using [MyBinder](https://mybinder.org) and the [`voila` library](https://voila.readthedocs.io), alongside instructions from the book and the forums, I managed to get my model deployed. If you visit [this address](https://hub.gke2.mybinder.org/user/strickvl-binder-redaction-s1nr4p8k/voila/render/binder-redaction-classifier.ipynb?token=kReM2K-iSkmSjud5N28o8Q) you'll see an interface where you should first upload an image — i.e. a screenshot of a document. When you click 'classify', you'll then see a prediction of whether the image is redacted or not, as well as the confidence/probability that that prediction is true.
 
-![]({{ site.baseurl }}/images/training_results.png "Part of the MyBinder interface following a successful inference")
+![]({{ site.baseurl }}/images/mybinder_interface.png "Part of the MyBinder interface following a successful inference")
 
 ## Next steps
 
