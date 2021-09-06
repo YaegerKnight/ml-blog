@@ -80,7 +80,7 @@ window.onload = wrap_img;
        • <span class="read-time" title="Estimated read time">
     
     
-      5 min read
+      9 min read
     
 </span></p>
 
@@ -111,11 +111,10 @@ window.onload = wrap_img;
 <li class="toc-entry toc-h2"><a href="#labelling-the-images-with-prodigy">Labelling the images with Prodigy</a></li>
 <li class="toc-entry toc-h2"><a href="#transferring-the-data-to-paperspace-with-magic-wormhole">Transferring the data to Paperspace with magic-wormhole</a></li>
 <li class="toc-entry toc-h2"><a href="#using-the-labelled-data-in-our-training">Using the labelled data in our training</a></li>
-<li class="toc-entry toc-h2"><a href="#initial-results">Initial results</a></li>
 <li class="toc-entry toc-h2"><a href="#experimenting-with-augmentations">Experimenting with augmentations</a></li>
 <li class="toc-entry toc-h2"><a href="#experimenting-with-different-architectures">Experimenting with different architectures</a></li>
 <li class="toc-entry toc-h2"><a href="#hosting-the-model-with-mybinder">Hosting the model with MyBinder</a></li>
-<li class="toc-entry toc-h2"><a href="#possible-next-steps">Possible next steps</a></li>
+<li class="toc-entry toc-h2"><a href="#next-steps">Next steps</a></li>
 <li class="toc-entry toc-h2"><a href="#footnotes">Footnotes</a></li>
 </ul><p>I am working my way through <a href="https://course.fast.ai">the fastai course</a> as part of an <a href="https://www.meetup.com/delft-fast-ai-study-group">online meetup group</a> I host.<sup id="fnref:1" role="doc-noteref"><a href="#fn:1" class="footnote" rel="footnote">1</a></sup></p>
 
@@ -200,27 +199,73 @@ window.onload = wrap_img;
 <h2 id="using-the-labelled-data-in-our-training">
 <a class="anchor" href="#using-the-labelled-data-in-our-training" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using the labelled data in our training</h2>
 
-<h2 id="initial-results">
-<a class="anchor" href="#initial-results" aria-hidden="true"><span class="octicon octicon-link"></span></a>Initial results</h2>
+<p>The process of ingesting all our data (labels and raw images) is pretty easy thanks to the fastai library’s convenience classes and layered structure. We’re using the <code class="language-plaintext highlighter-rouge">DataBlock</code> class instead of <code class="language-plaintext highlighter-rouge">ImageDataLoaders</code> for extra flexibility.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s">'redaction_training_data'</span><span class="p">)</span>
+
+<span class="n">foia_documents</span> <span class="o">=</span> <span class="n">DataBlock</span><span class="p">(</span>
+    <span class="n">blocks</span><span class="o">=</span><span class="p">(</span><span class="n">ImageBlock</span><span class="p">,</span> <span class="n">CategoryBlock</span><span class="p">),</span> 
+    <span class="n">get_items</span><span class="o">=</span><span class="n">get_image_files</span><span class="p">,</span> 
+    <span class="n">splitter</span><span class="o">=</span><span class="n">RandomSplitter</span><span class="p">(</span><span class="n">valid_pct</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">),</span>
+    <span class="n">get_y</span><span class="o">=</span><span class="n">parent_label</span><span class="p">,</span>
+    <span class="n">item_tfms</span><span class="o">=</span><span class="n">Resize</span><span class="p">(</span><span class="mi">224</span><span class="p">))</span>
+    
+<span class="n">dls</span> <span class="o">=</span> <span class="n">foia_documents</span><span class="p">.</span><span class="n">dataloaders</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+<span class="n">foia_documents</span> <span class="o">=</span> <span class="n">foia_documents</span><span class="p">.</span><span class="n">new</span><span class="p">(</span>
+    <span class="n">item_tfms</span><span class="o">=</span><span class="n">Resize</span><span class="p">(</span><span class="mi">224</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s">'pad'</span><span class="p">,</span> <span class="n">pad_mode</span><span class="o">=</span><span class="s">'reflection'</span><span class="p">),</span>
+    <span class="n">batch_tfms</span><span class="o">=</span><span class="n">aug_transforms</span><span class="p">(</span><span class="n">max_zoom</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">dls</span> <span class="o">=</span> <span class="n">foia_documents</span><span class="p">.</span><span class="n">dataloaders</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+<span class="n">learn</span> <span class="o">=</span> <span class="n">cnn_learner</span><span class="p">(</span><span class="n">dls</span><span class="p">,</span> <span class="n">resnet18</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">error_rate</span><span class="p">)</span>
+<span class="n">learn</span><span class="p">.</span><span class="n">fine_tune</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>The images get resized to 224x224 pixels, since this is the size that the <code class="language-plaintext highlighter-rouge">resnet</code> architecture expects. Since we have a good deal of labelled data, I’m comfortable using 80% of that data to train the model and the remaining 20% against which to validate.</p>
+
+<p>I train it for 10 epochs as I don’t appear to reach a point where I’m overfitting. As you can see from this image, we reach an accuracy of around 96%.</p>
+
+<p><img src="/images/training_results.png" alt=""></p>
 
 <h2 id="experimenting-with-augmentations">
 <a class="anchor" href="#experimenting-with-augmentations" aria-hidden="true"><span class="octicon octicon-link"></span></a>Experimenting with augmentations</h2>
 
+<p>Initially I had been using the <code class="language-plaintext highlighter-rouge">RandomResizedCrop</code> transformation on the data, but I was reminded by someone in our group (<a href="http://fabacademy.org/2021/labs/ulb/students/jason-pettiaux/fastai/">Jason</a>) that cropping or zooming our images wouldn’t be useful since it is possible that both of those transformations would remove the small part of the image where a redaction was to be found.</p>
+
+<p>In the end, I went with some settings that made sure we weren’t zooming into images or rotating them such that parts would be missing. I think there’s probably more I could squeeze out of <a href="https://docs.fast.ai/vision.augment.html#Resize">the documentation</a> here, particularly so that I’m not limiting myself too much in the arguments that I’m passing in.</p>
+
+<p>I chose the <code class="language-plaintext highlighter-rouge">pad</code> method with the <code class="language-plaintext highlighter-rouge">reflection</code> mode since this seemed to give the best results. The <code class="language-plaintext highlighter-rouge">zeros</code> mode was too close to an actual redaction (i.e. a black box on the image) so I ruled that out pretty early on.</p>
+
 <h2 id="experimenting-with-different-architectures">
 <a class="anchor" href="#experimenting-with-different-architectures" aria-hidden="true"><span class="octicon octicon-link"></span></a>Experimenting with different architectures</h2>
+
+<p>The course mentions that architectures with more layers do exist. I saw that the next step up from <code class="language-plaintext highlighter-rouge">resnet18</code> was <code class="language-plaintext highlighter-rouge">resnet50</code>. I’m certainly in the territory where I’m just turning knobs in the hope of seeing some kind of result, but I thought it was maybe worth a comparison.</p>
+
+<p>The danger with having more layers (and thus more parameters) is that the model is more likely to overfit. The training process also takes much longer to execute: 44 seconds per epoch compared to 21 seconds with <code class="language-plaintext highlighter-rouge">resnet18</code>. It didn’t seem to measurably improve the accuracy. The best results I was able to get were still around 95%, give or take a percent or two. It seems that the real improvements are to be found in the pre-processing or augmentation stage, rather than from choosing an architecture with more layers.</p>
 
 <h2 id="hosting-the-model-with-mybinder">
 <a class="anchor" href="#hosting-the-model-with-mybinder" aria-hidden="true"><span class="octicon octicon-link"></span></a>Hosting the model with MyBinder</h2>
 
-<h2 id="possible-next-steps">
-<a class="anchor" href="#possible-next-steps" aria-hidden="true"><span class="octicon octicon-link"></span></a>Possible next steps</h2>
+<p>Chapter two of the course book goes into a decent amount of detail of some of the tradeoffs and issues around model deployment. Part of the exercise is to not only train a model on your own data, but go through the steps to get the model hosted online.</p>
+
+<p>Using <a href="https://mybinder.org">MyBinder</a> and the <a href="https://voila.readthedocs.io"><code class="language-plaintext highlighter-rouge">voila</code> library</a>, alongside instructions from the book and the forums, I managed to get my model deployed. If you visit <a href="https://hub.gke2.mybinder.org/user/strickvl-binder-redaction-s1nr4p8k/voila/render/binder-redaction-classifier.ipynb?token=kReM2K-iSkmSjud5N28o8Q">this address</a> you’ll see an interface where you should first upload an image — i.e. a screenshot of a document. When you click ‘classify’, you’ll then see a prediction of whether the image is redacted or not, as well as the confidence/probability that that prediction is true.</p>
+
+<p><img src="/images/training_results.png" alt="" title="Part of the MyBinder interface following a successful inference"></p>
+
+<h2 id="next-steps">
+<a class="anchor" href="#next-steps" aria-hidden="true"><span class="octicon octicon-link"></span></a>Next steps</h2>
+
+<p>I’m at the point in the course where I know enough to be dangerous (i.e. train models), but I don’t know how to improve them from here. Some ideas I had for ways to improve the model’s accuracy:</p>
 
 <ul>
-  <li>more labelled data?</li>
-  <li>simple binary classification?</li>
-  <li>different types of redaction (handwritten vs computer) and a way to combine?</li>
-  <li>segmentation model?</li>
+  <li>better augmentation choices — it’s possible that I’ve misconfigured some argument or made the wrong choices in which augmentations should be applied.</li>
+  <li>more labelled data — this one is pretty easy to fix, but I probably shouldn’t continue down this route unless I know it’s really going to help. I’m not in a position right now to be able to judge how much it’d help me.</li>
+  <li>different redaction types — currently I have a single ‘redacted’ vs ‘unredacted’ category choice, but in reality there are several different types of redaction in the data set: some have handwritten redactions, others are square computerised boxes, and there are a couple of other types as well. I wonder whether I should train the model to recognise the different types, and then to combine those together as a ‘redacted’ set of categories. (I may be thinking about this wrong).</li>
 </ul>
+
+<p>Otherwise and for now, I’m happy with where I managed to reach with this model. I have some other ideas for how to keep going with exploring this data set. For example, even better than a slightly dumb classification model would be to have a segmentation model that was able to determine what percentage of the pixels or total area of the page that were redacted. With a reasonably accurate segmentation model of that kind, we’d then be able to provide really interesting metrics on what percentage of the information provided was redacted.</p>
+
+<p>I will probably also want to go back and add in the earlier processing steps into the notebook so that things are much closer to being an ‘end-to-end’ solution.</p>
 
 <h2 id="footnotes">
 <a class="anchor" href="#footnotes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Footnotes</h2>
