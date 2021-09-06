@@ -7,7 +7,7 @@ comments: false
 author: Alex Strick van Linschoten
 title: Training a classifier to detect redacted documents with fastai
 ---
-
+This is some sample text.
 
 
 ## The problem we're trying to solve
@@ -95,7 +95,7 @@ And a numbered list:
 
 ## Code
 
-You can format text and code per usual 
+You can format text and code per usual
 
 General preformatted text:
 
@@ -144,4 +144,3 @@ key: value
 
 
 [^1]: This is the footnote.
-
