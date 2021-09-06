@@ -17,11 +17,7 @@ I decided to work on something adjacent to my previous life / work, where I knew
 
 ## The Problem Domain: Image Redaction
 
-Under the [Freedom of Information Act](https://en.wikipedia.org/wiki/Freedom_of_Information_Act_(United_States)) (FOIA), individuals can request records and information from the US government.[^Other countries have variations of this law, like [this](https://www.gov.uk/make-a-freedom-of-information-request) from the United Kingdom.] This is [one collection](https://www.esd.whs.mil/FOIA/Reading-Room/Reading-Room-List_2/) of some of the responses to this requests, sorted into various categories. You can read, for example, responses relating to UFOs and alien visits [here](https://www.esd.whs.mil/FOIA/Reading-Room/Reading-Room-List/UFO/).
-
-Quite often, however, these images are censored or redacted.
-
-![]({{ site.baseurl }}/images/redacted_sample.png "a sample image")
+Under the Freedom of Information Act (FOIA), individuals can request records and information from the US government.[^Other countries have variations on this, like [this](https://www.gov.uk/make-a-freedom-of-information-request) from the United Kingdom.]
 
 ## Summary of chapters 1 and 2
 
