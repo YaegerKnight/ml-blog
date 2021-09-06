@@ -108,7 +108,7 @@ window.onload = wrap_img;
     <ul class="section-nav">
 <li class="toc-entry toc-h2"><a href="#the-problem-domain-image-redaction">The Problem Domain: Image Redaction</a></li>
 <li class="toc-entry toc-h2"><a href="#getting-the-data">Getting the Data</a></li>
-<li class="toc-entry toc-h2"><a href="#labelling-data-with-prodigy">Labelling data with Prodigy</a></li>
+<li class="toc-entry toc-h2"><a href="#labelling-the-images-with-prodigy">Labelling the images with Prodigy</a></li>
 <li class="toc-entry toc-h2"><a href="#transferring-the-data-to-paperspace-with-magic-wormhole">Transferring the data to Paperspace with magic-wormhole</a></li>
 <li class="toc-entry toc-h2"><a href="#using-the-labelled-data-in-our-training">Using the labelled data in our training</a></li>
 <li class="toc-entry toc-h2"><a href="#initial-results">Initial results</a></li>
@@ -149,10 +149,10 @@ window.onload = wrap_img;
 
 <p>At the end of the splitting-and-resizing process, I had a little over 67,000 images (of individual pages) to train with.</p>
 
-<h2 id="labelling-data-with-prodigy">
-<a class="anchor" href="#labelling-data-with-prodigy" aria-hidden="true"><span class="octicon octicon-link"></span></a>Labelling data with Prodigy</h2>
+<h2 id="labelling-the-images-with-prodigy">
+<a class="anchor" href="#labelling-the-images-with-prodigy" aria-hidden="true"><span class="octicon octicon-link"></span></a>Labelling the images with Prodigy</h2>
 
-<p>I had used Explosion.ai’s <a href="https://prodi.gy">Prodigy data labelling tool</a> in the past and so already had a license. The UI is clean and everything works pretty much as you’d hope. I had some teething issues getting it all working, but <a href="https://support.prodi.gy/t/labelling-a-set-of-images-classification/4608/1">Ines helped me work through those queries</a> and I was up and running pretty quickly.</p>
+<p>I had used Explosion.ai’s <a href="https://prodi.gy">Prodigy data labelling tool</a> in the past and so already had a license. The interface is clean and everything works pretty much as you’d hope. I had some teething issues getting it all working, but <a href="https://twitter.com/_inesmontani">Prodigy co-creator Ines</a> helped me <a href="https://support.prodi.gy/t/labelling-a-set-of-images-classification/4608/1">work through those queries</a> and I was up and running pretty quickly.</p>
 
 <p><img src="/images/prodigy-interface.png" alt="" title="The interface for image classification looked like this"></p>
 
@@ -160,7 +160,7 @@ window.onload = wrap_img;
 
 <p><img src="/images/annotations_jsonl.png" alt=""></p>
 
-<p>From that point it was pretty trivial to parse the file (using <a href="https://pypi.org/project/json-lines/"><code class="language-plaintext highlighter-rouge">json-lines</code> package</a>), and to resize the images down further in order to separate redacted from unredacted:</p>
+<p>From that point it was pretty trivial to parse the file (using the <a href="https://pypi.org/project/json-lines/"><code class="language-plaintext highlighter-rouge">json-lines</code> package</a>), and to resize the images down further in order to separate redacted from unredacted:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">json_lines</span>
 <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
@@ -179,8 +179,8 @@ window.onload = wrap_img;
 <span class="n">redacted_path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">+</span> <span class="s">"/redaction_training_data/"</span> <span class="o">+</span> <span class="s">"redacted"</span>
 <span class="n">unredacted_path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">+</span> <span class="s">"/redaction_training_data/"</span> <span class="o">+</span> <span class="s">"unredacted"</span>
 
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s">"/"</span> <span class="o">+</span> <span class="s">"annotations.jsonl"</span><span class="p">,</span> <span class="s">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span> <span class="c1"># opening file in binary(rb) mode    
-</span>    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">json_lines</span><span class="p">.</span><span class="n">reader</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s">"/"</span> <span class="o">+</span> <span class="s">"annotations.jsonl"</span><span class="p">,</span> <span class="s">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">json_lines</span><span class="p">.</span><span class="n">reader</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">record</span><span class="p">[</span><span class="s">"answer"</span><span class="p">]</span> <span class="o">==</span> <span class="s">"accept"</span><span class="p">:</span>
             <span class="n">save_resized_image_file</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">redacted_path</span> <span class="o">+</span> <span class="s">"/"</span> <span class="o">+</span> <span class="n">record</span><span class="p">[</span><span class="s">'meta'</span><span class="p">][</span><span class="s">'file'</span><span class="p">]))</span>
         <span class="k">else</span><span class="p">:</span>
@@ -195,7 +195,7 @@ window.onload = wrap_img;
 
 <p>I used <a href="https://magic-wormhole.readthedocs.io"><code class="language-plaintext highlighter-rouge">magic-wormhole</code></a> to transfer the files over to my <a href="https://gradient.paperspace.com">Paperspace Gradient</a> machine. The files were only about 400MB in size so it took less than a minute to transfer the data.</p>
 
-<p>Again, ideally I wouldn’t have this step of doing things locally first. I could certainly have done everything on the Paperspace machine from the very start, but it would have taken a bit of extra time to figure out how to process the data programatically.</p>
+<p>Again, ideally I wouldn’t have this step of doing things locally first. I could certainly have done everything on the Paperspace machine from the very start, but it would have taken a bit of extra time to figure out how to process the data programatically. Moreover if I was using JupyterLab I could then <a href="https://prodi.gy/docs/install#jupyterlab">use Prodigy from within my notebooks</a>.</p>
 
 <h2 id="using-the-labelled-data-in-our-training">
 <a class="anchor" href="#using-the-labelled-data-in-our-training" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using the labelled data in our training</h2>
