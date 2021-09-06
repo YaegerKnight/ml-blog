@@ -6,7 +6,9 @@ categories: [fastai, redactionmodel, computervision, datalabelling]
 comments: true
 author: Alex Strick van Linschoten
 title: Training a classifier to detect redacted documents with fastai
+image: images/prodigy_interface.png
 ---
+
 I am working my way through [the fastai course](https://course.fast.ai) as part of an [online meetup group](https://www.meetup.com/delft-fast-ai-study-group) I host.[^1]
 
 This week we finished the first and second chapters of the book, during which you train a model that can recognise if an image contains a cat or a dog. Later on, you train another model that distinguishes between different types of bears ('grizzly', 'black' and 'teddy').
@@ -17,7 +19,7 @@ I decided to work on something adjacent to my previous life / work, where I knew
 
 ## The Problem Domain: Image Redaction
 
-Under the [Freedom of Information Act](https://en.wikipedia.org/wiki/Freedom_of_Information_Act_(United_States)) (FOIA), individuals can request records and information from the US government.[^2] This is [one collection](https://www.esd.whs.mil/FOIA/Reading-Room/Reading-Room-List_2/) of some of the responses to this requests, sorted into various categories. You can read, for example, responses relating to UFOs and alien visits [here](https://www.esd.whs.mil/FOIA/Reading-Room/Reading-Room-List/UFO/).
+Under the [Freedom of Information Act](<https://en.wikipedia.org/wiki/Freedom_of_Information_Act_(United_States)>) (FOIA), individuals can request records and information from the US government.[^2] This is [one collection](https://www.esd.whs.mil/FOIA/Reading-Room/Reading-Room-List_2/) of some of the responses to this requests, sorted into various categories. You can read, for example, responses relating to UFOs and alien visits [here](https://www.esd.whs.mil/FOIA/Reading-Room/Reading-Room-List/UFO/).
 
 Quite often, however, these images are censored or redacted.
 
@@ -91,12 +93,12 @@ The process of ingesting all our data (labels and raw images) is pretty easy tha
 path = Path('redaction_training_data')
 
 foia_documents = DataBlock(
-    blocks=(ImageBlock, CategoryBlock), 
-    get_items=get_image_files, 
+    blocks=(ImageBlock, CategoryBlock),
+    get_items=get_image_files,
     splitter=RandomSplitter(valid_pct=0.2, seed=42),
     get_y=parent_label,
     item_tfms=Resize(224))
-    
+
 dls = foia_documents.dataloaders(path)
 
 foia_documents = foia_documents.new(
