@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Six problems TFX was trying to solve in 2017 | mlops.systems</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Six problems TFX was trying to solve in 2017" />
+<meta name="author" content="Alex Strick van Linschoten" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="I extracted the core problems that TensorFlow Extended (TFX) was looking to solve from its 2017 public launch paper." />
+<meta property="og:description" content="I extracted the core problems that TensorFlow Extended (TFX) was looking to solve from its 2017 public launch paper." />
+<link rel="canonical" href="https://www.mlops.systems/tfx/tensorflow/google/mlops/2021/09/11/tfx-paper.html" />
+<meta property="og:url" content="https://www.mlops.systems/tfx/tensorflow/google/mlops/2021/09/11/tfx-paper.html" />
+<meta property="og:site_name" content="mlops.systems" />
+<meta property="og:image" content="https://www.mlops.systems/images/tensorflow-extended-tfx-logo-social.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-09-11T00:00:00-05:00" />
+<script type="application/ld+json">
+{"datePublished":"2021-09-11T00:00:00-05:00","url":"https://www.mlops.systems/tfx/tensorflow/google/mlops/2021/09/11/tfx-paper.html","@type":"BlogPosting","dateModified":"2021-09-11T00:00:00-05:00","image":"https://www.mlops.systems/images/tensorflow-extended-tfx-logo-social.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.mlops.systems/tfx/tensorflow/google/mlops/2021/09/11/tfx-paper.html"},"author":{"@type":"Person","name":"Alex Strick van Linschoten"},"headline":"Six problems TFX was trying to solve in 2017","description":"I extracted the core problems that TensorFlow Extended (TFX) was looking to solve from its 2017 public launch paper.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://www.mlops.systems/feed.xml" title="mlops.systems" /><link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">mlops.systems</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About Me</a><a class="page-link" href="/search/">Search</a><a class="page-link" href="/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Six problems TFX was trying to solve in 2017</h1><p class="page-description">I extracted the core problems that TensorFlow Extended (TFX) was looking to solve from its 2017 public launch paper.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2021-09-11T00:00:00-05:00" itemprop="datePublished">
+        Sep 11, 2021
+      </time>• 
+          <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+            <span class="p-author h-card" itemprop="name">Alex Strick van Linschoten</span></span>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      8 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/categories/#tfx">tfx</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#tensorflow">tensorflow</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#google">google</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#mlops">mlops</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h2"><a href="#a-tensorflow-based-general-purpose-machine-learning-platform">‘A TensorFlow-based general-purpose machine learning platform’</a></li>
+<li class="toc-entry toc-h2"><a href="#an-end-to-end-platform">An end-to-end platform</a></li>
+<li class="toc-entry toc-h2"><a href="#continuous-training-and-serving">Continuous training and serving</a></li>
+<li class="toc-entry toc-h1"><a href="#reduce-technical-debt-accrued-via-duplicated-or-ad-hoc-solutions">Reduce technical debt accrued via duplicated or ad hoc solutions</a>
+<ul>
+<li class="toc-entry toc-h2"><a href="#reliable-serving-models-at-scale">Reliable serving models at scale</a></li>
+<li class="toc-entry toc-h2"><a href="#fast-retraining-with-warm-starting">Fast retraining with ‘warm-starting’</a></li>
+<li class="toc-entry toc-h2"><a href="#missing-pieces">Missing pieces</a></li>
+</ul>
+</li>
+</ul><p><a href="https://www.tensorflow.org/tfx">TensorFlow Extended</a> or TFX is a platform for machine learning that claims to handle pretty much everything you’d need for end-to-end model training, deployment and retraining. It was developed for Google, the successor to <a href="https://www.kdnuggets.com/2014/08/sibyl-google-system-large-scale-machine-learning.html">Sibyl</a>, and released in public in 2017. I read <a href="https://www.kdd.org/kdd2017/papers/view/tfx-a-tensorflow-based-production-scale-machine-learning-platform">the original paper</a> that accompanied its release to understand the problems it was trying to solve, as well as to get a handle on the specific context in which it was developed. (It’s worth being wary about tools developed at places like Google; after all, <a href="https://blog.bradfieldcs.com/you-are-not-google-84912cf44afb">hardly any of us</a> are operating at Google-scale).</p>
+
+<h2 id="a-tensorflow-based-general-purpose-machine-learning-platform">
+<a class="anchor" href="#a-tensorflow-based-general-purpose-machine-learning-platform" aria-hidden="true"><span class="octicon octicon-link"></span></a>‘A TensorFlow-based general-purpose machine learning platform’</h2>
+
+<p>The engineers wanted a general-purpose tool, one that could serve many different use cases. I haven’t yet read <a href="https://arxiv.org/abs/2010.02013">the subsequent paper</a> on the history of TFX, but from what I do know already there were other in-house solutions that existed before. Machine learning model training at scale, deployment and the general full-cycle behaviours are pretty involved and challenging, and it often seems like the needs of particular scenarios demand different approaches. This is as much true now as it was back int 2017, I imagine, though perhaps now we have some ideas of the broad pieces that make up the whole picture that needs to be addressed.</p>
+
+<p>The problem here is that you might have certain parts that either are very compute intensive, or require special distributed computing setups, or where the models need to be trained off streaming data rather than from static stores. So with TFX they tried to make the tool sufficiently abstract that they could handle most cases someone would want to use it for. (They say at the end that there were some parts that they hadn’t anticipated, specifically sequence-to-sequence language models used in machine translation).</p>
+
+<h2 id="an-end-to-end-platform">
+<a class="anchor" href="#an-end-to-end-platform" aria-hidden="true"><span class="octicon octicon-link"></span></a>An end-to-end platform</h2>
+
+<p>The ambition for the platform and software tooling was not just to handle the smaller pieces of the training and deployment cycle, but rather to tackle the big overarching abstractions in a single approach. This of course contained some baked-in assumptions about how users would use TFX as well as what I’d say were quasi-philosophical positions on how best to approach these various parts. The paper characterises these as ‘best practices’, but certainly there hasn’t been uniform acceptance of these.</p>
+
+<p>I imagine the end-to-end part was as much an attempt to encourage engineers to think of the problem in this exact way. If you are handling all the pieces of the training cycle, it’s easier to be fast and iterate and do all the things we expect of a more agile process.</p>
+
+<h2 id="continuous-training-and-serving">
+<a class="anchor" href="#continuous-training-and-serving" aria-hidden="true"><span class="octicon octicon-link"></span></a>Continuous training and serving</h2>
+
+<p>TFX was built to handle the kinds of models where the use cases demanded the ability to continuously retrain models using large quantities of streaming data. This is almost certainly not the norm, but for a company like Google I can understand that this would have been a key consideration if they wanted adoption of the tool across different teams.</p>
+
+<p>In this way, certain scenarios (for example the Google Play Store case study outlined in the paper) saw a continuous retraining of models as more users used the service as well as new apps continued to be uploaded to the Play Store. If you have this kind of engineering need, and if you need to keep latency to certain boundaries (in the tens of milliseconds), it makes complete sense to have this whole structure that allows this to take place. Reading the specific example, it’s a pretty amazing feat, handling all that complexity underneath the surface. There must be many hundreds of other such services which similar levels of complexity concealed beneath the surface.</p>
+
+<h1 id="reduce-technical-debt-accrued-via-duplicated-or-ad-hoc-solutions">
+<a class="anchor" href="#reduce-technical-debt-accrued-via-duplicated-or-ad-hoc-solutions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Reduce technical debt accrued via duplicated or ad hoc solutions</h1>
+
+<p>Prior to TFX and Sybil, it seems that there were many different approaches within Google, all addressing the same problem but in slightly different ways.</p>
+
+<p>Having a series of best-practices built in to the service means that everyone can communicate about problems and about their issues using a shared language. It means that solutions discovered by one team can help other future teams. There’s a lot to be said for finding a solution that is sufficiently abstracted to work for many people.</p>
+
+<p>Indeed, it seems this is the work of the MLOps community right now: find ways to abstract away problems that we all face, and to find the best abstractions that fit within the mental models we all have in our heads. The fact that there hasn’t been a grand convergence on a single solution indicates to me (at this current moment) that we haven’t found the right abstractions or flexibility within those abstractions. All the end-to-end tools handle much of the same stages of the model training and deployment process, but they each have opinions about the best practices to be employed along the way. (At least, that’s my current take on things).</p>
+
+<h2 id="reliable-serving-models-at-scale">
+<a class="anchor" href="#reliable-serving-models-at-scale" aria-hidden="true"><span class="octicon octicon-link"></span></a>Reliable serving models at scale</h2>
+
+<p>If you’re Google, you need to make sure that you aren’t serving garbage models to your users, or that inconsistencies in the input data aren’t polluting your retraining processes. At scale, even small mistakes compound really easily.</p>
+
+<p>In the paper, two specific improvements are mentioned, tackling the challenges of low latency and high efficiency. The high efficiency example wasn’t entirely comprehensible for me, but what was clear was that they had very high expectations for how fast they wanted to make all parts of the pipelines and process. As above, the challenges of making it easy and fast to serve models — all of which had to happen in a reliable manner — was something that could be reused elsewhere in the company. <a href="https://www.tensorflow.org/tfx/guide/serving">TensorFlow Serving</a> is what we get from their efforts in this regard.</p>
+
+<h2 id="fast-retraining-with-warm-starting">
+<a class="anchor" href="#fast-retraining-with-warm-starting" aria-hidden="true"><span class="octicon octicon-link"></span></a>Fast retraining with ‘warm-starting’</h2>
+
+<p>For the specific challenge of retraining models with streaming data, engineers were finding that they couldn’t retrain the entire model from scratch, particularly with the scale of the training data that they had. Instead, they leveraged transfer learning (reframed here as ‘warm-starting’) to take all the hard work that had already been done, and adapting this pre-existing model with the new data. This makes a lot of sense, though the reframing with the new term is a bit less comprehensible to me.</p>
+
+<h2 id="missing-pieces">
+<a class="anchor" href="#missing-pieces" aria-hidden="true"><span class="octicon octicon-link"></span></a>Missing pieces</h2>
+
+<p>There are various pieces of what I think of as the machine learning workflow (as of 2021) which seem to be missing when I read this paper. Explainability or governance of models seems somewhat of an afterthought, if it is raised at all. I think the authors might argue that many of the checks and balances are made on the data ingestion phase, and that if all that checks out then this tackles a large piece of the problem surface area.</p>
+
+<p>Similarly, there is relatively little said about model versioning and data versioning. Maybe coming at this from the present moment, where it seems obvious (with tools like <a href="https://dvc.org">DVC</a>) that data versioning is a thing you’d want to care about.</p>
+
+<p>As a general response, it seems clear that if you use <a href="https://www.tensorflow.org">TensorFlow</a> to train your models, TFX might well be a pretty neat solution that handles many of your needs, particularly if you’re operating at serious scale. If you’re a researcher (perhaps using <a href="https://pytorch.org">PyTorch</a>) with less of those specific contextual needs, it seems less than certain that TFX would suit your purposes.</p>
+
+<p>A couple of other interesting observations. The data observability and validation stage seemed to place a lot of emphasis on the automation of how pre-defined schemas might get updated. I’d be interested to see how that worked in practice. I understood the challenge that if there are too many error messages about dodgy data inputs, engineers are likely to grow inured to those alerts and maybe just ignore them. But at scale, I wonder about the risks of allowing automatic updates to those schema boundaries.</p>
+
+<p>Again on the validation point, I found it interesting how the authors of the paper said that users of TFX internal to Google found the option to enable this was actually a hard sell unless or until the team had experienced some kind of failure connected to poor data validation. The TFX team ended up turning on the validation parts of the pipeline by default instead of assuming that users would choose to do so manually.</p>
+
+<p>I wasn’t active in the field in 2017, so it’s hard for me to be able to reconstruct exactly how prescient or not this paper was in some of its diagnoses of the problem. It doesn’t seem that TFX was the total solution that perhaps it was pitched as being, but nonetheless it seems an important engineering achievement for Google.</p>
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="strickvl/ml-blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/tfx/tensorflow/google/mlops/2021/09/11/tfx-paper.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>A place to share my technical learnings.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/strickvl" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/strickvl" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
