@@ -145,6 +145,12 @@ The `add` command adds required packages to your `pyproject.toml` and installs t
 poetry add zenml
 ```
 
+To add packages only to be used in the development environment:
+
+```bash
+poetry add --dev zenml
+```
+
 To list all installed packages in your current environment / project:
 
 ```bash
