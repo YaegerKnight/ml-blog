@@ -130,29 +130,29 @@ window.onload = wrap_img;
 
 <p>To see which versions of Python you have installed locally:</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pyenv versions
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pyenv versions
 </code></pre></div></div>
 
 <p>To see versions of Python which are available for installation:</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pyenv install —list
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pyenv <span class="nb">install</span> —list
 </code></pre></div></div>
 
 <p>Note that, as I understand it, these versions are not dynamically updated. You get an updated list of new Python versions by updating <code class="language-plaintext highlighter-rouge">pyenv</code>, in other words.</p>
 
 <p>To install a specific version of Python, and to make it available for use:</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pyenv install 3.9.1
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pyenv <span class="nb">install </span>3.9.1
 </code></pre></div></div>
 
 <p>To set that version of Python as the global version (i.e. running <code class="language-plaintext highlighter-rouge">python</code> will use this version by default):</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pyenv global 3.9.1
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pyenv global 3.9.1
 </code></pre></div></div>
 
 <p>If you are in a project directory and wish to only use a particular version of Python in that directory (and its subdirectories):</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pyenv local 3.8.2
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pyenv <span class="nb">local </span>3.8.2
 </code></pre></div></div>
 
 <p>This creates a <code class="language-plaintext highlighter-rouge">.python-version</code> file in that directory with the desired local version.</p>
@@ -166,33 +166,33 @@ window.onload = wrap_img;
 
 <p>To create a virtual environment for the Python version used with <code class="language-plaintext highlighter-rouge">pyenv</code>, run <code class="language-plaintext highlighter-rouge">pyenv virtualenv</code>, specifying the Python version you want and the name of the virtual environment directory:</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pyenv virtualenv 3.8.2 my-virtual-env-3.8.2
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pyenv virtualenv 3.8.2 my-virtual-env-3.8.2
 </code></pre></div></div>
 
 <p>This will create a virtual environment based on Python 3.8.2 under <code class="language-plaintext highlighter-rouge">$(pyenv root)/versions</code> in a folder called <code class="language-plaintext highlighter-rouge">my-virtual-env-3.8.2</code>.</p>
 
 <p>To list what virtual environments have been created and are available to use:</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pyenv virtualenvs
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pyenv virtualenvs
 </code></pre></div></div>
 
 <p>As a common workflow pattern, you’d create your directory and <code class="language-plaintext highlighter-rouge">cd</code> into it, and then you can set the virtual environment you just created as the one to use for that directory:</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mkdir test-project &amp;&amp; cd test-project
-pyenv local my-virtual-env-3.8.2
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mkdir </span>test-project <span class="o">&amp;&amp;</span> <span class="nb">cd </span>test-project
+pyenv <span class="nb">local </span>my-virtual-env-3.8.2
 </code></pre></div></div>
 
 <p>This should change the prompt in your terminal window and you’ll thus know that you’re now working out of that virtual environment. Any time you return to that folder you’ll automatically switch to that environment.</p>
 
 <p>The manual way of turning on and off virtual environments is:</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pyenv activate env-name
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pyenv activate env-name
 pyenv deactivate env-name
 </code></pre></div></div>
 
 <p>To remove a virtual environment from your system:</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pyenv uninstall my-virtual-env
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pyenv uninstall my-virtual-env
 </code></pre></div></div>
 
 <p>(This is the functional equivalent of removing the directories in <code class="language-plaintext highlighter-rouge">$(pyenv root)/versions</code> and <code class="language-plaintext highlighter-rouge">$(pyenv root)/versions/{version}/envs</code>.)</p>
@@ -206,14 +206,14 @@ pyenv deactivate env-name
 
 <p>Then update <code class="language-plaintext highlighter-rouge">poetry</code>:</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>poetry self update
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>poetry self update
 </code></pre></div></div>
 
 <p><code class="language-plaintext highlighter-rouge">poetry</code> is one of those tools that’s able to update itself.</p>
 
 <p>For basic usage for a new project, you can follow the following workflow. There are two ways to start a new project using <code class="language-plaintext highlighter-rouge">poetry</code>: using <code class="language-plaintext highlighter-rouge">new</code> or <code class="language-plaintext highlighter-rouge">init</code>. For example:</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>poetry new some-project-name
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>poetry new some-project-name
 </code></pre></div></div>
 
 <p>This will kickstart your new project by creating a bunch of files and a directory structure suitable for most projects, like so:</p>
@@ -230,29 +230,29 @@ pyenv deactivate env-name
 
 <p>You might want to use a <code class="language-plaintext highlighter-rouge">src</code> folder (above the <code class="language-plaintext highlighter-rouge">some-project-name</code> in our example) which is fairly commonly used, in which case amend the command as follows:</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>poetry new --src some-project-name
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>poetry new <span class="nt">--src</span> some-project-name
 </code></pre></div></div>
 
 <p><code class="language-plaintext highlighter-rouge">poetry init</code> doesn’t do all the extra work of creating a directory and file structure. It merely creates a <code class="language-plaintext highlighter-rouge">pyproject.toml</code> file interactively, using some smart defaults. For a minimal use of <code class="language-plaintext highlighter-rouge">poetry</code>, this is definitely the way to go.</p>
 
 <p>The <code class="language-plaintext highlighter-rouge">add</code> command adds required packages to your <code class="language-plaintext highlighter-rouge">pyproject.toml</code> and installs them (along with all their dependencies). It does a lot under the hood to make sure that dependencies are correctly resolving before installing. For example:</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>poetry add zenml
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>poetry add zenml
 </code></pre></div></div>
 
 <p>To list all installed packages in your current environment / project:</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>poetry show
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>poetry show
 </code></pre></div></div>
 
 <p>To uninstall a package and remove it (and its dependencies) from the project:</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>poetry remove zenml
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>poetry remove zenml
 </code></pre></div></div>
 
 <p>To install all relevant packages and dependencies of a project that you’ve newly cloned into:</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>poetry install
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>poetry <span class="nb">install</span>
 </code></pre></div></div>
 
 <p>Note that it is possibly worth creating some custom scripts to handle some of the overhead of using these tools, depending on your common development workflows.</p>
