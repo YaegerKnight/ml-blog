@@ -1,7 +1,7 @@
 ---
 toc: true
 layout: post
-description: Getting a development environment setup for Python and having to choose between `pyenv` vs `virtualenv` vs `venv`
+description: Getting a development environment setup for Python and having to choose between pyenv vs virtualenv vs venv
 categories: [python, tools]
 comments: true
 author: Alex Strick van Linschoten
