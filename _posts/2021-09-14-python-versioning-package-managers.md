@@ -22,13 +22,13 @@ Visit the [pyenv github page](https://github.com/pyenv/pyenv) for more on instal
 
 To see which versions of Python you have installed locally:
 
-```
+```bash
 pyenv versions
 ```
 
 To see versions of Python which are available for installation:
 
-```
+```bash
 pyenv install —list
 ```
 
@@ -36,19 +36,19 @@ Note that, as I understand it, these versions are not dynamically updated. You g
 
 To install a specific version of Python, and to make it available for use:
 
-```
+```bash
 pyenv install 3.9.1
 ```
 
 To set that version of Python as the global version (i.e. running `python` will use this version by default):
 
-```
+```bash
 pyenv global 3.9.1
 ```
 
 If you are in a project directory and wish to only use a particular version of Python in that directory (and its subdirectories):
 
-```
+```bash
 pyenv local 3.8.2
 ```
 
@@ -62,7 +62,7 @@ Read installation instructions and the docs [here](https://github.com/pyenv/pyen
 
 To create a virtual environment for the Python version used with `pyenv`, run `pyenv virtualenv`, specifying the Python version you want and the name of the virtual environment directory:
 
-```
+```bash
 pyenv virtualenv 3.8.2 my-virtual-env-3.8.2
 ```
 
@@ -70,13 +70,13 @@ This will create a virtual environment based on Python 3.8.2 under `$(pyenv root
 
 To list what virtual environments have been created and are available to use:
 
-```
+```bash
 pyenv virtualenvs
 ```
 
 As a common workflow pattern, you'd create your directory and `cd` into it, and then you can set the virtual environment you just created as the one to use for that directory:
 
-```
+```bash
 mkdir test-project && cd test-project
 pyenv local my-virtual-env-3.8.2
 ```
@@ -85,14 +85,14 @@ This should change the prompt in your terminal window and you'll thus know that 
 
 The manual way of turning on and off virtual environments is:
 
-```
+```bash
 pyenv activate env-name
 pyenv deactivate env-name
 ```
 
 To remove a virtual environment from your system:
 
-```
+```bash
 pyenv uninstall my-virtual-env
 ```
 
@@ -106,7 +106,7 @@ You can use `poetry` without the previous two tools, but really they work best a
 
 Then update `poetry`:
 
-```
+```bash
 poetry self update
 ```
 
@@ -114,7 +114,7 @@ poetry self update
 
 For basic usage for a new project, you can follow the following workflow. There are two ways to start a new project using `poetry`: using `new` or `init`. For example:
 
-```
+```bash
 poetry new some-project-name
 ```
 
@@ -133,7 +133,7 @@ some-project-name
 
 You might want to use a `src` folder (above the `some-project-name` in our example) which is fairly commonly used, in which case amend the command as follows:
 
-```
+```bash
 poetry new --src some-project-name
 ```
 
@@ -141,25 +141,25 @@ poetry new --src some-project-name
 
 The `add` command adds required packages to your `pyproject.toml` and installs them (along with all their dependencies). It does a lot under the hood to make sure that dependencies are correctly resolving before installing. For example:
 
-```
+```bash
 poetry add zenml
 ```
 
 To list all installed packages in your current environment / project:
 
-```
+```bash
 poetry show
 ```
 
 To uninstall a package and remove it (and its dependencies) from the project:
 
-```
+```bash
 poetry remove zenml
 ```
 
 To install all relevant packages and dependencies of a project that you've newly cloned into:
 
-```
+```bash
 poetry install
 ```
 
