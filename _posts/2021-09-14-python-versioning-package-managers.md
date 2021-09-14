@@ -8,6 +8,7 @@ author: Alex Strick van Linschoten
 title: A Baseline Python Development Setup
 image: images/pyenv_terminal_output.png
 ---
+
 The world of Python versioning (and the downstream package versioning) is wild. This [StackOverflow thread](https://stackoverflow.com/questions/41573587/what-is-the-difference-between-venv-pyvenv-pyenv-virtualenv-virtualenvwrappe) gives you a sense of some of the core issues at play. (As an indication of the importance of the issue, even [BDFL](https://www.urbandictionary.com/define.php?term=BDFL) Guido van Rossum himself has the current second most upvoted answer.)
 
 For a really vanilla and close-to-core-python setup, a combination of `venv` and `pip` seem to be the way to go. `venv` is part of the standard library and as such is pretty close to a default option.
@@ -100,7 +101,7 @@ pyenv uninstall my-virtual-env
 
 ## `poetry` for handling package installation and dependencies
 
-[`python-poetry`](https://python-poetry.org) is the latest standard tool for handling package installations and dependency management. 
+[`python-poetry`](https://python-poetry.org) is the latest standard tool for handling package installations and dependency management.
 
 You can use `poetry` without the previous two tools, but really they work best all together. Follow the [installation instructions](https://python-poetry.org/docs/#installation) documented [on their page](https://python-poetry.org/docs/#installation) to get it going.
 
