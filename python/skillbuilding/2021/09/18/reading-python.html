@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Reading Python Code | mlops.systems</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Reading Python Code" />
+<meta name="author" content="Alex Strick van Linschoten" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Some of the code libraries I plan on reading to improve my Pythonic style" />
+<meta property="og:description" content="Some of the code libraries I plan on reading to improve my Pythonic style" />
+<link rel="canonical" href="https://www.mlops.systems/python/skillbuilding/2021/09/18/reading-python.html" />
+<meta property="og:url" content="https://www.mlops.systems/python/skillbuilding/2021/09/18/reading-python.html" />
+<meta property="og:site_name" content="mlops.systems" />
+<meta property="og:image" content="https://www.mlops.systems/images/python-code.jpeg" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-09-18T00:00:00-05:00" />
+<script type="application/ld+json">
+{"datePublished":"2021-09-18T00:00:00-05:00","url":"https://www.mlops.systems/python/skillbuilding/2021/09/18/reading-python.html","@type":"BlogPosting","dateModified":"2021-09-18T00:00:00-05:00","image":"https://www.mlops.systems/images/python-code.jpeg","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.mlops.systems/python/skillbuilding/2021/09/18/reading-python.html"},"author":{"@type":"Person","name":"Alex Strick van Linschoten"},"headline":"Reading Python Code","description":"Some of the code libraries I plan on reading to improve my Pythonic style","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://www.mlops.systems/feed.xml" title="mlops.systems" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script
+  defer
+  data-domain="mlops.systems"
+  src="https://plausible.io/js/plausible.js"
+></script>
+
+
+<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">mlops.systems</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About Me</a><a class="page-link" href="/search/">Search</a><a class="page-link" href="/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Reading Python Code</h1><p class="page-description">Some of the code libraries I plan on reading to improve my Pythonic style</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2021-09-18T00:00:00-05:00" itemprop="datePublished">
+        Sep 18, 2021
+      </time>• 
+          <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+            <span class="p-author h-card" itemprop="name">Alex Strick van Linschoten</span></span>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      1 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/categories/#python">python</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#skillbuilding">skillbuilding</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h2"><a href="#good-quality-python-code">Good Quality Python Code</a></li>
+<li class="toc-entry toc-h2"><a href="#other-resources">Other Resources</a></li>
+</ul><p>It’s a truism of sorts that in order to improve your skills, you have to practice them. For coding, the stereotypical image is of someone typing, actually creating new things. But as often as not, you’re going to be <em>reading</em> code instead. This code might be something you write yesterday or last year, or it might be something that someone else wrote.</p>
+
+<p>One way or another, reading code is a great way to get increasing familiarity with stylistic, syntactic patterns and to get exposed to some best practices, especially if you get to pick the code you’re reading.</p>
+
+<p>I’ll be doing the same as I ramp up my Python proficiency. I wanted to gather some lists of codebases and assorted resources in one place for myself, and I hope maybe it’ll be useful for someone else as well.</p>
+
+<h2 id="good-quality-python-code">
+<a class="anchor" href="#good-quality-python-code" aria-hidden="true"><span class="octicon octicon-link"></span></a>Good Quality Python Code</h2>
+
+<ul>
+  <li>
+<a href="https://jinja.palletsprojects.com/en/3.0.x/"><code class="language-plaintext highlighter-rouge">jinja</code></a> — a templating engine written in Python (and see the recommendations for supplemental reading and watching for <code class="language-plaintext highlighter-rouge">jinja</code> <a href="https://death.andgravity.com/aosa">here</a>)</li>
+  <li>
+<a href="https://github.com/gleitz/howdoi"><code class="language-plaintext highlighter-rouge">howdoi</code></a> — a search tool for coding answers via the command line</li>
+  <li>
+<a href="https://github.com/pallets/flask"><code class="language-plaintext highlighter-rouge">flask</code></a> — a micro-web framework for Python</li>
+  <li>
+<a href="https://fastapi.tiangolo.com"><code class="language-plaintext highlighter-rouge">FastAPI</code></a> — another web framework that’s a bit larger than flask</li>
+  <li>
+<a href="https://github.com/python-diamond/Diamond"><code class="language-plaintext highlighter-rouge">diamond</code></a> — a Python daemon that collects and publishes system metrics</li>
+  <li>
+<a href="https://github.com/pallets/werkzeug"><code class="language-plaintext highlighter-rouge">werkzeug</code></a> — a web server gateway library</li>
+  <li>
+<a href="https://docs.python-requests.org/en/latest/"><code class="language-plaintext highlighter-rouge">requests</code></a> — an HTTP library, now part of the Python standard library</li>
+  <li>
+<a href="https://tablib.readthedocs.io/en/stable/"><code class="language-plaintext highlighter-rouge">tablib</code></a> — library for Pythonic way to work with tabular datasets</li>
+  <li>
+<a href="https://click.palletsprojects.com/en/8.0.x/"><code class="language-plaintext highlighter-rouge">click</code></a> — a Python package for creating command line interfaces</li>
+  <li>
+<a href="https://docs.python.org/3/library/pathlib.html"><code class="language-plaintext highlighter-rouge">pathlib</code></a> — part of the Python standard library; a module to handle filesystem paths (also the corresponding <a href="https://www.python.org/dev/peps/pep-0428/">PEP proposal #428</a>)</li>
+  <li>
+<a href="https://docs.python.org/3/library/dataclasses.html"><code class="language-plaintext highlighter-rouge">dataclasses</code></a> — a module in the Python standard library; reduces boilerplate of writing classes (also the corresponding <a href="https://www.python.org/dev/peps/pep-0557/">PEP proposal #557</a>)</li>
+</ul>
+
+<h2 id="other-resources">
+<a class="anchor" href="#other-resources" aria-hidden="true"><span class="octicon octicon-link"></span></a>Other Resources</h2>
+
+<ul>
+  <li>
+<a href="http://aosabook.org/en/index.html">500 Lines or Less</a> — a book in which specific small open-source projects are profiled to understand how they approached their particular challenge.</li>
+  <li>
+<a href="http://aosabook.org/en/index.html">The Architecture of Open Source Applications: Elegance, Evolution and a Few Fearless Hacks</a> — examination of the structure of the software of some open-source software applications.</li>
+  <li>
+<a href="http://aosabook.org/en/index.html">The Architecture of Open Source Applications: Volume II: Structure, Scale and a Few More Fearless Hacks</a> — the second volume in the series.</li>
+</ul>
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="strickvl/ml-blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/python/skillbuilding/2021/09/18/reading-python.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>A place to share my technical learnings.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/strickvl" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/strickvl" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
