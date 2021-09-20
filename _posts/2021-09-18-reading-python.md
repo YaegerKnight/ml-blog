@@ -27,6 +27,7 @@ I'll be doing the same as I ramp up my Python proficiency. I wanted to gather so
 - [`click`](https://click.palletsprojects.com/en/8.0.x/) — a Python package for creating command line interfaces
 - [`pathlib`](https://docs.python.org/3/library/pathlib.html) — part of the Python standard library; a module to handle filesystem paths (also the corresponding [PEP proposal #428](https://www.python.org/dev/peps/pep-0428/))
 - [`dataclasses`](https://docs.python.org/3/library/dataclasses.html) — a module in the Python standard library; reduces boilerplate of writing classes (also the corresponding [PEP proposal #557](https://www.python.org/dev/peps/pep-0557/))
+- [`joblib`](https://joblib.readthedocs.io/en/latest/) — a library to support lightweight pipelining in Python
 
 ## Other Resources
 
