@@ -7,6 +7,7 @@ comments: true
 author: Alex Strick van Linschoten
 title: Some things I learned about debugging
 ---
+
 I've had to deal with a whole bunch of bugs in the past few days and weeks. I thought it'd be useful to put down some thoughts about things that I've learned along the way.
 
 ## Logging & Printing
@@ -16,6 +17,12 @@ These are maybe the first things that everyone says you should do when you have 
 There are some scenarios where simple `print` calls aren't enough. If you're running code through a series of tests, then the test harness will often consume all output to `stdout` so you won't see any of your print statements. Luckily, test environments can usually be configured to print debug statements of loggers.
 
 Once you can see what's happening at a particular moment, you can see if what you expected to happen at that moment is actually happening.
+
+## Breakpoint your way to infinity!
+
+The `breakpoint()` function comes built-in with Python. It's a convenience wrapper around some [`pdb`](https://docs.python.org/3/library/pdb.html) magic, and practically speaking it means you can set a point where you can interrupt the Python execution. Your terminal will halt at that point, and you can inspect the variables or objects available at that particular moment.
+
+I wish I had known about this earlier on. It's extremely useful for understanding exactly how a function or piece of code is being executed.
 
 ## Come with hypotheses
 
@@ -37,7 +44,7 @@ This is something about updating your assumptions as you move through the proces
 
 ## Be systematic
 
-I've found a few times now, that there are certain moments where I notice I'm far *far* down the road. I'll have kept making a bunch of decisions at the various crossroads that I passed. At a certain moment, though, I need to take stock and just note down all the decisions and assumptions I've made in order to reach this point.
+I've found a few times now, that there are certain moments where I notice I'm far _far_ down the road. I'll have kept making a bunch of decisions at the various crossroads that I passed. At a certain moment, though, I need to take stock and just note down all the decisions and assumptions I've made in order to reach this point.
 
 I'll write a short note to myself (mainly), but also for teammates, where I explain all the different assumptions and pathways that I'm travelling down. I'll specifically write down all the conditions that need to be present for this bug to present (as far as I know them).
 
