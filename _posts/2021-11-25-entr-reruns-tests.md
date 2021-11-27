@@ -2,7 +2,7 @@
 toc: false
 layout: post
 description: "entr is a useful tool to rerun things when watched files change. It's especially useful when testing."
-categories: [debugging, testing, tools]
+categories: [debugging, testing, tools, calmcode]
 comments: true
 author: Alex Strick van Linschoten
 title: "entr: a tool to run commands when files change"
