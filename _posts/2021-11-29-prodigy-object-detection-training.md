@@ -15,7 +15,7 @@ Object detection is when you put bounding boxes around the specific object that 
 
 For this, I need annotations. Annotations are the data that I will use as the fuel for the model I hope to train. We need a lot of annotations of specific redactions in order for the computer to be able to learn to detect what is a redaction and what is just an empty box, for example.
 
-I showed in [an earlier post](https://mlops.systems/fastai/redactionmodel/computervision/datalabelling/2021/09/06/redaction-classification-chapter-2.html) how I trained a model to detect whether there was any kind of redaction inside an image (to around 95% accuracy). For this next stage, it wasn't enough to offer a binary 'yes' or 'no' for whether it had been redacted. I needed to specify the coordinates of a bounding box which encompasses each redaction.
+I showed in [an earlier post](https://mlops.systems/fastai/redactionmodel/computervision/datalabelling/2021/09/06/redaction-classification-chapter-2.html) how I trained a model to detect whether there was any kind of redaction inside an image (to around 95% accuracy). For this next stage, it isn't enough to offer a binary 'yes' or 'no' for whether it has been redacted. I need to specify the coordinates of a bounding box which encompasses each redaction.
 
 In terms of the final output of the annotations, there are two main ways that this could go. I could either:
 
