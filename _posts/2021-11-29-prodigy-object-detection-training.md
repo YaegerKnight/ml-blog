@@ -22,9 +22,9 @@ In terms of the final output of the annotations, there are two main ways that th
 1. get `x` and `y` coordinates for the centre of the bounding box, and then a height and a width of the box around this centre point
 2. get the four coordinates for each of the corners of the bounding box.
 
-The [COCO dataset format](https://www.immersivelimit.com/tutorials/create-coco-annotations-from-scratch) will eventually want datasets in the second format, but Prodigy has its own way of storing the data which I just left for now. Once I have a better handle on the annotation flow I will write a [custom recipe](https://prodi.gy/docs/custom-recipes) which will save the data in exactly the format that I want. For now, it's good enough.
+The [COCO dataset format](https://www.immersivelimit.com/tutorials/create-coco-annotations-from-scratch) will eventually want datasets in the second format, but [Prodigy](https://prodi.gy) has its own way of storing the data which I just left for now. Once I have a better handle on the annotation flow I will write a [custom recipe](https://prodi.gy/docs/custom-recipes) which will save the data in exactly the format that I want. For now, it's good enough.
 
-Installing Prodigy into your development environment is a breeze now that you can do it with `pip`:
+Installing [Prodigy](https://prodi.gy) into your development environment is a breeze now that you can do it with `pip`:
 
 ```bash
 pip install prodigy -f https://XXXX-XXXX-XXXX-XXXX@download.prodi.gy # where the XXXs are your license code
@@ -36,7 +36,7 @@ Getting going with the image training was as easy as the following CLI command:
 prodigy image.manual redaction-object-detection /path/to/image/data --label CONTENT,REDACTION --remove-base64
 ```
 
-Note that the `--remove-base64` is to ensure that Prodigy doesn't store the raw binary image data inside the database alongside the annotations. Prodigy (and their sister tool Spacy) is a little more focused on textual data, where storing the original data alongside the annotation doesn't pose too much of an issue, but for image files this probably is a bit of an anti-pattern and could lead to a very large database.
+Note that the `--remove-base64` is to ensure that Prodigy doesn't store the raw binary image data inside the database alongside the annotations. [Prodigy](https://prodi.gy) (and their sister tool [Spacy](https://spacy.io)) is a little more focused on textual data, where storing the original data alongside the annotation doesn't pose too much of an issue, but for image files this probably is a bit of an anti-pattern and could lead to a very large database.
 
 You get a local URL to go visit and you see an interface where you can make the necessary annotations:
 
@@ -138,4 +138,5 @@ This gives us a file containing all our annotations. A sample for one image give
 
 Everything we're interested in is inside the `spans` attribute, and it actually contains both kinds of the annotation that I mentioned above.
 
-As you can see, annotating images in this way is fairly painless, and it brings you in closer contact with your raw data which is an added bonus.
+As you can see, annotating images in this way is fairly painless, and it brings
+you in closer contact with your raw data which is an added bonus.
