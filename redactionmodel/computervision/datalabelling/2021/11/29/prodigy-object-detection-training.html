@@ -130,9 +130,9 @@ window.onload = wrap_img;
   <li>get the four coordinates for each of the corners of the bounding box.</li>
 </ol>
 
-<p>The <a href="https://www.immersivelimit.com/tutorials/create-coco-annotations-from-scratch">COCO dataset format</a> will eventually want datasets in the second format, but Prodigy has its own way of storing the data which I just left for now. Once I have a better handle on the annotation flow I will write a <a href="https://prodi.gy/docs/custom-recipes">custom recipe</a> which will save the data in exactly the format that I want. For now, it’s good enough.</p>
+<p>The <a href="https://www.immersivelimit.com/tutorials/create-coco-annotations-from-scratch">COCO dataset format</a> will eventually want datasets in the second format, but <a href="https://prodi.gy">Prodigy</a> has its own way of storing the data which I just left for now. Once I have a better handle on the annotation flow I will write a <a href="https://prodi.gy/docs/custom-recipes">custom recipe</a> which will save the data in exactly the format that I want. For now, it’s good enough.</p>
 
-<p>Installing Prodigy into your development environment is a breeze now that you can do it with <code class="language-plaintext highlighter-rouge">pip</code>:</p>
+<p>Installing <a href="https://prodi.gy">Prodigy</a> into your development environment is a breeze now that you can do it with <code class="language-plaintext highlighter-rouge">pip</code>:</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pip <span class="nb">install </span>prodigy <span class="nt">-f</span> https://XXXX-XXXX-XXXX-XXXX@download.prodi.gy <span class="c"># where the XXXs are your license code</span>
 </code></pre></div></div>
@@ -142,7 +142,7 @@ window.onload = wrap_img;
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>prodigy image.manual redaction-object-detection /path/to/image/data <span class="nt">--label</span> CONTENT,REDACTION <span class="nt">--remove-base64</span>
 </code></pre></div></div>
 
-<p>Note that the <code class="language-plaintext highlighter-rouge">--remove-base64</code> is to ensure that Prodigy doesn’t store the raw binary image data inside the database alongside the annotations. Prodigy (and their sister tool Spacy) is a little more focused on textual data, where storing the original data alongside the annotation doesn’t pose too much of an issue, but for image files this probably is a bit of an anti-pattern and could lead to a very large database.</p>
+<p>Note that the <code class="language-plaintext highlighter-rouge">--remove-base64</code> is to ensure that Prodigy doesn’t store the raw binary image data inside the database alongside the annotations. <a href="https://prodi.gy">Prodigy</a> (and their sister tool <a href="https://spacy.io">Spacy</a>) is a little more focused on textual data, where storing the original data alongside the annotation doesn’t pose too much of an issue, but for image files this probably is a bit of an anti-pattern and could lead to a very large database.</p>
 
 <p>You get a local URL to go visit and you see an interface where you can make the necessary annotations:</p>
 
@@ -245,7 +245,8 @@ window.onload = wrap_img;
 
 <p>Everything we’re interested in is inside the <code class="language-plaintext highlighter-rouge">spans</code> attribute, and it actually contains both kinds of the annotation that I mentioned above.</p>
 
-<p>As you can see, annotating images in this way is fairly painless, and it brings you in closer contact with your raw data which is an added bonus.</p>
+<p>As you can see, annotating images in this way is fairly painless, and it brings
+you in closer contact with your raw data which is an added bonus.</p>
 
   </div><!-- from https://github.com/utterance/utterances -->
 <script src="https://utteranc.es/client.js"
