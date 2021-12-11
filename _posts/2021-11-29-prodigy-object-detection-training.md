@@ -6,6 +6,7 @@ categories: [redactionmodel, computervision, datalabelling]
 comments: true
 author: Alex Strick van Linschoten
 title: How to annotate image data for object detection with Prodigy
+sticky_rank: 2
 image: images/2021-11-29-prodigy-object-detection-training/prodigy-redaction.png
 ---
 

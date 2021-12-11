@@ -1,5 +1,6 @@
 ---
 toc: true
+sticky_rank: 1
 layout: post
 description: How I trained a model to detect redactions in FOIA requests, using Prodigy for data labelling and the fastai library for model training
 categories: [fastai, redactionmodel, computervision, datalabelling]
