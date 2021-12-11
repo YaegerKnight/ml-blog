@@ -6,7 +6,6 @@ categories: [redactionmodel, computervision, progressreport]
 comments: true
 author: Alex Strick van Linschoten
 title: 73% accuracy for redaction object detection
-sticky_rank: 3
 image: images/redaction-progress-week-one/redaction_sample_3-small.png
 ---
 
