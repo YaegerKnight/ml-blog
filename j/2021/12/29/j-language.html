@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Exploring J, an array programming language | mlops.systems</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Exploring J, an array programming language" />
+<meta name="author" content="Alex Strick van Linschoten" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="What I have learned so far about why the J language exists and what problems it tries to solve." />
+<meta property="og:description" content="What I have learned so far about why the J language exists and what problems it tries to solve." />
+<link rel="canonical" href="https://www.mlops.systems/j/2021/12/29/j-language.html" />
+<meta property="og:url" content="https://www.mlops.systems/j/2021/12/29/j-language.html" />
+<meta property="og:site_name" content="mlops.systems" />
+<meta property="og:image" content="https://www.mlops.systems/images/j-language/jblue.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-12-29T00:00:00-06:00" />
+<script type="application/ld+json">
+{"datePublished":"2021-12-29T00:00:00-06:00","url":"https://www.mlops.systems/j/2021/12/29/j-language.html","@type":"BlogPosting","dateModified":"2021-12-29T00:00:00-06:00","image":"https://www.mlops.systems/images/j-language/jblue.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.mlops.systems/j/2021/12/29/j-language.html"},"author":{"@type":"Person","name":"Alex Strick van Linschoten"},"headline":"Exploring J, an array programming language","description":"What I have learned so far about why the J language exists and what problems it tries to solve.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://www.mlops.systems/feed.xml" title="mlops.systems" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script
+  defer
+  data-domain="mlops.systems"
+  src="https://plausible.io/js/plausible.js"
+></script>
+
+
+<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">mlops.systems</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About Me</a><a class="page-link" href="/search/">Search</a><a class="page-link" href="/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Exploring J, an array programming language</h1><p class="page-description">What I have learned so far about why the J language exists and what problems it tries to solve.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2021-12-29T00:00:00-06:00" itemprop="datePublished">
+        Dec 29, 2021
+      </time>• 
+          <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+            <span class="p-author h-card" itemprop="name">Alex Strick van Linschoten</span></span>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      3 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/categories/#j">j</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>I’ve long wanted to explore <a href="https://www.jsoftware.com">the J programming language</a>. I think I probably first heard about it from Jeremy Howard amidst one of the early iterations of the fastai course. He’s since spoken about it <a href="https://youtu.be/J6XcP4JOHmk?t=505">in other places</a>.</p>
+
+<p>It is part of the family of programming languages that includes <a href="https://en.wikipedia.org/wiki/APL_(programming_language)">APL</a>, <a href="https://en.wikipedia.org/wiki/K_%28programming_language%29">K</a> and <a href="https://en.wikipedia.org/wiki/Q_(programming_language_from_Kx_Systems)">Q</a>. These can broadly be categorised as array-programming languages, where arrays are generally the core data structure and mental model to keep in mind. They used to be extremely popular in the 1970s and 1980s, particularly among institutions or businesses with a requirement for performant calculation / computation. One of these, Q, continues to live on (as a closed-source language) <a href="https://www.efinancialcareers.se/news/2020/10/kdb-finance-jobs">in the world of finance and trading</a>. (Q is popular alongside the proprietary database <a href="https://en.wikipedia.org/wiki/Kdb%2B">kdb+</a>).</p>
+
+<p>You’re probably wondering why someone would want to use this fairly specialised and niche language. When you look at examples of J code — like the ones <a href="https://code.jsoftware.com/wiki/Studio/IdiosyncraticIntroduction">here</a>, for example — it’s easy to simply dismiss it as an unreadable (‘write-only’) language. Indeed, many do dismiss it for this reason. Code is often compact, with single letters or symbols doing all the work. Defenders of J hold this up as a feature, not a problem. The compactness of the language means that you can fit the entirety of the solution (space) of a complex problem on a single screen, whereas in many (most?) other languages you would have to be scrolling up and down through dozens or even hundreds of lines of code.</p>
+
+<p>The array languages seem to come at solving problems from a particular perspective. The symbols and letters that transform the arrays in J function as a pattern language. For a simple example, think of what you have to do when you want to find the count of a particular element from within an array/list. The array language paradigm argues that you don’t want to waste your time and screen space writing out boilerplate code to carry out this calculation, when it’s a common pattern that you can just use from the language itself. When problem-solving, therefore, spend your time thinking about the problem and not messing around with syntax or repeating yourself.</p>
+
+<p>J and its cousins are extremely efficient. It is written in C, and I recently heard someone quote one of the early J pioneers as having said that “it is not theoretically possible to write J code that is more performant than C, but it often ends up being so”. For some math- or statistics-heavy domains (think the world of finance), it is extremely helpful to have this highly abstracted language that works performantly on large datasets. Moreover, it seems to be even more helpful when you have a hard problem to work on that isn’t fully understood.</p>
+
+<p>Kenneth Iverson’s wrote a paper (<a href="https://www.jsoftware.com/papers/tot.htm">“Notation as a Tool of Thought”</a>) that is a classic in computer science and gets into some of the above arguments. (It is written using APL, but <a href="https://www.hillelwayne.com/post/j-notation/">it also applies to J</a>). I will probably return to that at a future date, because it often comes up and is recommended as a particularly rich document worth taking time to explore in depth.</p>
+
+<p>Very much as a project to indulge my curiosity, I will be exploring J over the coming months. I have been listening to the back catalogue of <a href="https://www.arraycast.com">The Array Cast</a> podcast, and I will be slowly working my way through <a href="https://code.jsoftware.com/wiki/Main_Page">some of the resources</a> listed on the official J site. Let me know if you have experience working with J!</p>
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="strickvl/ml-blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/j/2021/12/29/j-language.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>A place to share my technical learnings.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/strickvl" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/strickvl" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
