@@ -1,1 +1,1 @@
-Sitemap: https://www.mlops.systems/sitemap.xml
+Sitemap: https://mlops.systems/sitemap.xml
