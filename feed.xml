@@ -1,38 +1,96 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://mlops.systems/feed.xml" rel="self" type="application/atom+xml" /><link href="https://mlops.systems/" rel="alternate" type="text/html" /><updated>2022-01-16T04:05:36-06:00</updated><id>https://mlops.systems/feed.xml</id><title type="html">mlops.systems</title><subtitle>A place to share my technical learnings.</subtitle><entry><title type="html">A Midway Report on my Computer Vision Project</title><link href="https://mlops.systems/python/fastai/tools/redactionmodel/2022/01/16/midway-report-redaction-project.html" rel="alternate" type="text/html" title="A Midway Report on my Computer Vision Project" /><published>2022-01-16T00:00:00-06:00</published><updated>2022-01-16T00:00:00-06:00</updated><id>https://mlops.systems/python/fastai/tools/redactionmodel/2022/01/16/midway-report-redaction-project</id><content type="html" xml:base="https://mlops.systems/python/fastai/tools/redactionmodel/2022/01/16/midway-report-redaction-project.html">&lt;p&gt;(&lt;em&gt;This post is adapted from &lt;a href=&quot;https://twitter.com/strickvl/status/1482645800656281604&quot;&gt;a twitter thread&lt;/a&gt;, so is a bit more terse than usual.&lt;/em&gt;)&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://mlops.systems/feed.xml" rel="self" type="application/atom+xml" /><link href="https://mlops.systems/" rel="alternate" type="text/html" /><updated>2022-01-16T04:09:50-06:00</updated><id>https://mlops.systems/feed.xml</id><title type="html">mlops.systems</title><subtitle>A place to share my technical learnings.</subtitle><entry><title type="html">A Midway Report on my Computer Vision Project</title><link href="https://mlops.systems/python/fastai/tools/redactionmodel/2022/01/16/midway-report-redaction-project.html" rel="alternate" type="text/html" title="A Midway Report on my Computer Vision Project" /><published>2022-01-16T00:00:00-06:00</published><updated>2022-01-16T00:00:00-06:00</updated><id>https://mlops.systems/python/fastai/tools/redactionmodel/2022/01/16/midway-report-redaction-project</id><content type="html" xml:base="https://mlops.systems/python/fastai/tools/redactionmodel/2022/01/16/midway-report-redaction-project.html">&lt;p&gt;(&lt;em&gt;This post is adapted from
+&lt;a href=&quot;https://twitter.com/strickvl/status/1482645800656281604&quot;&gt;a twitter thread&lt;/a&gt;, so
+is a bit more terse than usual.&lt;/em&gt;)&lt;/p&gt;
 
-&lt;p&gt;I recently switched what I spend the majority of my professional life doing (history -&amp;gt; software engineering). I’m currently working as an ML Engineer at &lt;a href=&quot;https://github.com/zenml-io/zenml&quot;&gt;ZenML&lt;/a&gt; and really enjoying this new world of MLOps, filled as it is with challenges and opportunities.&lt;/p&gt;
+&lt;p&gt;I recently switched what I spend the majority of my professional life doing
+(history -&amp;gt; software engineering). I’m currently working as an ML Engineer at
+&lt;a href=&quot;https://github.com/zenml-io/zenml&quot;&gt;ZenML&lt;/a&gt; and really enjoying this new world of
+MLOps, filled as it is with challenges and opportunities.&lt;/p&gt;
 
-&lt;p&gt;I wanted to get some context for the wider work of a data scientist to help me appreciate the problem we are trying to address at &lt;a href=&quot;https://github.com/zenml-io/zenml&quot;&gt;ZenML&lt;/a&gt;, so looked around for a juicy machine learning problem to work on as a longer project.&lt;/p&gt;
+&lt;p&gt;I wanted to get some context for the wider work of a data scientist to help me
+appreciate the problem we are trying to address at
+&lt;a href=&quot;https://github.com/zenml-io/zenml&quot;&gt;ZenML&lt;/a&gt;, so looked around for a juicy machine
+learning problem to work on as a longer project.&lt;/p&gt;
 
-&lt;p&gt;I was also encouraged by &lt;a href=&quot;https://www.alexstrick.com/blog/fastai-lesson-zero&quot;&gt;Jeremy Howard’s advice&lt;/a&gt; to “build one project and make it great”. This approach seems like it has really paid off for those who’ve studied &lt;a href=&quot;https://course.fast.ai&quot;&gt;the fastai course&lt;/a&gt; and I wanted to really go deep on something myself.&lt;/p&gt;
+&lt;p&gt;I was also encouraged by
+&lt;a href=&quot;https://www.alexstrick.com/blog/fastai-lesson-zero&quot;&gt;Jeremy Howard’s advice&lt;/a&gt; to
+“build one project and make it great”. This approach seems like it has really
+paid off for those who’ve studied &lt;a href=&quot;https://course.fast.ai&quot;&gt;the fastai course&lt;/a&gt;
+and I wanted to really go deep on something myself.&lt;/p&gt;
 
-&lt;p&gt;Following some previous success working with other mentors from &lt;a href=&quot;https://www.sharpestminds.com&quot;&gt;SharpestMinds&lt;/a&gt; on a previous project, I settled on Computer Vision and was lucky to find Farid AKA &lt;a href=&quot;https://twitter.com/ai_fast_track&quot;&gt;@ai_fast_track&lt;/a&gt; to mentor me through the work.&lt;/p&gt;
+&lt;p&gt;Following some previous success working with other mentors from
+&lt;a href=&quot;https://www.sharpestminds.com&quot;&gt;SharpestMinds&lt;/a&gt; on a previous project, I settled
+on Computer Vision and was lucky to find Farid AKA
+&lt;a href=&quot;https://twitter.com/ai_fast_track&quot;&gt;@ai_fast_track&lt;/a&gt; to mentor me through the
+work.&lt;/p&gt;
 
-&lt;p&gt;In the last 6 weeks, I’ve made what feels like good progress on the problem. This image offers an overview of the pieces I’ve been working on, to the point where the ‘solution’ to my original problem feels on the verge of being practically within reach.&lt;/p&gt;
+&lt;p&gt;In the last 6 weeks, I’ve made what feels like good progress on the problem.
+This image offers an overview of the pieces I’ve been working on, to the point
+where the ‘solution’ to my original problem feels on the verge of being
+practically within reach.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;images/midway-report-redaction-project/midway-presentation.jpeg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/midway-report-redaction-project/midway-presentation.jpeg&quot; alt=&quot;&quot; title=&quot;Some of the things
+I worked on over the past six weeks.&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;After just a few lessons of the FastAI course, I &lt;a href=&quot;https://mlops.systems/fastai/redactionmodel/computervision/datalabelling/2021/09/06/redaction-classification-chapter-2.html&quot;&gt;trained a classification model&lt;/a&gt; to ~95% accuracy to help me sort redacted images from unredacted images.&lt;/p&gt;
+&lt;p&gt;After just a few lessons of the FastAI course, I
+&lt;a href=&quot;https://mlops.systems/fastai/redactionmodel/computervision/datalabelling/2021/09/06/redaction-classification-chapter-2.html&quot;&gt;trained a classification model&lt;/a&gt;
+to ~95% accuracy to help me sort redacted images from unredacted images.&lt;/p&gt;
 
-&lt;p&gt;I used Explosion’s Prodigy to &lt;a href=&quot;https://mlops.systems/redactionmodel/computervision/datalabelling/2021/11/29/prodigy-object-detection-training.html&quot;&gt;annotate an initial round&lt;/a&gt; of data to pass into the next step, enjoying how the labelling process brought me into greater contact with the dataset along the way.&lt;/p&gt;
+&lt;p&gt;I used Explosion’s Prodigy to
+&lt;a href=&quot;https://mlops.systems/redactionmodel/computervision/datalabelling/2021/11/29/prodigy-object-detection-training.html&quot;&gt;annotate an initial round&lt;/a&gt;
+of data to pass into the next step, enjoying how the labelling process brought
+me into greater contact with the dataset along the way.&lt;/p&gt;
 
-&lt;p&gt;I switched to using &lt;a href=&quot;https://airctic.com/&quot;&gt;IceVision&lt;/a&gt; to help me with the more complicated object detection problem, using MMDetection and VFNet &lt;a href=&quot;https://mlops.systems/redactionmodel/computervision/progressreport/2021/12/11/redaction-progress-week-one.html&quot;&gt;to get pretty good results&lt;/a&gt; early on.&lt;/p&gt;
+&lt;p&gt;I switched to using &lt;a href=&quot;https://airctic.com/&quot;&gt;IceVision&lt;/a&gt; to help me with the more
+complicated object detection problem, using MMDetection and VFNet
+&lt;a href=&quot;https://mlops.systems/redactionmodel/computervision/progressreport/2021/12/11/redaction-progress-week-one.html&quot;&gt;to get pretty good results&lt;/a&gt;
+early on.&lt;/p&gt;
 
-&lt;p&gt;I’m currently in the process of creating my own synthetic images to boost the annotations I’ve manually made. (I’ll be writing about this process soon as well, as I’m learning a lot about why this is so important for these kinds of computer vision problems.)&lt;/p&gt;
+&lt;p&gt;I’m currently in the process of creating my own synthetic images to boost the
+annotations I’ve manually made. (I’ll be writing about this process soon as
+well, as I’m learning a lot about why this is so important for these kinds of
+computer vision problems.)&lt;/p&gt;
 
-&lt;p&gt;I’ve also been amazed at the effectiveness of self-training (i.e. using my initial model in my annotation loop to generate an initial set of annotations which I can easily amend as appropriate, then feeding those annotations in to create a better model and so on). More to follow on that step, too.&lt;/p&gt;
+&lt;p&gt;I’ve also been amazed at the effectiveness of self-training (i.e. using my
+initial model in my annotation loop to generate an initial set of annotations
+which I can easily amend as appropriate, then feeding those annotations in to
+create a better model and so on). More to follow on that step, too.&lt;/p&gt;
 
-&lt;p&gt;I started using &lt;a href=&quot;https://evidentlyai.com&quot;&gt;Evidently&lt;/a&gt; to do some drift detection, inspired by some work I was doing for ZenML on adding Evidently as an integration to our own tool. This helped me think about how new data was affecting the model and the training cycle. I feel like there’s a lot of depth here to understand, and am looking forward to diving in.&lt;/p&gt;
+&lt;p&gt;I started using &lt;a href=&quot;https://evidentlyai.com&quot;&gt;Evidently&lt;/a&gt; to do some drift detection,
+inspired by some work I was doing for ZenML on adding Evidently as an
+integration to our own tool. This helped me think about how new data was
+affecting the model and the training cycle. I feel like there’s a lot of depth
+here to understand, and am looking forward to diving in.&lt;/p&gt;
 
-&lt;p&gt;I made a tiny little demo on &lt;a href=&quot;https://huggingface.co/spaces&quot;&gt;HuggingFace Spaces&lt;/a&gt; to show off the current inference capabilities and to see the model in a setting that feels close to reality. This is a simple little &lt;a href=&quot;https://www.gradio.app&quot;&gt;Gradio&lt;/a&gt; app but I liked how easy this was to put together (a couple of hours, mainly involving some build issues and a dodgy &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;requirements.txt&lt;/code&gt; file)&lt;/p&gt;
+&lt;p&gt;I made a tiny little demo on &lt;a href=&quot;https://huggingface.co/spaces&quot;&gt;HuggingFace Spaces&lt;/a&gt;
+to show off the current inference capabilities and to see the model in a setting
+that feels close to reality. This is a simple little
+&lt;a href=&quot;https://www.gradio.app&quot;&gt;Gradio&lt;/a&gt; app but I liked how easy this was to put
+together (a couple of hours, mainly involving some build issues and a dodgy
+&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;requirements.txt&lt;/code&gt; file)&lt;/p&gt;
 
-&lt;p&gt;Along the way, I found it sometimes quite painful or fiddly to handle the PDF files that are the main data source for the project, so I built &lt;a href=&quot;https://pypi.org/project/pdfsplitter/&quot;&gt;my own Python package&lt;/a&gt; to handle the hard work. I used fastai’s nbdev to &lt;a href=&quot;https://mlops.systems/python/jupyter/fastai/tools/2022/01/06/nbdev-early-impressions.html&quot;&gt;very quickly get the starters&lt;/a&gt; of what I’m hoping might be a useful tool for others using PDF data for ML projects.&lt;/p&gt;
+&lt;p&gt;Along the way, I found it sometimes quite painful or fiddly to handle the PDF
+files that are the main data source for the project, so I built
+&lt;a href=&quot;https://pypi.org/project/pdfsplitter/&quot;&gt;my own Python package&lt;/a&gt; to handle the
+hard work. I used fastai’s nbdev to
+&lt;a href=&quot;https://mlops.systems/python/jupyter/fastai/tools/2022/01/06/nbdev-early-impressions.html&quot;&gt;very quickly get the starters&lt;/a&gt;
+of what I’m hoping might be a useful tool for others using PDF data for ML
+projects.&lt;/p&gt;
 
-&lt;p&gt;Throughout all this, &lt;a href=&quot;https://www.linkedin.com/in/farid-hassainia-ca/&quot;&gt;Farid&lt;/a&gt; has been patiently helping guide me forward. He saved me from going down some dark rabbit holes, from spending too long studying skills and parts of the problem that needed relatively little mastery in order to get to where I am.&lt;/p&gt;
+&lt;p&gt;Throughout all this, &lt;a href=&quot;https://www.linkedin.com/in/farid-hassainia-ca/&quot;&gt;Farid&lt;/a&gt;
+has been patiently helping guide me forward. He saved me from going down some
+dark rabbit holes, from spending too long studying skills and parts of the
+problem that needed relatively little mastery in order to get to where I am.&lt;/p&gt;
 
-&lt;p&gt;Farid has been a consistently enthusiastic and kind advocate for my work, moreover, and this has really helped me stay the course for this project that takes a decent chunk of my time (especially seeing as I do it completely aside / separately from my day job).&lt;/p&gt;
+&lt;p&gt;Farid has been a consistently enthusiastic and kind advocate for my work,
+moreover, and this has really helped me stay the course for this project that
+takes a decent chunk of my time (especially seeing as I do it completely aside /
+separately from my day job).&lt;/p&gt;
 
-&lt;p&gt;I feel like I’m consistently making progress and learning the skills of a data scientist working in computer vision, even though I have so much left to learn! My project still has a ways to go before it’s ‘done’, but I’m confident that I’ll get there with Farid’s support. (Thank you!)&lt;/p&gt;</content><author><name>Alex Strick van Linschoten</name></author><category term="python" /><category term="fastai" /><category term="tools" /><category term="redactionmodel" /><summary type="html">(This post is adapted from a twitter thread, so is a bit more terse than usual.)</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://mlops.systems/images/midway-report-redaction-project/midway-thumb.png" /><media:content medium="image" url="https://mlops.systems/images/midway-report-redaction-project/midway-thumb.png" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Different ways to constrain types in Python</title><link href="https://mlops.systems/robustpython/python/books-i-read/2022/01/08/robust-python-4.html" rel="alternate" type="text/html" title="Different ways to constrain types in Python" /><published>2022-01-08T00:00:00-06:00</published><updated>2022-01-08T00:00:00-06:00</updated><id>https://mlops.systems/robustpython/python/books-i-read/2022/01/08/robust-python-4</id><content type="html" xml:base="https://mlops.systems/robustpython/python/books-i-read/2022/01/08/robust-python-4.html">&lt;p&gt;The fourth chapter of &lt;a href=&quot;https://www.amazon.com/Robust-Python-Patrick-Viafore-ebook-dp-B09982C9FX/dp/B09982C9FX/ref=mt_other?_encoding=UTF8&amp;amp;me=&amp;amp;tag=soumet-20&amp;amp;qid=&quot;&gt;‘Robust Python’&lt;/a&gt; continues on from &lt;a href=&quot;https://mlops.systems/robustpython/python/books-i-read/2022/01/03/robust-python-3.html&quot;&gt;where we left off&lt;/a&gt; last time. We had previously learned about the benefits of type annotations in general terms, as well as started to understand how we might apply these annotations to simple code examples. But what if things are a bit more complicated? Then we have a few more options at our disposal.&lt;/p&gt;
+&lt;p&gt;I feel like I’m consistently making progress and learning the skills of a data
+scientist working in computer vision, even though I have so much left to learn!
+My project still has a ways to go before it’s ‘done’, but I’m confident that
+I’ll get there with Farid’s support. (Thank you!)&lt;/p&gt;</content><author><name>Alex Strick van Linschoten</name></author><category term="python" /><category term="fastai" /><category term="tools" /><category term="redactionmodel" /><summary type="html">(This post is adapted from a twitter thread, so is a bit more terse than usual.)</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://mlops.systems/images/midway-report-redaction-project/midway-thumb.png" /><media:content medium="image" url="https://mlops.systems/images/midway-report-redaction-project/midway-thumb.png" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Different ways to constrain types in Python</title><link href="https://mlops.systems/robustpython/python/books-i-read/2022/01/08/robust-python-4.html" rel="alternate" type="text/html" title="Different ways to constrain types in Python" /><published>2022-01-08T00:00:00-06:00</published><updated>2022-01-08T00:00:00-06:00</updated><id>https://mlops.systems/robustpython/python/books-i-read/2022/01/08/robust-python-4</id><content type="html" xml:base="https://mlops.systems/robustpython/python/books-i-read/2022/01/08/robust-python-4.html">&lt;p&gt;The fourth chapter of &lt;a href=&quot;https://www.amazon.com/Robust-Python-Patrick-Viafore-ebook-dp-B09982C9FX/dp/B09982C9FX/ref=mt_other?_encoding=UTF8&amp;amp;me=&amp;amp;tag=soumet-20&amp;amp;qid=&quot;&gt;‘Robust Python’&lt;/a&gt; continues on from &lt;a href=&quot;https://mlops.systems/robustpython/python/books-i-read/2022/01/03/robust-python-3.html&quot;&gt;where we left off&lt;/a&gt; last time. We had previously learned about the benefits of type annotations in general terms, as well as started to understand how we might apply these annotations to simple code examples. But what if things are a bit more complicated? Then we have a few more options at our disposal.&lt;/p&gt;
 
 &lt;p&gt;Note that you can assign all of these type assignments to variables (‘type aliases’), which might just make your code that much more readable.&lt;/p&gt;
 
