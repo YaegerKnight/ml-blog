@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Using type annotation with collections in Python | mlops.systems</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Using type annotation with collections in Python" />
+<meta name="author" content="Alex Strick van Linschoten" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Reflections on the fifth chapter of Patrick Viafore’s book, ‘Robust Python’. We learn about how to use type annotations when collections (lists, dictionaries and sets, primarily) are involved." />
+<meta property="og:description" content="Reflections on the fifth chapter of Patrick Viafore’s book, ‘Robust Python’. We learn about how to use type annotations when collections (lists, dictionaries and sets, primarily) are involved." />
+<link rel="canonical" href="https://mlops.systems/robustpython/python/books-i-read/2022/01/16/robust-python-5.html" />
+<meta property="og:url" content="https://mlops.systems/robustpython/python/books-i-read/2022/01/16/robust-python-5.html" />
+<meta property="og:site_name" content="mlops.systems" />
+<meta property="og:image" content="https://mlops.systems/images/robust-python/robust-python-cover.jpeg" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-01-16T00:00:00-06:00" />
+<script type="application/ld+json">
+{"datePublished":"2022-01-16T00:00:00-06:00","url":"https://mlops.systems/robustpython/python/books-i-read/2022/01/16/robust-python-5.html","@type":"BlogPosting","dateModified":"2022-01-16T00:00:00-06:00","image":"https://mlops.systems/images/robust-python/robust-python-cover.jpeg","mainEntityOfPage":{"@type":"WebPage","@id":"https://mlops.systems/robustpython/python/books-i-read/2022/01/16/robust-python-5.html"},"author":{"@type":"Person","name":"Alex Strick van Linschoten"},"headline":"Using type annotation with collections in Python","description":"Reflections on the fifth chapter of Patrick Viafore’s book, ‘Robust Python’. We learn about how to use type annotations when collections (lists, dictionaries and sets, primarily) are involved.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://mlops.systems/feed.xml" title="mlops.systems" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script
+  defer
+  data-domain="mlops.systems"
+  src="https://plausible.io/js/plausible.js"
+></script>
+
+
+<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">mlops.systems</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About Me</a><a class="page-link" href="/search/">Search</a><a class="page-link" href="/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Using type annotation with collections in Python</h1><p class="page-description">Reflections on the fifth chapter of Patrick Viafore's book, 'Robust Python'. We learn about how to use type annotations when collections (lists, dictionaries and sets, primarily) are involved.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-01-16T00:00:00-06:00" itemprop="datePublished">
+        Jan 16, 2022
+      </time>• 
+          <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+            <span class="p-author h-card" itemprop="name">Alex Strick van Linschoten</span></span>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      6 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/categories/#robustpython">robustpython</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#python">python</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#books-i-read">books-i-read</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h2"><a href="#the-first-of-our-collection-type-helpers-typeddict">The first of our collection type helpers: TypedDict</a></li>
+<li class="toc-entry toc-h2"><a href="#custom-collections-with-typevar">Custom Collections with TypeVar</a></li>
+<li class="toc-entry toc-h2"><a href="#tweaking-existing-functionality-with-collections">Tweaking existing functionality with collections</a></li>
+<li class="toc-entry toc-h2"><a href="#typeguard">Typeguard</a></li>
+</ul><p>The fifth chapter of <a href="https://www.amazon.com/Robust-Python-Patrick-Viafore-ebook-dp-B09982C9FX/dp/B09982C9FX/ref=mt_other?_encoding=UTF8&amp;me=&amp;tag=soumet-20&amp;qid=">‘Robust Python’</a> continues on from <a href="https://mlops.systems/robustpython/python/books-i-read/2022/01/08/robust-python-4.html">where we left off</a> last time. We saw how to apply type annotations when simple things like strings, integers and floats were involved. This chapter deals with the different ways you annotate your types when collections get involved.</p>
+
+<p>We start with the context for why this is even something that requires a separate chapter to deal with. This involves the difference between homogenous and heterogeneous types. For a Python list, we could say it had homogenous types if all the items were of the same type (strings, e.g.). If this list contains multiple different types (a mix of strings and integers, e.g.) then we’d have to say it contained heterogenous types. This is of importance given that the presence of multiple types in a single list is going to require you to handle the types differently. Even in the most trivial of examples (as with strings and integers being together), the interfaces for both are different. Try adding a string to an integer in Python and see what happens.</p>
+
+<p>So it’s actually not quite true to say that a collection of homogenous types have to all be exactly the same type, but they must share common interfaces and ideally be handled using the same logic. If you think about it, in the real world heterogenous types are pretty common occurrences. There are often situations where, for example, you have to handle the output of API calls or data that doesn’t derive from code that’s in yous control and then you’ll perhaps be dealing with a dictionary that contains all sorts of types.</p>
+
+<p>In Python we do have the <code class="language-plaintext highlighter-rouge">typing.Any</code> annotation, but it’s pretty clear — and the book emphasises this — that isn’t really useful in the vast majority of cases. You might as well not bother with type annotations if you’re going to liberally be using <code class="language-plaintext highlighter-rouge">Any</code>.</p>
+
+<h2 id="the-first-of-our-collection-type-helpers-typeddict">
+<a class="anchor" href="#the-first-of-our-collection-type-helpers-typeddict" aria-hidden="true"><span class="octicon octicon-link"></span></a>The first of our collection type helpers: <code class="language-plaintext highlighter-rouge">TypedDict</code>
+</h2>
+
+<p><code class="language-plaintext highlighter-rouge">TypedDict</code> was introduced in Python 3.8 and allows you to communicate intent when it comes to the types that are being passed through your code. Note that, as with a lot of what we’re talking about here, this is all information that’s useful for a type checker and isn’t something that is dynamically checked.</p>
+
+<p>You can use <code class="language-plaintext highlighter-rouge">TypedDict</code> to define structures that specify the types of fields of your dictionary in a way that is easier to parse as a human reader than just using <code class="language-plaintext highlighter-rouge">dict</code>. See this example, adapted from one in the book:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TypedDict</span>
+
+<span class="k">class</span> <span class="nc">Range</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+    <span class="nb">min</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="nb">max</span><span class="p">:</span> <span class="nb">float</span>
+
+<span class="k">class</span> <span class="nc">Stats</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+	<span class="n">value</span><span class="p">:</span> <span class="nb">int</span>
+	<span class="n">unit</span><span class="p">:</span> <span class="nb">str</span>
+	<span class="n">confidenceRange</span><span class="p">:</span> <span class="n">Range</span>
+
+<span class="n">our_stats</span> <span class="o">=</span> <span class="n">Stats</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s">"some_name"</span><span class="p">,</span> <span class="n">confidenceRange</span><span class="o">=</span><span class="n">Range</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mf">1.3</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">5.5</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">our_stats</span><span class="p">)</span> <span class="c1"># returns {'value': 3, 'unit': 'some_name', 'confidenceRange': {'min': 1.3, 'max': 5.5}}
+</span></code></pre></div></div>
+
+<p>If <code class="language-plaintext highlighter-rouge">TypedDict</code> doesn’t do everything you need it to, we have some other options.</p>
+
+<h2 id="custom-collections-with-typevar">
+<a class="anchor" href="#custom-collections-with-typevar" aria-hidden="true"><span class="octicon octicon-link"></span></a>Custom Collections with <code class="language-plaintext highlighter-rouge">TypeVar</code>
+</h2>
+
+<p><code class="language-plaintext highlighter-rouge">TypeVar</code> in Python is how you can implement generics. Generics, as I learned while reading, are ways of representing things that are the same, like when you don’t care what specific type is being used. Take this example from the book, where you want to reverse items in a list, but only if the items are all of the same type. You could write the following:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TypeVar</span>
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s">'T'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">reverse</span><span class="p">(</span><span class="n">coll</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>
+	<span class="k">return</span> <span class="n">coll</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p>You can use generics in other ways to create new kinds of collections or groupings. For example, again this one is adapted from the book, if you were writing a series of methods that returned either something useful or a particular error message:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">get_weather_data</span><span class="p">(</span><span class="n">location</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">WeatherData</span><span class="p">,</span> <span class="n">APIError</span><span class="p">]:</span>
+	<span class="c1"># …
+</span>	
+<span class="k">def</span> <span class="nf">get_financial_data</span><span class="p">(</span><span class="n">transaction</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">FinancialData</span><span class="p">,</span> <span class="n">APIError</span><span class="p">]:</span>
+	<span class="c1"># …
+</span></code></pre></div></div>
+
+<p>…and so on, you could use generics as a way of simplifying how this gets presented:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s">'T'</span><span class="p">)</span>
+<span class="n">APIResponse</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="n">APIError</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">get_weather_data</span><span class="p">(</span><span class="n">location</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">APIResponse</span><span class="p">[</span><span class="n">WeatherData</span><span class="p">]:</span>
+	<span class="c1"># …
+</span>	
+<span class="k">def</span> <span class="nf">get_financial_data</span><span class="p">(</span><span class="n">transaction</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">APIResponse</span><span class="p">[</span><span class="n">FinancialData</span><span class="p">]:</span>
+	<span class="c1"># …
+</span></code></pre></div></div>
+
+<p>That looks and feels so much cleaner!</p>
+
+<h2 id="tweaking-existing-functionality-with-collections">
+<a class="anchor" href="#tweaking-existing-functionality-with-collections" aria-hidden="true"><span class="octicon octicon-link"></span></a>Tweaking existing functionality with <code class="language-plaintext highlighter-rouge">collections</code>
+</h2>
+
+<p>If you’re just making slight changes to the behaviour of collections, instead of subclassing dictionaries or lists or whatever, it’s better to override the methods of <code class="language-plaintext highlighter-rouge">collections.UserDict</code>, <code class="language-plaintext highlighter-rouge">collections.UserString</code> and/or <code class="language-plaintext highlighter-rouge">collections.UserList</code>.</p>
+
+<p>You’ll run into fewer problems when you actually implement this. Of course, there is a slight performance cost to importing these collections, so it’s worth making sure this cost isn’t too high.</p>
+
+<p>You’ll maybe have noticed that there isn’t a <code class="language-plaintext highlighter-rouge">collections.UserSet</code> in the list above. For sets we’ll have to use abstract base classes which are found in <code class="language-plaintext highlighter-rouge">collections.abc</code>. The big difference between the <code class="language-plaintext highlighter-rouge">User*</code> pattern of classes, there is no built-in storage for the <code class="language-plaintext highlighter-rouge">abc</code> classes. You have to provide your own storage if you need it. So for sets, we’d use <code class="language-plaintext highlighter-rouge">collections.abc.Set</code> and then implement whatever group of methods are required for that particular class.</p>
+
+<p>In the set example, we have to implement <code class="language-plaintext highlighter-rouge">__contains__</code>, <code class="language-plaintext highlighter-rouge">__iter__</code> and <code class="language-plaintext highlighter-rouge">__len__</code>, and then the other set operations will automatically work. There are currently (as of Python 3.10.2) <a href="https://docs.python.org/3/library/collections.abc.html#collections-abstract-base-classes">25 different ABCs</a> available to use. I definitely will be exploring those as they seem really useful.</p>
+
+<p>Even though this chapter got into the weeds of collections a little, I learned a <em>lot</em> and I’m already finding places in the ZenML codebase where all of this is being used.</p>
+
+<h2 id="typeguard">
+<a class="anchor" href="#typeguard" aria-hidden="true"><span class="octicon octicon-link"></span></a>Typeguard</h2>
+
+<p>Before I leave, since we’re still thinking about types, I wanted to share this little package I discovered the other day: <a href="https://typeguard.readthedocs.io/en/latest/index.html"><code class="language-plaintext highlighter-rouge">typeguard</code></a>. You can use it in a bunch of different ways, but a <a href="https://calmcode.io/shorts/typeguard.py.html">useful short video from calmcode.io</a> showed how a simple decorator can simplify code and catch type errors.</p>
+
+<p>Consider the following example code:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">calculate_risk</span><span class="p">(</span><span class="n">risk_factor</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+	<span class="s">"""Calculates how much risk you took"""</span>
+	<span class="k">return</span> <span class="n">risk_factor</span> <span class="o">*</span> <span class="mi">3</span> <span class="c1"># arbitrary return value :)
+</span></code></pre></div></div>
+
+<p>What if someone passes in a wrong type into this function? It’ll fail. So maybe we want to handle that particular situation:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">calculate_risk</span><span class="p">(</span><span class="n">risk_factor</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+	<span class="s">"""Calculates how much risk you took"""</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">risk_factor</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+		<span class="k">raise</span> <span class="nb">ValueError</span><span class="p">(</span><span class="s">"Wrong type for risk_factor"</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">risk_factor</span> <span class="o">*</span> <span class="mi">3</span>
+</code></pre></div></div>
+
+<p>If you have lots of parameters in your function and you have to handle them all, this could get messy quite quickly. Instead, we can <code class="language-plaintext highlighter-rouge">pip install typeguard</code> and do the following:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">from</span> <span class="nb">type</span> <span class="n">guard</span> <span class="kn">import</span> <span class="nn">typechecked</span>
+
+<span class="o">@</span><span class="n">typechecked</span>
+<span class="k">def</span> <span class="nf">calculate_risk</span><span class="p">(</span><span class="n">risk_factor</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+	<span class="s">"""Calculates how much risk you took"""</span>
+	<span class="k">return</span> <span class="n">risk_factor</span> <span class="o">*</span> <span class="mi">3</span>
+</code></pre></div></div>
+
+<p>Now that’s a handy little decorator! It’ll handle all the raising of appropriate errors above based on whether you passed in the right type or not. It works for classes as well. You’re welcome, and thanks <a href="https://twitter.com/fishnets88">Vincent</a> for making the introductory video!</p>
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="strickvl/ml-blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/robustpython/python/books-i-read/2022/01/16/robust-python-5.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>A place to share my technical learnings.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
