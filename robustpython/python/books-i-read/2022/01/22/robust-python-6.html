@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Using mypy for Python type checking | mlops.systems</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Using mypy for Python type checking" />
+<meta name="author" content="Alex Strick van Linschoten" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Reflections on the sixth and seventh chapters of Patrick Viafore’s book, ‘Robust Python’. We slowly wind down our discussion of type hints in Python code and think through using mypy and how to introduce type hints to a legacy codebase." />
+<meta property="og:description" content="Reflections on the sixth and seventh chapters of Patrick Viafore’s book, ‘Robust Python’. We slowly wind down our discussion of type hints in Python code and think through using mypy and how to introduce type hints to a legacy codebase." />
+<link rel="canonical" href="https://mlops.systems/robustpython/python/books-i-read/2022/01/22/robust-python-6.html" />
+<meta property="og:url" content="https://mlops.systems/robustpython/python/books-i-read/2022/01/22/robust-python-6.html" />
+<meta property="og:site_name" content="mlops.systems" />
+<meta property="og:image" content="https://mlops.systems/images/robust-python/robust-python-cover.jpeg" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-01-22T00:00:00-06:00" />
+<script type="application/ld+json">
+{"datePublished":"2022-01-22T00:00:00-06:00","url":"https://mlops.systems/robustpython/python/books-i-read/2022/01/22/robust-python-6.html","@type":"BlogPosting","dateModified":"2022-01-22T00:00:00-06:00","image":"https://mlops.systems/images/robust-python/robust-python-cover.jpeg","mainEntityOfPage":{"@type":"WebPage","@id":"https://mlops.systems/robustpython/python/books-i-read/2022/01/22/robust-python-6.html"},"author":{"@type":"Person","name":"Alex Strick van Linschoten"},"headline":"Using mypy for Python type checking","description":"Reflections on the sixth and seventh chapters of Patrick Viafore’s book, ‘Robust Python’. We slowly wind down our discussion of type hints in Python code and think through using mypy and how to introduce type hints to a legacy codebase.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://mlops.systems/feed.xml" title="mlops.systems" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script
+  defer
+  data-domain="mlops.systems"
+  src="https://plausible.io/js/plausible.js"
+></script>
+
+
+<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">mlops.systems</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About Me</a><a class="page-link" href="/search/">Search</a><a class="page-link" href="/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Using mypy for Python type checking</h1><p class="page-description">Reflections on the sixth and seventh chapters of Patrick Viafore's book, 'Robust Python'. We slowly wind down our discussion of type hints in Python code and think through using `mypy` and how to introduce type hints to a legacy codebase.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-01-22T00:00:00-06:00" itemprop="datePublished">
+        Jan 22, 2022
+      </time>• 
+          <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+            <span class="p-author h-card" itemprop="name">Alex Strick van Linschoten</span></span>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      4 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/categories/#robustpython">robustpython</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#python">python</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#books-i-read">books-i-read</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+</ul><p>The final two chapters of part one of Patrick Viafore’s ‘<a href="https://www.amazon.com/Robust-Python-Patrick-Viafore-ebook-dp-B09982C9FX/dp/B09982C9FX/ref=mt_other?qid=&amp;me=&amp;tag=soumet-20&amp;_encoding=UTF8">Robust Python</a>’ cover more practical advice on how to actually use and implement type checking in either a new project or a legacy codebase.</p>
+
+<p><a href="http://www.mypy-lang.org"><code class="language-plaintext highlighter-rouge">mypy</code></a> is the most commonly used option for type checking in Python and it does most of what you probably need it for. You can run it via the command line, inline as part of your IDE, or as part of a CI/CD pipeline. At work we do all three.</p>
+
+<p>You can configure <code class="language-plaintext highlighter-rouge">mypy</code> to your heart’s desire either with inline comments in your code, or via a configuration file. A configuration file is probably the way to go, particularly if you’re versioning your code and sharing these kinds of settings across a team.</p>
+
+<p>Chapter 6 goes into detail about some of the specific options or settings you can tweak to make <code class="language-plaintext highlighter-rouge">mypy</code> more or less sensitive to certain kinds of errors. For example, in <a href="https://mlops.systems/robustpython/python/books-i-read/2022/01/08/robust-python-4.html">a previous post</a> we mentioned how you can implicitly accept <code class="language-plaintext highlighter-rouge">None</code> as a type with the <code class="language-plaintext highlighter-rouge">Optional</code> type annotation wrapper. But maybe you don’t want to allow this behaviour because it’s generally not a great idea: if so, you can use the <code class="language-plaintext highlighter-rouge">—strict-optional</code> flag to get notified whenever you’re using that particular construction.</p>
+
+<p><code class="language-plaintext highlighter-rouge">mypy</code> also allows for the export of its results to html and xml, and you can run it in the background as a daemon which (particularly for large code bases) might speed it up.</p>
+
+<p>We also learn about some alternatives to <code class="language-plaintext highlighter-rouge">mypy</code>, namely Pyre and Pyright. <a href="https://pyre-check.org">Pyre</a> runs as a daemon in the background and allows you to run queries relating to type usage in your codebase. It also includes a static code analyser called <a href="https://pyre-check.org/docs/pysa-basics/">Pysa</a> that runs a kind of security analysis on your code called ‘taint analysis’. A quick summary of this would be to say that you can specify specific kinds of security flaws that you want to address and/or prevent being part of your codebase.</p>
+
+<p><a href="https://github.com/microsoft/pyright">Pyright</a> is interesting since it has a useful VS Code integration (via the <a href="https://marketplace.visualstudio.com/items?itemName=ms-python.vscode-pylance">Pylance extension</a>). You get all sorts of autocompletion and tooltip goodness by using Pyright/Pylance.</p>
+
+<p>Finally, chapter 7 thinks through how you might want to approach actually using type checking and type hints in a larger codebase, perhaps one that already exists. It’s useful this was included as I imagine these sorts of practicalities are much more of a blocker to adoption than any technical issues. After a brief discussion of tradeoffs, we learn about some different options for where you might want to start with introducing types to a legacy codebase.</p>
+
+<ul>
+  <li>Focusing on the pain points — i.e. where the lack of type hints has already seen bugs emerge in the past</li>
+  <li>or perhaps adding them to new code only</li>
+  <li>or perhaps type annotating the pieces of the codebase that actually drive the product or business’ profits</li>
+  <li>or maybe whatever is complex to understand</li>
+</ul>
+
+<p>All of these are options and it will definitely depend on your particular situation.</p>
+
+<p>We also learn about two tools that might help get you started with type annotation: <a href="https://github.com/instagram/MonkeyType">MonkeyType</a> and <a href="https://google.github.io/pytype/">Pytype</a>. Both auto-generate type hints for your codebase. MonkeyType does so dynamically, so it only generates type hints for parts of your code that it accesses while running the code. Pytype does so by static analysis. Both deliver some kind of output that you can then use (perhaps) as the basis of some annotations of your codebase. My instinct is that these two tools feel like they might lead to some faulty assumptions or errors if you rely on them too much and that in fact it would be better to just methodically go through your code and incrementally add type hints as suggested above.</p>
+
+<p>This concludes the type hints part of the book. I feel like I really got a solid overview of why type hints are used in large or complex Python codebases as well as how to implement this practically. I will be writing separately about how we use <code class="language-plaintext highlighter-rouge">mypy</code> and type hinting at ZenML as I think it offers an interesting case study on some of the benefits and tradeoffs that we’ve observed on a day-to-day basis.</p>
+
+<p>Next up in Robust Python: defining your own types with <code class="language-plaintext highlighter-rouge">Enums</code>, data classes, classes and how this fits into libraries like Pydantic.</p>
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="strickvl/ml-blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/robustpython/python/books-i-read/2022/01/22/robust-python-6.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>A place to share my technical learnings.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
