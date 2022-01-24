@@ -58,8 +58,8 @@ dates = [...]
 
 def process_date(input: datetime.datetime):
 	date = extract_date(input)
-    dates.append(date)
-    return date
+  dates.append(date)
+  return date
 ```
 
 Now we know what the `input` should be, and we can also add a type hint to the
