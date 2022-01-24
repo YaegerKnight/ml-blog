@@ -114,21 +114,46 @@ window.onload = wrap_img;
     </header>
 
   <div class="post-content e-content" itemprop="articleBody">
-    <p>The first section of <a href="https://www.amazon.com/Robust-Python-Patrick-Viafore-ebook-dp-B09982C9FX/dp/B09982C9FX/ref=mt_other?qid=&amp;me=&amp;tag=soumet-20&amp;_encoding=UTF8"><em>Robust Python</em></a> dives into types. We begin by taking a step back to think about what exactly types are being used for, and what they might bring us. Python was not (<a href="https://stackoverflow.com/questions/32557920/what-are-type-hints-in-python-3-5">until v3.5</a>) a language with which you could easily use typing. I remember going to <a href="http://pylondinium.org/2018/">the Pylondinium conference</a> in London in 2018 and going to <a href="https://pylondinium.org/2018/talk.html?talk_id=24">a talk by Bernat Gabor</a> about type hints in Python. Back then I didn’t have much of a sense of how new they were to many people, but even now I don’t get the feeling that they’ve been universally adopted. Hence Patrick’s book, I suppose…</p>
+    <p>The first section of
+<a href="https://www.amazon.com/Robust-Python-Patrick-Viafore-ebook-dp-B09982C9FX/dp/B09982C9FX/ref=mt_other?qid=&amp;me=&amp;tag=soumet-20&amp;_encoding=UTF8"><em>Robust Python</em></a>
+dives into types. We begin by taking a step back to think about what exactly
+types are being used for, and what they might bring us. Python was not
+(<a href="https://stackoverflow.com/questions/32557920/what-are-type-hints-in-python-3-5">until v3.5</a>)
+a language with which you could easily use typing. I remember going to
+<a href="http://pylondinium.org/2018/">the Pylondinium conference</a> in London in 2018 and
+going to
+<a href="https://pylondinium.org/2018/talk.html?talk_id=24">a talk by Bernat Gabor</a>
+about type hints in Python. Back then I didn’t have much of a sense of how new
+they were to many people, but even now I don’t get the feeling that they’ve been
+universally adopted. Hence Patrick’s book, I suppose…</p>
 
-<p>A type is defined in the book as being “a communication method”, both to / for computers (“mechanical representation”) as well as for humans (“semantic representation”). For the computer, when a variable is of a certain type this determines what methods can be called on that particular object. As such, though I’m straying into territory I don’t fully understand, I believe it also helps with compilation efficiency. (Python is a dynamically-typed language so any errors or type mismatches will only become apparent at runtime, however).</p>
+<p>A type is defined in the book as being “a communication method”, both to / for
+computers (“mechanical representation”) as well as for humans (“semantic
+representation”). For the computer, when a variable is of a certain type this
+determines what methods can be called on that particular object. As such, though
+I’m straying into territory I don’t fully understand, I believe it also helps
+with compilation efficiency. (Python is a dynamically-typed language so any
+errors or type mismatches will only become apparent at runtime, however).</p>
 
-<p>For humans, types can help signal intent. This connects with <a href="https://mlops.systems/robustpython/python/books-i-read/2021/12/29/robust-python-1.html">my previous chapter summary</a> from this book where I stated that code should communicate intent well to be considered ‘robust’. Take the following simple code snippet:</p>
+<p>For humans, types can help signal intent. This connects with
+<a href="https://mlops.systems/robustpython/python/books-i-read/2021/12/29/robust-python-1.html">my previous chapter summary</a>
+from this book where I stated that code should communicate intent well to be
+considered ‘robust’. Take the following simple code snippet:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dates</span> <span class="o">=</span> <span class="p">[...]</span>
 
 <span class="k">def</span> <span class="nf">process_date</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
-	<span class="n">date</span> <span class="o">=</span> <span class="n">extract_date</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
-    <span class="n">dates</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">date</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">date</span>
+  <span class="n">date</span> <span class="o">=</span> <span class="n">extract_date</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+  <span class="n">dates</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">date</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">date</span>
 </code></pre></div></div>
 
-<p>We have an <code class="language-plaintext highlighter-rouge">extract_date</code> function (defined elsewhere in the code), but we have no real sense of what this <code class="language-plaintext highlighter-rouge">input</code> parameter would be. Are we taking in strings as input? Are we taking in <code class="language-plaintext highlighter-rouge">datetime.datetime</code> objects? Does the <code class="language-plaintext highlighter-rouge">extract_date</code> function accept both, or do we need to ensure that we are only taking a specific type? All these questions could be cleared up with a simple type hint as part of the function definition, like so:</p>
+<p>We have an <code class="language-plaintext highlighter-rouge">extract_date</code> function (defined elsewhere in the code), but we have
+no real sense of what this <code class="language-plaintext highlighter-rouge">input</code> parameter would be. Are we taking in strings
+as input? Are we taking in <code class="language-plaintext highlighter-rouge">datetime.datetime</code> objects? Does the <code class="language-plaintext highlighter-rouge">extract_date</code>
+function accept both, or do we need to ensure that we are only taking a specific
+type? All these questions could be cleared up with a simple type hint as part of
+the function definition, like so:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dates</span> <span class="o">=</span> <span class="p">[...]</span>
 
@@ -138,9 +163,14 @@ window.onload = wrap_img;
     <span class="k">return</span> <span class="n">date</span>
 </code></pre></div></div>
 
-<p>Now we know what the <code class="language-plaintext highlighter-rouge">input</code> should be, and we can also add a type hint to the <code class="language-plaintext highlighter-rouge">extract_date</code> function as well which will help <em>communicate our intent</em>.</p>
+<p>Now we know what the <code class="language-plaintext highlighter-rouge">input</code> should be, and we can also add a type hint to the
+<code class="language-plaintext highlighter-rouge">extract_date</code> function as well which will help <em>communicate our intent</em>.</p>
 
-<p>We also learn how Python is more towards the ‘strongly-typed’ side of things on the language spectrum. If you try to concatenate a <code class="language-plaintext highlighter-rouge">list</code> with a <code class="language-plaintext highlighter-rouge">dict</code> in Python using the <code class="language-plaintext highlighter-rouge">+</code> operator, Python will throw a <code class="language-plaintext highlighter-rouge">TypeError</code> and fail. If you try to do the same in Javascript you get two different answers depending on the order of the two operands:</p>
+<p>We also learn how Python is more towards the ‘strongly-typed’ side of things on
+the language spectrum. If you try to concatenate a <code class="language-plaintext highlighter-rouge">list</code> with a <code class="language-plaintext highlighter-rouge">dict</code> in
+Python using the <code class="language-plaintext highlighter-rouge">+</code> operator, Python will throw a <code class="language-plaintext highlighter-rouge">TypeError</code> and fail. If you
+try to do the same in Javascript you get two different answers depending on the
+order of the two operands:</p>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt;&gt;&gt; [] + {}
 "[object Object]"
@@ -151,11 +181,23 @@ window.onload = wrap_img;
 
 <p>For our purposes, using Python, we can use the strong typing to our advantage.</p>
 
-<p>Python is dynamically typed, though, which takes a bit more caution to handle in a robust manner. Any type mismatches will only be found at runtime — at least using just the vanilla install of the language without any extra imports or modules.</p>
+<p>Python is dynamically typed, though, which takes a bit more caution to handle in
+a robust manner. Any type mismatches will only be found at runtime — at least
+using just the vanilla install of the language without any extra imports or
+modules.</p>
 
-<p>The chapter ends with a brief discussion of duck typing, defined as “the ability to use objects and entities in a programming language as long as they adhere to some interface”. We gain a lot in terms of increased composability, but if you rely on this feature of the language too much then it can become a hindrance in terms of communicating intent.</p>
+<p>The chapter ends with a brief discussion of duck typing, defined as “the ability
+to use objects and entities in a programming language as long as they adhere to
+some interface”. We gain a lot in terms of increased composability, but if you
+rely on this feature of the language too much then it can become a hindrance in
+terms of communicating intent.</p>
 
-<p>This chapter didn’t add too many new concepts or skills to my current understanding of the benefits of types, but it was useful to have this concept of ‘communicating intent’ to be reiterated. When I think back to how I’ve heard types mentioned in the past, they often get cast in a technical sense, whereas thinking about communication between developers I think is a more motivating framing.</p>
+<p>This chapter didn’t add too many new concepts or skills to my current
+understanding of the benefits of types, but it was useful to have this concept
+of ‘communicating intent’ to be reiterated. When I think back to how I’ve heard
+types mentioned in the past, they often get cast in a technical sense, whereas
+thinking about communication between developers I think is a more motivating
+framing.</p>
 
   </div><!-- from https://github.com/utterance/utterances -->
 <script src="https://utteranc.es/client.js"
