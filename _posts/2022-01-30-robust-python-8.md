@@ -44,7 +44,7 @@ print(current_state.value) # prints 3
 
 You can iterate through your enums or get their length just as if it was a list, too.
 
-{% include info.html text="While writing the above text, I realised that I was getting confused about the difference between types and classes in Python. It turns out that whatever differences once existed, they aren't much of a thing any more and [to all intents and purposes](https://stackoverflow.com/questions/4162578/python-terminology-class-vs-type) they're practically the same thing." %}
+While writing the above text, I realised that I was getting confused about the difference between types and classes in Python. It turns out that whatever differences once existed, they aren't much of a thing any more and [to all intents and purposes](https://stackoverflow.com/questions/4162578/python-terminology-class-vs-type) they're practically the same thing.
 
 A lot of the enum-related definitions at work are defined in [this file](https://github.com/zenml-io/zenml/blob/0.6.0/src/zenml/enums.py). You can see that we tend not to use `auto`, though I'm not really sure why. (We don't ever seem to compare against actual values.)
 
@@ -62,7 +62,7 @@ def get_status(some_input: str) -> TrafficLightsState:
 
 In the first case, it is far less clear what's going on.
 
-{% include info.html text="Note that if you're purely looking for a way to restrict the assignation to a particular variable, you can also use the `Literal` type, introduced in Python 3.8, though remember that it doesn't help with iteration, runtime checking or map values from name to value. For all that, you'll want to be using `Enum`." %}
+Note that if you're purely looking for a way to restrict the assignation to a particular variable, you can also use the `Literal` type, introduced in Python 3.8, though remember that it doesn't help with iteration, runtime checking or map values from name to value. For all that, you'll want to be using `Enum`."
 
 If you want a way to combine Enums together, you can subclass from `enum.Flag`. Consider the case of when you have a list of enums for days of the week, but you want to represent the weekend as a pairing of Saturday and Sunday (if you were in Europe, e.g.). You could do the following:
 
