@@ -119,8 +119,8 @@ window.onload = wrap_img;
   <div class="post-content e-content" itemprop="articleBody">
     <ul class="section-nav">
 <li class="toc-entry toc-h2"><a href="#whats-the-deal-with-synthetic-images">What’s the deal with synthetic images?</a></li>
-<li class="toc-entry toc-h2"><a href="#phase-1-get-a-baseline--naive-trial">Phase 1: Get a baseline / Naive Trial</a></li>
-<li class="toc-entry toc-h2"><a href="#detour-get-stuck-pretty-quickly-experience-bbox-sprawl">Detour: get stuck pretty quickly, experience bbox sprawl</a></li>
+<li class="toc-entry toc-h2"><a href="#phase-1-get-a-baseline--naive-trial">Phase 1: Get a Baseline / Naive Trial</a></li>
+<li class="toc-entry toc-h2"><a href="#detour-get-stuck-pretty-quickly-experience-bbox-sprawl">Detour: Get Stuck Pretty Quickly, Experience bbox Sprawl</a></li>
 <li class="toc-entry toc-h2"><a href="#phase-2-generate-my-own-base-images">Phase 2: Generate My Own Base Images</a></li>
 <li class="toc-entry toc-h2"><a href="#phase-3-generate-my-own-redactions">Phase 3: Generate My Own Redactions</a></li>
 <li class="toc-entry toc-h2"><a href="#the-big-picture-bringing-it-all-together">The Big Picture: Bringing It All Together</a></li>
@@ -148,7 +148,7 @@ window.onload = wrap_img;
 <p>My overall goal here was to boost my model’s performance. I didn’t know how how well these synthetic images would contribute, or even if they’d contribute to any boost at all. I was also quite conscious of the fact that you could probably spend a year generating pixel-perfect synthetic redacted documents. I didn’t want to waste too much time doing that, so at various points I had to make decisions as to whether a particular stage was good enough.</p>
 
 <h2 id="phase-1-get-a-baseline--naive-trial">
-<a class="anchor" href="#phase-1-get-a-baseline--naive-trial" aria-hidden="true"><span class="octicon octicon-link"></span></a>Phase 1: Get a baseline / Naive Trial</h2>
+<a class="anchor" href="#phase-1-get-a-baseline--naive-trial" aria-hidden="true"><span class="octicon octicon-link"></span></a>Phase 1: Get a Baseline / Naive Trial</h2>
 
 <p>When I started this, I didn’t know how hard or easy it was going to be, so I set myself a low bar. I knew it was theoretically possible to create images with Python, but I’d never done it before so didn’t have a sense of the range of possibilities.</p>
 
@@ -168,7 +168,7 @@ window.onload = wrap_img;
 <p>I found that it was pretty trivial to generate images of the kind I proposed above. The placement of the redactions didn’t always make sense, and sometimes the random resize that the redaction underwent meant that it was either far too small or far too large. I also hadn’t included any steps to capture the annotation in this prototype, but I knew it was possible so continued onwards.</p>
 
 <h2 id="detour-get-stuck-pretty-quickly-experience-bbox-sprawl">
-<a class="anchor" href="#detour-get-stuck-pretty-quickly-experience-bbox-sprawl" aria-hidden="true"><span class="octicon octicon-link"></span></a>Detour: get stuck pretty quickly, experience bbox sprawl</h2>
+<a class="anchor" href="#detour-get-stuck-pretty-quickly-experience-bbox-sprawl" aria-hidden="true"><span class="octicon octicon-link"></span></a>Detour: Get Stuck Pretty Quickly, Experience bbox Sprawl</h2>
 
 <p>Buoyed by my success in the prototype stage, I immediately added a bunch of improvements and features to what I wanted to achieve. I knew I wanted to make sure that the redaction stayed within the boundaries of the original base image. I also wanted to ensure that it stayed within the boundaries of the content of the base image — i.e. redactions generally tend to be made on top of content which tends not to be right on the outer margins.</p>
 
