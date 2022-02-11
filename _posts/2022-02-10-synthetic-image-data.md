@@ -32,7 +32,7 @@ The big bottleneck in the annotation process is, of course, me. Depending on how
 
 My overall goal here was to boost my model's performance. I didn't know how how well these synthetic images would contribute, or even if they'd contribute to any boost at all. I was also quite conscious of the fact that you could probably spend a year generating pixel-perfect synthetic redacted documents. I didn't want to waste too much time doing that, so at various points I had to make decisions as to whether a particular stage was good enough.
 
-## Phase 1: Get a baseline / Naive Trial
+## Phase 1: Get a Baseline / Naive Trial
 
 When I started this, I didn't know how hard or easy it was going to be, so I set myself a low bar. I knew it was theoretically possible to create images with Python, but I'd never done it before so didn't have a sense of the range of possibilities.
 
@@ -50,7 +50,7 @@ And voila! Finding unredacted images was easy since [I had previously used `fast
 
 I found that it was pretty trivial to generate images of the kind I proposed above. The placement of the redactions didn't always make sense, and sometimes the random resize that the redaction underwent meant that it was either far too small or far too large. I also hadn't included any steps to capture the annotation in this prototype, but I knew it was possible so continued onwards.
 
-## Detour: get stuck pretty quickly, experience bbox sprawl
+## Detour: Get Stuck Pretty Quickly, Experience bbox Sprawl
 
 Buoyed by my success in the prototype stage, I immediately added a bunch of improvements and features to what I wanted to achieve. I knew I wanted to make sure that the redaction stayed within the boundaries of the original base image. I also wanted to ensure that it stayed within the boundaries of the content of the base image — i.e. redactions generally tend to be made on top of content which tends not to be right on the outer margins.
 
