@@ -30,3 +30,16 @@ I had started off with a batch size of 8, but increasing to 16 and then 32 had a
 
 ![]({{ site.baseurl
 }}/images/model-improvements/batch-size-experiments.png "COCOMetric and validation loss charts for the different batch size increases")
+
+Batch sizes of both 16 and 32 eventually converged on more or less the same COCOMetric score of around 74%. The validation loss rate showed pretty clearly that the highest (32) batch size overfit far faster than for 16. It seems that 16 is the best choice for now.
+
+# Backbone model size
+
+The way I've set things up to train this object detection model requires two main choices in terms of architecture: a particular pre-trained model and a backbone. VFNet ([as mentioned previously](https://mlops.systems/redactionmodel/computervision/2021/11/30/vfnet-basics.html)) outperformed basically everything else I've tried and I think it seems to be a clear best choice for the model. In terms of the backbone, I'd been using resnet50 until now, but following some of the above experiments, it made sense to try increasing the backbone size as well. (An obvious disadvantage to this approach was slower training times and a larger final model size.)
+
+![]({{ site.baseurl
+}}/images/model-improvements/backbone-size-experiments.png "COCOMetric and validation loss charts for the different backbone size increases")
+
+In this image you can see the stages of improvements we made throughout this whole process. `vfnet-pre-synthetic-base` was the lowest performer at the beginning, then doubling the batch size gave another boost of almost 8% to our model performance. Then the final increase to the backbone size added another 4% increase bringing us to a score of around 78% for the COCOMetric.
+
+It remains to be seen how much of these changes will make sense when I introduce the synthetic data, or if there are more effective boosters to the model performance in the form of adding annotations to areas where the model struggles the most.
