@@ -6,7 +6,7 @@ description:
 categories: [python, tools]
 comments: true
 author: Alex Strick van Linschoten
-title: Three Python Helper for Parsing Inputs
+title: Three Python Helpers for Parsing Inputs
 image: images/python-parsers/parse.png
 ---
 
