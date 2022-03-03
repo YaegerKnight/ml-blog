@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Incremental Improvements to my Redaction Detection Model | mlops.systems</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Incremental Improvements to my Redaction Detection Model" />
+<meta name="author" content="Alex Strick van Linschoten" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="I used a series of techniques to improve the performance of my model while creating a pathway to (hopefully) bigger gains going forward." />
+<meta property="og:description" content="I used a series of techniques to improve the performance of my model while creating a pathway to (hopefully) bigger gains going forward." />
+<link rel="canonical" href="https://mlops.systems/redactionmodel/computervision/tools/2022/03/03/model-improvements.html" />
+<meta property="og:url" content="https://mlops.systems/redactionmodel/computervision/tools/2022/03/03/model-improvements.html" />
+<meta property="og:site_name" content="mlops.systems" />
+<meta property="og:image" content="https://mlops.systems/images/model-improvements/coco_scores.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-03-03T00:00:00-06:00" />
+<script type="application/ld+json">
+{"datePublished":"2022-03-03T00:00:00-06:00","url":"https://mlops.systems/redactionmodel/computervision/tools/2022/03/03/model-improvements.html","@type":"BlogPosting","dateModified":"2022-03-03T00:00:00-06:00","image":"https://mlops.systems/images/model-improvements/coco_scores.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://mlops.systems/redactionmodel/computervision/tools/2022/03/03/model-improvements.html"},"author":{"@type":"Person","name":"Alex Strick van Linschoten"},"headline":"Incremental Improvements to my Redaction Detection Model","description":"I used a series of techniques to improve the performance of my model while creating a pathway to (hopefully) bigger gains going forward.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://mlops.systems/feed.xml" title="mlops.systems" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script
+  defer
+  data-domain="mlops.systems"
+  src="https://plausible.io/js/plausible.js"
+></script>
+
+
+<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">mlops.systems</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About Me</a><a class="page-link" href="/search/">Search</a><a class="page-link" href="/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Incremental Improvements to my Redaction Detection Model</h1><p class="page-description">I used a series of techniques to improve the performance of my model while creating a pathway to (hopefully) bigger gains going forward.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-03-03T00:00:00-06:00" itemprop="datePublished">
+        Mar 3, 2022
+      </time>• 
+          <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+            <span class="p-author h-card" itemprop="name">Alex Strick van Linschoten</span></span>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      3 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/categories/#redactionmodel">redactionmodel</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#computervision">computervision</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#tools">tools</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h1"><a href="#increasing-the-image-size">Increasing the image size</a></li>
+<li class="toc-entry toc-h1"><a href="#increasing-the-batch-size">Increasing the batch size</a></li>
+<li class="toc-entry toc-h1"><a href="#backbone-model-size">Backbone model size</a></li>
+</ul><p><em>(This is part of a series of blog posts documenting my work to train a model that detects redactions in documents. To read other posts, check out <a href="https://mlops.systems/categories/#redactionmodel">the <code class="language-plaintext highlighter-rouge">redactionmodel</code> taglist</a>.)</em></p>
+
+<p>Last time I wrote about my work on this project, I’d just finished <a href="https://mlops.systems/redactionmodel/computervision/python/tools/2022/02/10/synthetic-image-data.html">creating synthetic image data</a> to supplement my manual annotations. Before integrating those into the model training, I wanted to make changes to a few hyper parameters to ensure that I’m getting as much out of the current configuration as possible.</p>
+
+<p>I focused on three ways of improving the model’s performance, each of which ended up having an effect albeit in different ways.</p>
+
+<h1 id="increasing-the-image-size">
+<a class="anchor" href="#increasing-the-image-size" aria-hidden="true"><span class="octicon octicon-link"></span></a>Increasing the image size</h1>
+
+<p>When I started the project, I set the size of the images that would be passed into the training as the training dataset to 384x384 pixels. (It is a convention relating to how some of the older pre-trained models (like EfficientDet) were such that the image size must be divisible by 128.) This turned out to be too small.</p>
+
+<p>The next steps up were 512 and 640. The GPU / hardware on which I was training my model seemed to have no problem with either of these image sizes and the performance increased as I worked with either 512 or 640 as the base image sizes.</p>
+
+<h1 id="increasing-the-batch-size">
+<a class="anchor" href="#increasing-the-batch-size" aria-hidden="true"><span class="octicon octicon-link"></span></a>Increasing the batch size</h1>
+
+<p>Another important lever at my disposal was either to increase the batch size (the number of images that are used in each epoch) or to decrease the learning rate. (<a href="https://twitter.com/borisdayma/status/1488297953429266433">A useful Twitter thread by Boris Dayma</a> explains some of the tradeoffs for one versus the other, along with some references to things to read).</p>
+
+<p>I had started off with a batch size of 8, but increasing to 16 and then 32 had a big effect on my model’s performance:</p>
+
+<p><img src="/images/model-improvements/batch-size-experiments.png" alt="" title="COCOMetric and validation loss charts for the different batch size increases"></p>
+
+<p>Batch sizes of both 16 and 32 eventually converged on more or less the same COCOMetric score of around 74%. The validation loss rate showed pretty clearly that the highest (32) batch size overfit far faster than for 16. It seems that 16 is the best choice for now.</p>
+
+<h1 id="backbone-model-size">
+<a class="anchor" href="#backbone-model-size" aria-hidden="true"><span class="octicon octicon-link"></span></a>Backbone model size</h1>
+
+<p>The way I’ve set things up to train this object detection model requires two main choices in terms of architecture: a particular pre-trained model and a backbone. VFNet (<a href="https://mlops.systems/redactionmodel/computervision/2021/11/30/vfnet-basics.html">as mentioned previously</a>) outperformed basically everything else I’ve tried and I think it seems to be a clear best choice for the model. In terms of the backbone, I’d been using resnet50 until now, but following some of the above experiments, it made sense to try increasing the backbone size as well. (An obvious disadvantage to this approach was slower training times and a larger final model size.)</p>
+
+<p><img src="/images/model-improvements/backbone-size-experiments.png" alt="" title="COCOMetric and validation loss charts for the different backbone size increases"></p>
+
+<p>In this image you can see the stages of improvements we made throughout this whole process. <code class="language-plaintext highlighter-rouge">vfnet-pre-synthetic-base</code> was the lowest performer at the beginning, then doubling the batch size gave another boost of almost 8% to our model performance. Then the final increase to the backbone size added another 4% increase bringing us to a score of around 78% for the COCOMetric.</p>
+
+<p>It remains to be seen how much of these changes will make sense when I introduce the synthetic data, or if there are more effective boosters to the model performance in the form of adding annotations to areas where the model struggles the most.</p>
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="strickvl/ml-blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/redactionmodel/computervision/tools/2022/03/03/model-improvements.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>A place to share my technical learnings.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
