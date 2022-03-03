@@ -13,7 +13,7 @@
   
     
         ,"post1": {
-            "title": "Three Python Helper for Parsing Inputs",
+            "title": "Three Python Helpers for Parsing Inputs",
             "content": "I continue to slowly work my way through the calmcode back catalogue. This week I learned about three tiny utility packages that make certain parsing tasks less painful. . parse (introduced here) is a way of turning simple text patterns into restructured data. Take the following example as an illustration: . from parse import parse url = &quot;https://github.com/strickvl/some-repo/&quot; parse(&quot;https://github.com/{owner}/{repo}/&quot;, url).named # returns {&#39;owner&#39;: &#39;strickvl&#39;, &#39;repo&#39;: &#39;some-repo&#39;} . As Vincent explains, it’s sort of the inverse or opposite operation to what happens with an f-string. . For URLs of various kinds that you want to decompose easily, yarl (introduced here) is a great way to approach that in Python. . For dates stored in some kind of a string format, you might want to try datefinder (introduced here), an elegant if not always perfect way for converting date strings into datetime.datetime objects. .",
             "url": "https://mlops.systems/python/tools/2022/02/27/python-parsers.html",
             "relUrl": "/python/tools/2022/02/27/python-parsers.html",
