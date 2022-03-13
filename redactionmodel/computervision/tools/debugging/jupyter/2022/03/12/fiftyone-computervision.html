@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Figuring out why my object detection model is underperforming with FiftyOne, a great tool you probably haven’t heard of | mlops.systems</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Figuring out why my object detection model is underperforming with FiftyOne, a great tool you probably haven’t heard of" />
+<meta name="author" content="Alex Strick van Linschoten" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="I used the under-appreciated tool FiftyOne to analyse the ways that my object detection model is underperforming. For computer vision problems, it’s really useful to have visual debugging aids and FiftyOne is a well-documented and solid tool to help with that." />
+<meta property="og:description" content="I used the under-appreciated tool FiftyOne to analyse the ways that my object detection model is underperforming. For computer vision problems, it’s really useful to have visual debugging aids and FiftyOne is a well-documented and solid tool to help with that." />
+<link rel="canonical" href="https://mlops.systems/redactionmodel/computervision/tools/debugging/jupyter/2022/03/12/fiftyone-computervision.html" />
+<meta property="og:url" content="https://mlops.systems/redactionmodel/computervision/tools/debugging/jupyter/2022/03/12/fiftyone-computervision.html" />
+<meta property="og:site_name" content="mlops.systems" />
+<meta property="og:image" content="https://mlops.systems/images/fiftyone-computervision/fiftyone-overview.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-03-12T00:00:00-06:00" />
+<script type="application/ld+json">
+{"datePublished":"2022-03-12T00:00:00-06:00","url":"https://mlops.systems/redactionmodel/computervision/tools/debugging/jupyter/2022/03/12/fiftyone-computervision.html","@type":"BlogPosting","dateModified":"2022-03-12T00:00:00-06:00","image":"https://mlops.systems/images/fiftyone-computervision/fiftyone-overview.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://mlops.systems/redactionmodel/computervision/tools/debugging/jupyter/2022/03/12/fiftyone-computervision.html"},"author":{"@type":"Person","name":"Alex Strick van Linschoten"},"headline":"Figuring out why my object detection model is underperforming with FiftyOne, a great tool you probably haven’t heard of","description":"I used the under-appreciated tool FiftyOne to analyse the ways that my object detection model is underperforming. For computer vision problems, it’s really useful to have visual debugging aids and FiftyOne is a well-documented and solid tool to help with that.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://mlops.systems/feed.xml" title="mlops.systems" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script
+  defer
+  data-domain="mlops.systems"
+  src="https://plausible.io/js/plausible.js"
+></script>
+
+
+<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">mlops.systems</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About Me</a><a class="page-link" href="/search/">Search</a><a class="page-link" href="/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Figuring out why my object detection model is underperforming with FiftyOne, a great tool you probably haven&#39;t heard of</h1><p class="page-description">I used the under-appreciated tool FiftyOne to analyse the ways that my object detection model is underperforming. For computer vision problems, it's really useful to have visual debugging aids and FiftyOne is a well-documented and solid tool to help with that.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-03-12T00:00:00-06:00" itemprop="datePublished">
+        Mar 12, 2022
+      </time>• 
+          <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+            <span class="p-author h-card" itemprop="name">Alex Strick van Linschoten</span></span>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      10 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/categories/#redactionmodel">redactionmodel</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#computervision">computervision</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#tools">tools</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#debugging">debugging</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#jupyter">jupyter</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h1"><a href="#fiftyone-basics">FiftyOne Basics</a></li>
+<li class="toc-entry toc-h1"><a href="#comparing-ground-truth-with-predictions">Comparing ground truth with predictions</a>
+<ul>
+<li class="toc-entry toc-h2"><a href="#viewing-only-high-confidence-predictions">Viewing only high-confidence predictions</a></li>
+<li class="toc-entry toc-h2"><a href="#patches-detailed-views-for-detected-objects">‘Patches’: detailed views for detected objects</a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h1"><a href="#understanding-how-our-model-performs-for-separate-classes">Understanding how our model performs for separate classes</a></li>
+<li class="toc-entry toc-h1"><a href="#viewing-the-false-positives-and-false-negatives">Viewing the false positives and false negatives</a></li>
+<li class="toc-entry toc-h1"><a href="#finding-detection-mistakes-with-fiftyone-brains-mistakenness-calculation">Finding detection mistakes with FiftyOne Brain’s mistakenness calculation</a></li>
+<li class="toc-entry toc-h1"><a href="#finding-missing-annotations">Finding missing annotations</a></li>
+<li class="toc-entry toc-h1"><a href="#conclusions-and-next-steps">Conclusions and Next Steps</a></li>
+</ul><p><em>(This is part of a series of blog posts documenting my work to train a model that detects redactions in documents. To read other posts, check out <a href="https://mlops.systems/categories/#redactionmodel">the <code class="language-plaintext highlighter-rouge">redactionmodel</code> taglist</a>.)</em></p>
+
+<p>So you’ve trained a computer vision model, but you think it could do better. What do you do next? This is a common scenario, especially for computer vision problems where fine-tuning someone else’s pre-trained model is a pretty normal initial step that gets taken. You emerge with a decent score on whatever metric you care about, but it also isn’t great.</p>
+
+<p>One part of the solution is certainly ‘more data’. This approach was recently highlighted by Boris Dayma on Twitter:</p>
+
+<div class="jekyll-twitter-plugin">
+<blockquote class="twitter-tweet">
+<p lang="en" dir="ltr">Easy recipe to get quickly a cool classification model on your own dataset 🤓<br>✅ spend 1-2h to sort part of your data<br>✅ split in train/val as 90/10<br>✅ fine-tune a model (HuggingFace makes it easy)<br>✅ use that model to sort faster more data<br>✅ train again &amp; repeat until happy!</p>— Boris Dayma 🥑 (@borisdayma) <a href="https://twitter.com/borisdayma/status/1502317249423679495?ref_src=twsrc%5Etfw">March 11, 2022</a>
+</blockquote>
+<script async="" src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</div>
+
+<p>In my case, I currently have a little over 1200 images that have been annotated, but of those some 600 of them don’t contain any redactions at all (i.e. they just have content boxes). I did mention that I was using a similar approach early on, where I’d use the model to help pre-annotate images, but I haven’t been using that recently.</p>
+
+<p>I’m realising that more important than pure volume of data is to annotate types of images that are the hardest for the model to learn. So what I really want to know at this point is where I should place my focus when it comes to supplementing the training data. My images aren’t currently divided into separate classes, but I have a proxy (the filename) which will be really helpful once I’ve identified which types I need to supplement.</p>
+
+<p>When seeking to improve computer vision models with error analysis, some kind of visual inspection is essential. <code class="language-plaintext highlighter-rouge">fastai</code> had <a href="https://docs.fast.ai/interpret.html">a number of utility methods</a> that helped in the interpretation of where a model was underperforming, but for object detection I think you do need something that was built to purpose, where you can really dive into the specific ways each object was or wasn’t detected.</p>
+
+<p>Enter <a href="https://voxel51.com/docs/fiftyone/">FiftyOne</a>.</p>
+
+<p><a href="https://voxel51.com/docs/fiftyone/">FiftyOne</a> is an open-source tool built specifically to support the curation and creation of datasets for computer vision models. It is almost two years old in its open-source incarnation, and (or but?) it feels very solid and robust in its implementation. <a href="https://voxel51.com">Voxel51</a>, the company behind it, has taken great pains to write excellent documentation and guides, and they have <a href="https://join.slack.com/t/fiftyone-users/shared_invite/zt-gtpmm76o-9AjvzNPBOzevBySKzt02gg">a supportive community</a> behind the scenes, too.</p>
+
+<h1 id="fiftyone-basics">
+<a class="anchor" href="#fiftyone-basics" aria-hidden="true"><span class="octicon octicon-link"></span></a>FiftyOne Basics</h1>
+
+<p>FiftyOne is a Python library that offers a visual interface to your data. For my redaction model, the base interface looks something like this:</p>
+
+<p><img src="/images/fiftyone-computervision/fiftyone-overview.png" alt="" title="The basic view of the FiftyOne app"></p>
+
+<p>You need to convert your dataset such that FiftyOne can interpret the structure of where images are stored as well as the annotations themselves, but many commonly-used formats are supported. In my case, COCO annotations are supported out of the box, so it was trivial to import the data to generate the above visualisation.</p>
+
+<p>You can use the FiftyOne application inside a Jupyter Notebook, or you can have it open in a separate tab. A separate tab is my preference as it allows for a larger interface. (There is also a completely separate Desktop app interface you can use, but I think not all functionality works there so you might want to stick to a separate tab).</p>
+
+<p>Luckily for me, my computer vision framework of choice is IceVision, and <a href="https://airctic.com/0.12.0/using_fiftyone_in_icevision/">they recently integrated</a> with FiftyOne which makes creating datasets a breeze.</p>
+
+<p>So how did FiftyOne help me understand how my model was performing? (Note: the sections that follow were significantly helped by following <a href="https://voxel51.com/docs/fiftyone/tutorials/evaluate_detections.html">this</a>, <a href="https://voxel51.com/docs/fiftyone/tutorials/uniqueness.html">this</a> and <a href="https://voxel51.com/docs/fiftyone/tutorials/detection_mistakes.html">this</a> part of the <a href="https://voxel51.com/docs/fiftyone/">FiftyOne docs</a>.)</p>
+
+<h1 id="comparing-ground-truth-with-predictions">
+<a class="anchor" href="#comparing-ground-truth-with-predictions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Comparing ground truth with predictions</h1>
+
+<p>The first thing I did was visualise the ground truth annotations alongside the predictions of my model. (This is the model mentioned in <a href="https://mlops.systems/redactionmodel/computervision/tools/2022/03/03/model-improvements.html">my last blogpost</a>, which had a COCO score of almost 80%.)</p>
+
+<p>This requires performing inference on a slice of our images. Unfortunately, I had to do that inference on my local (CPU) machine because FiftyOne doesn’t work on Paperspace cloud machines on account of port forwarding choices that Paperspace make. This makes for a slightly slower iteration cycle, but once the inference is done you don’t have to do it again.</p>
+
+<p><img src="/images/fiftyone-computervision/groundtruth-predictions.gif" alt="" title="Comparing ground truth with predictions"></p>
+
+<p>You can see here that it’s possible to selectively turn off and on the various overlaid annotations. If you want to compare how redactions are detected (and not see the content box), then this is an easy way to toggle between.</p>
+
+<h2 id="viewing-only-high-confidence-predictions">
+<a class="anchor" href="#viewing-only-high-confidence-predictions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Viewing only high-confidence predictions</h2>
+
+<p>Not all predictions are created equal, too, so it would be useful to view only those predictions where the confidence was higher than 75%. FiftyOne makes this kind of conditional view easy. You can do it in code, as in the following snippet, or you can do it via the GUI inside the app.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">fiftyone</span> <span class="kn">import</span> <span class="n">ViewField</span> <span class="k">as</span> <span class="n">F</span>
+
+<span class="c1"># Only contains detections with confidence &gt;= 0.75
+# `dataset` is the FiftyOne core object that was created before
+</span><span class="n">high_conf_view</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">.</span><span class="n">filter_labels</span><span class="p">(</span><span class="s">"prediction"</span><span class="p">,</span> <span class="n">F</span><span class="p">(</span><span class="s">"confidence"</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.75</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><img src="/images/fiftyone-computervision/highconfidence.png" alt="" title="Viewing high-confidence predictions"></p>
+
+<h2 id="patches-detailed-views-for-detected-objects">
+<a class="anchor" href="#patches-detailed-views-for-detected-objects" aria-hidden="true"><span class="octicon octicon-link"></span></a>‘Patches’: detailed views for detected objects</h2>
+
+<p>For a more fine-grained understanding on the ways our model is predicting redactions, we can create what are called ‘patches’ to view and scroll through prediction-by-prediction.</p>
+
+<p><img src="/images/fiftyone-computervision/redaction-patch.png" alt="" title="Patch view of some predicted redactions"></p>
+
+<p>This is an excellent way to view things through the eyes of your model. These are all the objects it considers to be redactions. We’ll get to finding the ones where it doesn’t do as well in a bit, but this view allows us to immerse ourselves in the reality of how our model is predicting redaction boxes. We can see that certain types of boxes are well-represented in our dataset: coloured or shaded rectangles in particular.</p>
+
+<h1 id="understanding-how-our-model-performs-for-separate-classes">
+<a class="anchor" href="#understanding-how-our-model-performs-for-separate-classes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Understanding how our model performs for separate classes</h1>
+
+<p>We only have two classes in our training data: redaction and content, so doing a class analysis doesn’t help us too much for this problem, but using the mean average precision (MAP) calculation we can see the difference between how well our model does on redactions vs content:</p>
+
+<p><img src="/images/fiftyone-computervision/class-comparison.png" alt="" title="A classification report for our dataset"></p>
+
+<p>We can also easily plot an interactive chart that quite clearly displays these differences:</p>
+
+<p><img src="/images/fiftyone-computervision/plotting-curves.png" alt="" title="Plotting the precision vs recall curves for our two classes"></p>
+
+<h1 id="viewing-the-false-positives-and-false-negatives">
+<a class="anchor" href="#viewing-the-false-positives-and-false-negatives" aria-hidden="true"><span class="octicon octicon-link"></span></a>Viewing the false positives and false negatives</h1>
+
+<p>The previous calculations also added some metadata to each image, denoting whether it was considered a true positive, false positive or false negative. It’s really useful to be able to easily switch between these views, and identifying the images with the largest numbers of false positives and false negatives will help appreciate what our model struggles with.</p>
+
+<p>This view is sorted by total number of false positives in an image. False positives are where the model confidently has predicted something to be a redaction box, for example, that is not actually a redaction box.</p>
+
+<p><img src="/images/fiftyone-computervision/false-positives.png" alt="" title="Plotting the precision vs recall curves for our two classes"></p>
+
+<p>In this image you can see that the model predicts a redaction box with 82% confidence that is clearly not a redaction. Note, too, how the smaller redactions to the right and the large partial redaction to the left were not detected.</p>
+
+<p>False negatives are where there were some redactions to be predicted, but our model never made those predictions (or was very unconfident in doing so).</p>
+
+<p><img src="/images/fiftyone-computervision/false-negatives.png" alt="" title="False negatives &amp; missing predictions"></p>
+
+<p>In this image excerpt, you can see that some predictions were made, but many were also missed. This image shows the ground truth reality of what should have been predicted:</p>
+
+<p><img src="/images/fiftyone-computervision/false-negatives-overlaid.png" alt="" title="Overlaying the ground truth, showing many false negatives"></p>
+
+<p>Scrolling through the examples with high numbers of false positives and false negatives gives me a really useful indication of which kinds of redactions with which I need to annotate and supplement my training data. I already had a sense of this from my own intuition, but it’s excellent to see this confirmed in the data.</p>
+
+<h1 id="finding-detection-mistakes-with-fiftyone-brains-mistakenness-calculation">
+<a class="anchor" href="#finding-detection-mistakes-with-fiftyone-brains-mistakenness-calculation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Finding detection mistakes with FiftyOne Brain’s <code class="language-plaintext highlighter-rouge">mistakenness</code> calculation</h1>
+
+<p>FiftyOne is not only the visual interface, but it also has something called the FiftyOne <a href="https://voxel51.com/docs/fiftyone/user_guide/brain.html"><code class="language-plaintext highlighter-rouge">brain</code></a>.</p>
+
+<div class="Toast">
+   <span class="Toast-icon"><svg class="octicon octicon-info octicon octicon-info" viewbox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8zm6.5-.25A.75.75 0 017.25 7h1a.75.75 0 01.75.75v2.75h.25a.75.75 0 010 1.5h-2a.75.75 0 010-1.5h.25v-2h-.25a.75.75 0 01-.75-.75zM8 6a1 1 0 100-2 1 1 0 000 2z"></path></svg></span>
+   <span class="Toast-content">It's worth being aware of the distinction between the two: FiftyOne itself is open-source and free to use. The brain is closed-source and free for non-commercial uses.</span>
+</div>
+
+<p>The brain allows you to perform various calculations on your dataset to determine (among other things):</p>
+
+<ul>
+  <li>visual similarity</li>
+  <li>uniqueness</li>
+  <li>mistakenness</li>
+  <li>hardness</li>
+</ul>
+
+<p>(You can also <a href="https://voxel51.com/docs/fiftyone/user_guide/brain.html#brain-embeddings-visualization">visualise embeddings</a> to cluster image or annotation types, but I haven’t used that feature yet so can’t comment as its effectiveness.)</p>
+
+<p>For my dataset, visualising similarity and uniqueness revealed what I already knew: that lots of the images were similar. Knowing the context of the documents well means I’m familiar with how a lot of the documents look the same. Not much of a revelation there.</p>
+
+<p>The mistakenness calculation is useful, however. It compares between the ground truth and the predictions to get a sense of which images it believes contains annotations that might be wrong. I can filter these such that we only show images where it is more than 80% confident mistakes have been made. Instantly it reveals a few examples where there have been annotation mistakes. To take one example, here you can see the ground truth annotations:</p>
+
+<p><img src="/images/fiftyone-computervision/groundtruth-mistake.png" alt="" title="Ground truth mistakes"></p>
+
+<p>And here you can see what was predicted:</p>
+
+<p><img src="/images/fiftyone-computervision/mistake-what-was-predicted.png" alt="" title="What was predicted, revealing mistakes in the ground truth annotations"></p>
+
+<p>In this example, it was even clear from the beginning that redactions had been missed, and that the single annotation that had been made (a content box) was incorrect.</p>
+
+<h1 id="finding-missing-annotations">
+<a class="anchor" href="#finding-missing-annotations" aria-hidden="true"><span class="octicon octicon-link"></span></a>Finding missing annotations</h1>
+
+<p>We can also view images that the FiftyOne brain tagged as containing missing annotations:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">session</span><span class="p">.</span><span class="n">view</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">.</span><span class="n">match</span><span class="p">(</span><span class="n">F</span><span class="p">(</span><span class="s">"possible_missing"</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><img src="/images/fiftyone-computervision/missing-annotations.png" alt="" title="Suggestions for images containing annotations that were missing"></p>
+
+<p>Unfortunately the <a href="https://voxel51.com/docs/fiftyone/user_guide/brain.html#brain-sample-hardness"><code class="language-plaintext highlighter-rouge">compute_hardness</code></a> method only works for classification models currently, but regardless I think we have a lot to work with already.</p>
+
+<h1 id="conclusions-and-next-steps">
+<a class="anchor" href="#conclusions-and-next-steps" aria-hidden="true"><span class="octicon octicon-link"></span></a>Conclusions and Next Steps</h1>
+
+<p>I hope this practical introduction to FiftyOne has given you a high-level overview of the ways the tool can be useful in evaluating your computer vision models.</p>
+
+<p>For my redaction project, I’m taking some clear action steps I need to work on as a result of some of this analysis.</p>
+
+<ul>
+  <li>I need do annotate more of the kinds of images it struggles with. Specifically, this means images containing redactions that are just white boxes, with a bonus for those white redaction boxes being superimposed on top of a page filed with white boxes (i.e. some sort of table or form).</li>
+  <li>I need to remove some of the bad/false ground truth annotations that the FiftyOne brain helpfully identified.</li>
+  <li>I will probably want to repeat this process together in a model that was trained together with the synthetic data to see what differences can be observed.</li>
+  <li>As a general point, I probably want to incorporate visual inspection of the data at various points in the training pipeline, not just after the model has been trained.</li>
+</ul>
+
+<p>If you know any other tools that help with this kind of visual analysis of model performance and how to improve in a data-driven approach, please do <a href="https://twitter.com/strickvl">let me know</a>!</p>
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="strickvl/ml-blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/redactionmodel/computervision/tools/debugging/jupyter/2022/03/12/fiftyone-computervision.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>A place to share my technical learnings.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
