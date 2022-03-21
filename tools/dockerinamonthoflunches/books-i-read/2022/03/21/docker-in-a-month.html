@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Starting Docker In A Month Of Lunches | mlops.systems</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Starting Docker In A Month Of Lunches" />
+<meta name="author" content="Alex Strick van Linschoten" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="I’m reading Elton Stoneman’s ‘Learn Docker in a month of lunches’ and blogging as I learn along the way. In chapters 1-3 we learn about the context for Docker as well as some basic commands." />
+<meta property="og:description" content="I’m reading Elton Stoneman’s ‘Learn Docker in a month of lunches’ and blogging as I learn along the way. In chapters 1-3 we learn about the context for Docker as well as some basic commands." />
+<link rel="canonical" href="https://mlops.systems/tools/dockerinamonthoflunches/books-i-read/2022/03/21/docker-in-a-month.html" />
+<meta property="og:url" content="https://mlops.systems/tools/dockerinamonthoflunches/books-i-read/2022/03/21/docker-in-a-month.html" />
+<meta property="og:site_name" content="mlops.systems" />
+<meta property="og:image" content="https://mlops.systems/images/diamol/diamol-cover.jpg" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-03-21T00:00:00-05:00" />
+<script type="application/ld+json">
+{"datePublished":"2022-03-21T00:00:00-05:00","url":"https://mlops.systems/tools/dockerinamonthoflunches/books-i-read/2022/03/21/docker-in-a-month.html","@type":"BlogPosting","dateModified":"2022-03-21T00:00:00-05:00","image":"https://mlops.systems/images/diamol/diamol-cover.jpg","mainEntityOfPage":{"@type":"WebPage","@id":"https://mlops.systems/tools/dockerinamonthoflunches/books-i-read/2022/03/21/docker-in-a-month.html"},"author":{"@type":"Person","name":"Alex Strick van Linschoten"},"headline":"Starting Docker In A Month Of Lunches","description":"I’m reading Elton Stoneman’s ‘Learn Docker in a month of lunches’ and blogging as I learn along the way. In chapters 1-3 we learn about the context for Docker as well as some basic commands.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://mlops.systems/feed.xml" title="mlops.systems" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script
+  defer
+  data-domain="mlops.systems"
+  src="https://plausible.io/js/plausible.js"
+></script>
+
+
+<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">mlops.systems</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About Me</a><a class="page-link" href="/search/">Search</a><a class="page-link" href="/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Starting Docker In A Month Of Lunches</h1><p class="page-description">I'm reading Elton Stoneman's 'Learn Docker in a month of lunches' and blogging as I learn along the way. In chapters 1-3 we learn about the context for Docker as well as some basic commands.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-03-21T00:00:00-05:00" itemprop="datePublished">
+        Mar 21, 2022
+      </time>• 
+          <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+            <span class="p-author h-card" itemprop="name">Alex Strick van Linschoten</span></span>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      6 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/categories/#tools">tools</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#dockerinamonthoflunches">dockerinamonthoflunches</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#books-i-read">books-i-read</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h1"><a href="#core-docker-commands">Core Docker Commands</a></li>
+<li class="toc-entry toc-h1"><a href="#building-your-own-images-with-dockerfiles">Building your own images with Dockerfiles</a>
+<ul>
+<li class="toc-entry toc-h2"><a href="#dockerfile-layout">Dockerfile layout</a></li>
+</ul>
+</li>
+</ul><p>As far as software engineers go, I’m still barely a spring chicken, six months into my job with <a href="https://zenml.io/">ZenML</a>. Working at a startup is fairly fast-paced and the ability to get going quickly with any number of libraries and tools is a requirement of the work. The number of things I could study, learn or practice is vastly larger than the amount of time I have. Accordingly, it helps to try to pick things that will be long-lasting, teach a cross-cutting skill or that are somehow fundamental.</p>
+
+<p>Two closely-connected technologies that I’ve realised I can no longer avoid are <a href="https://www.docker.com/">Docker</a> and <a href="https://kubernetes.io/">Kubernetes</a>. I have some high-level knowledge of both, having worked with Docker images on Ekko and having encountered Kubernetes in recent months, but it’s become clear in the last few weeks that they aren’t going away. More than that, it seems that not having a better (practical) grasp of some of the ins and outs of both is holding me back from grasping more complex decisions that are being made at work.</p>
+
+<p>[<em>Side-note: I’m very curious about <a href="https://podman.io/">Podman</a> as a Docker-adjacent alternative, but I need to understand Docker better first before I can make comparisons. I’d also note that I’m pretty sure that there are lots of cases where Kubernetes is overkill, and where it doesn’t make much sense to add all that complexity, particularly for smaller teams and projects. It’s nevertheless a feature of life in the MLOps space, it seems, so I must understand it.</em>]</p>
+
+<p>I’ve had my eye on two Manning books by <a href="https://blog.sixeyed.com/">Elton Stoneman</a> for a while, and now seems the perfect time to dive in. <a href="https://www.amazon.com/Learn-Docker-Month-Lunches-Stoneman-ebook/dp/B097824MVJ/ref=tmm_kin_swatch_0?qid=&amp;sr=&amp;tag=soumet-20&amp;_encoding=UTF8">Learn Docker in a Month of Lunches</a> and <a href="https://www.amazon.com/gp/product/B0978175TP/ref=dbs_a_def_rwt_bibl_vppi_i1?tag=soumet-20">Learn Kubernetes in a Month of Lunches</a> are very practical introductions to their subjects, come with good reviews and feedback and were published relatively recently. I’m especially happy that both books are extremely hands-on and even though I won’t in any way be an expert in either technology by the end, I’ll at least have some experience of having encountered the core use cases of both and maybe have a strong idea of what I do and don’t know.</p>
+
+<p>I’m not sure whether I’ll complete each one in exactly a month, but I’ll try to fast-track my reading. Stoneman says in the introduction to the Kubernetes book that it’s best to start with the Docker one, which I suppose makes sense given that one builds on the other.</p>
+
+<p>Just like <a href="https://mlops.systems/categories/#robustpython">my posts as I read through Robust Python</a> (which I haven’t stopped doing), I’ll write up various things that I learn along the way, mainly as notes for myself but perhaps it will have value beyond this limited goal. So far I’ve read through the first three chapters of the Docker book, so what follows are some notes on the key points from that.</p>
+
+<h1 id="core-docker-commands">
+<a class="anchor" href="#core-docker-commands" aria-hidden="true"><span class="octicon octicon-link"></span></a>Core Docker Commands</h1>
+
+<p>The book has you running a lot of examples. Two commands mentioned (specific to this book) to help clean up the images and containers that you were using:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># clean up containers and application packages</span>
+docker container <span class="nb">rm</span> <span class="nt">-f</span> <span class="si">$(</span>docker container <span class="nb">ls</span> <span class="nt">-aq</span><span class="si">)</span>
+
+<span class="c"># to reclaim disk space</span>
+docker image <span class="nb">rm</span> <span class="nt">-f</span> <span class="si">$(</span>docker image <span class="nb">ls</span> <span class="nt">-f</span> <span class="nv">reference</span><span class="o">=</span><span class="s1">'dial/*'</span> <span class="nt">-q</span><span class="si">)</span>
+</code></pre></div></div>
+
+<p>Some core commands for interacting with a container:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># run a container</span>
+docker container run CONTAINERNAME
+
+<span class="c"># run an interactive container with a connected terminal session</span>
+docker container run <span class="nt">--interactive</span> <span class="nt">--tty</span> CONTAINERNAME
+
+<span class="c"># list running containers</span>
+docker container <span class="nb">ls</span>
+<span class="c"># list all containers with any status</span>
+docker container <span class="nb">ls</span> <span class="nt">--all</span> 
+
+<span class="c"># list processes running in a container</span>
+<span class="c"># CONTAINERNAME could be part of the container ID as well</span>
+docker container top CONTAINERNAME
+
+<span class="c"># show logs for a container</span>
+docker container logs CONTAINERNAME
+
+<span class="c"># view all details about a container</span>
+docker container inspect CONTAINERNAME
+
+<span class="c"># get stats on a particular container</span>
+docker container stats CONTAINERNAME
+
+<span class="c"># special flags</span>
+<span class="c"># --detach starts the container in the background</span>
+<span class="c"># --publish publishes a port from the container to the computer</span>
+
+<span class="c"># delete containers</span>
+<span class="c"># the force flag shuts it down if still running</span>
+docker container <span class="nb">rm</span> <span class="nt">--force</span> CONTAINERNAME
+
+<span class="c"># the nuclear option</span>
+docker container <span class="nb">rm</span> <span class="nt">--force</span> <span class="si">$(</span>docker container <span class="nb">ls</span> <span class="nt">--all</span> <span class="nt">--quiet</span><span class="si">)</span>
+</code></pre></div></div>
+
+<h1 id="building-your-own-images-with-dockerfiles">
+<a class="anchor" href="#building-your-own-images-with-dockerfiles" aria-hidden="true"><span class="octicon octicon-link"></span></a>Building your own images with Dockerfiles</h1>
+
+<p>Some commands which are useful for making your own images:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># gets the image from DockerHub registry</span>
+docker image pull IMAGENAME
+</code></pre></div></div>
+
+<p>Key mental models for Docker images:</p>
+
+<ul>
+  <li>images are made up of ‘layers’</li>
+  <li>Docker images are stored as lots of small files, brought together as one image when you build with a <code class="language-plaintext highlighter-rouge">Dockerfile</code>.</li>
+  <li>each layer of an image corresponds to a line in your <code class="language-plaintext highlighter-rouge">Dockerfile</code>
+</li>
+  <li>layers are successively built on top of each other</li>
+  <li>the order of the layers determines the cache invalidation. If something changes in a lower layer, then all subsequent layers are regenerated. It’s for this reason that it pays to be careful about the order in which you write the commands that make up your <code class="language-plaintext highlighter-rouge">Dockerfile</code>.</li>
+</ul>
+
+<p>It seems to be considered a good practice (at least where I am right now in the book) to pass in environment variables from the outside into your Docker image. This way you can keep configuration separate from how you actually run it. So you’d have a command something like this:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker container run <span class="nt">--env</span> <span class="nv">EPOCHS</span><span class="o">=</span>30 SOMEUSER/CONTAINERNAME
+</code></pre></div></div>
+
+<p>which would pass the <code class="language-plaintext highlighter-rouge">EPOCHS</code> environment variable into the runtime of the Docker image if it had been set up with something like this as a line inside the <code class="language-plaintext highlighter-rouge">Dockerfile</code>:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ENV EPOCHS="1"
+</code></pre></div></div>
+
+<p>Note that only the environment variables that you specifically select to be passed into the container get passed in.</p>
+
+<h2 id="dockerfile-layout">
+<a class="anchor" href="#dockerfile-layout" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dockerfile layout</h2>
+
+<p><code class="language-plaintext highlighter-rouge">Dockerfile</code>s seem to have some commonalities in terms of the structure:</p>
+
+<ul>
+  <li>you start with a base image on which you’re building. These seem usually or often to be a base image containing a runtime for whatever language your application uses</li>
+  <li>Then there’s often environment variables afterwards</li>
+  <li>Then you can specify a <code class="language-plaintext highlighter-rouge">WORKDIR</code> which is the working directory for the application</li>
+  <li>Then you can <code class="language-plaintext highlighter-rouge">COPY</code> files from your local filesystem into that working directory</li>
+  <li>Then at the end you specify which <code class="language-plaintext highlighter-rouge">CMD</code> needs to be run in order to execute the application.</li>
+</ul>
+
+<p>Once you’re done with writing your <code class="language-plaintext highlighter-rouge">Dockerfile</code>, use the following command to build your image:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker image build <span class="nt">--tag</span> SOMENAME <span class="nb">.</span>
+</code></pre></div></div>
+
+<p>Note that final <code class="language-plaintext highlighter-rouge">.</code> trailing that command. The <code class="language-plaintext highlighter-rouge">.</code> states that the current directory is the ‘context’ and thus is used for when you’re copying in files using the <code class="language-plaintext highlighter-rouge">COPY</code> command.</p>
+
+<p>You can view the layers of your Docker image with the <code class="language-plaintext highlighter-rouge">docker image history IMAGENAME</code> command (which will output them to the terminal).</p>
+
+<p>To see how much disk space your containers and images are taking up, type <code class="language-plaintext highlighter-rouge">docker system df</code>.</p>
+
+<p>When you rebuild an image, you can specify this with a <code class="language-plaintext highlighter-rouge">:v2</code> after the name, as in this command:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker image build <span class="nt">-t</span> web-app:v2 <span class="nb">.</span>
+</code></pre></div></div>
+
+<p>When it comes to optimising your <code class="language-plaintext highlighter-rouge">Dockerfile</code>, bear the following in mind:</p>
+
+<blockquote>
+  <p>“Any Dockerfile you write should be optimised so that the instructions are ordered by how frequently they change — with instructions that are unlikely to change at the start of the Dockerfile, and instructions most likely to change at the end. The goal is for most builds to only need to execute the last instruction, using the cache for everything else. That saves time, disk space, and network bandwidth when you start sharing your images.” (pp. 42-43)</p>
+</blockquote>
+
+<p>Some command tips and tricks:</p>
+
+<ul>
+  <li>combine multiple commands onto the same line</li>
+  <li>put the <code class="language-plaintext highlighter-rouge">CMD</code> instruction early on as it’s unlikely to change</li>
+</ul>
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="strickvl/ml-blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/tools/dockerinamonthoflunches/books-i-read/2022/03/21/docker-in-a-month.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>A place to share my technical learnings.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

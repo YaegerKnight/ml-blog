@@ -1,4 +1,136 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://mlops.systems/feed.xml" rel="self" type="application/atom+xml" /><link href="https://mlops.systems/" rel="alternate" type="text/html" /><updated>2022-03-13T07:08:03-05:00</updated><id>https://mlops.systems/feed.xml</id><title type="html">mlops.systems</title><subtitle>A place to share my technical learnings.</subtitle><entry><title type="html">Figuring out why my object detection model is underperforming with FiftyOne, a great tool you probably haven’t heard of</title><link href="https://mlops.systems/redactionmodel/computervision/tools/debugging/jupyter/2022/03/12/fiftyone-computervision.html" rel="alternate" type="text/html" title="Figuring out why my object detection model is underperforming with FiftyOne, a great tool you probably haven’t heard of" /><published>2022-03-12T00:00:00-06:00</published><updated>2022-03-12T00:00:00-06:00</updated><id>https://mlops.systems/redactionmodel/computervision/tools/debugging/jupyter/2022/03/12/fiftyone-computervision</id><content type="html" xml:base="https://mlops.systems/redactionmodel/computervision/tools/debugging/jupyter/2022/03/12/fiftyone-computervision.html">&lt;p&gt;&lt;em&gt;(This is part of a series of blog posts documenting my work to train a model that detects redactions in documents. To read other posts, check out &lt;a href=&quot;https://mlops.systems/categories/#redactionmodel&quot;&gt;the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;redactionmodel&lt;/code&gt; taglist&lt;/a&gt;.)&lt;/em&gt;&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://mlops.systems/feed.xml" rel="self" type="application/atom+xml" /><link href="https://mlops.systems/" rel="alternate" type="text/html" /><updated>2022-03-21T15:56:54-05:00</updated><id>https://mlops.systems/feed.xml</id><title type="html">mlops.systems</title><subtitle>A place to share my technical learnings.</subtitle><entry><title type="html">Starting Docker In A Month Of Lunches</title><link href="https://mlops.systems/tools/dockerinamonthoflunches/books-i-read/2022/03/21/docker-in-a-month.html" rel="alternate" type="text/html" title="Starting Docker In A Month Of Lunches" /><published>2022-03-21T00:00:00-05:00</published><updated>2022-03-21T00:00:00-05:00</updated><id>https://mlops.systems/tools/dockerinamonthoflunches/books-i-read/2022/03/21/docker-in-a-month</id><content type="html" xml:base="https://mlops.systems/tools/dockerinamonthoflunches/books-i-read/2022/03/21/docker-in-a-month.html">&lt;p&gt;As far as software engineers go, I’m still barely a spring chicken, six months into my job with &lt;a href=&quot;https://zenml.io/&quot;&gt;ZenML&lt;/a&gt;. Working at a startup is fairly fast-paced and the ability to get going quickly with any number of libraries and tools is a requirement of the work. The number of things I could study, learn or practice is vastly larger than the amount of time I have. Accordingly, it helps to try to pick things that will be long-lasting, teach a cross-cutting skill or that are somehow fundamental.&lt;/p&gt;
+
+&lt;p&gt;Two closely-connected technologies that I’ve realised I can no longer avoid are &lt;a href=&quot;https://www.docker.com/&quot;&gt;Docker&lt;/a&gt; and &lt;a href=&quot;https://kubernetes.io/&quot;&gt;Kubernetes&lt;/a&gt;. I have some high-level knowledge of both, having worked with Docker images on Ekko and having encountered Kubernetes in recent months, but it’s become clear in the last few weeks that they aren’t going away. More than that, it seems that not having a better (practical) grasp of some of the ins and outs of both is holding me back from grasping more complex decisions that are being made at work.&lt;/p&gt;
+
+&lt;p&gt;[&lt;em&gt;Side-note: I’m very curious about &lt;a href=&quot;https://podman.io/&quot;&gt;Podman&lt;/a&gt; as a Docker-adjacent alternative, but I need to understand Docker better first before I can make comparisons. I’d also note that I’m pretty sure that there are lots of cases where Kubernetes is overkill, and where it doesn’t make much sense to add all that complexity, particularly for smaller teams and projects. It’s nevertheless a feature of life in the MLOps space, it seems, so I must understand it.&lt;/em&gt;]&lt;/p&gt;
+
+&lt;p&gt;I’ve had my eye on two Manning books by &lt;a href=&quot;https://blog.sixeyed.com/&quot;&gt;Elton Stoneman&lt;/a&gt; for a while, and now seems the perfect time to dive in. &lt;a href=&quot;https://www.amazon.com/Learn-Docker-Month-Lunches-Stoneman-ebook/dp/B097824MVJ/ref=tmm_kin_swatch_0?qid=&amp;amp;sr=&amp;amp;tag=soumet-20&amp;amp;_encoding=UTF8&quot;&gt;Learn Docker in a Month of Lunches&lt;/a&gt; and &lt;a href=&quot;https://www.amazon.com/gp/product/B0978175TP/ref=dbs_a_def_rwt_bibl_vppi_i1?tag=soumet-20&quot;&gt;Learn Kubernetes in a Month of Lunches&lt;/a&gt; are very practical introductions to their subjects, come with good reviews and feedback and were published relatively recently. I’m especially happy that both books are extremely hands-on and even though I won’t in any way be an expert in either technology by the end, I’ll at least have some experience of having encountered the core use cases of both and maybe have a strong idea of what I do and don’t know.&lt;/p&gt;
+
+&lt;p&gt;I’m not sure whether I’ll complete each one in exactly a month, but I’ll try to fast-track my reading. Stoneman says in the introduction to the Kubernetes book that it’s best to start with the Docker one, which I suppose makes sense given that one builds on the other.&lt;/p&gt;
+
+&lt;p&gt;Just like &lt;a href=&quot;https://mlops.systems/categories/#robustpython&quot;&gt;my posts as I read through Robust Python&lt;/a&gt; (which I haven’t stopped doing), I’ll write up various things that I learn along the way, mainly as notes for myself but perhaps it will have value beyond this limited goal. So far I’ve read through the first three chapters of the Docker book, so what follows are some notes on the key points from that.&lt;/p&gt;
+
+&lt;h1 id=&quot;core-docker-commands&quot;&gt;Core Docker Commands&lt;/h1&gt;
+
+&lt;p&gt;The book has you running a lot of examples. Two commands mentioned (specific to this book) to help clean up the images and containers that you were using:&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# clean up containers and application packages&lt;/span&gt;
+docker container &lt;span class=&quot;nb&quot;&gt;rm&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;docker container &lt;span class=&quot;nb&quot;&gt;ls&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-aq&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# to reclaim disk space&lt;/span&gt;
+docker image &lt;span class=&quot;nb&quot;&gt;rm&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;docker image &lt;span class=&quot;nb&quot;&gt;ls&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;reference&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'dial/*'&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-q&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Some core commands for interacting with a container:&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# run a container&lt;/span&gt;
+docker container run CONTAINERNAME
+
+&lt;span class=&quot;c&quot;&gt;# run an interactive container with a connected terminal session&lt;/span&gt;
+docker container run &lt;span class=&quot;nt&quot;&gt;--interactive&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--tty&lt;/span&gt; CONTAINERNAME
+
+&lt;span class=&quot;c&quot;&gt;# list running containers&lt;/span&gt;
+docker container &lt;span class=&quot;nb&quot;&gt;ls&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# list all containers with any status&lt;/span&gt;
+docker container &lt;span class=&quot;nb&quot;&gt;ls&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--all&lt;/span&gt; 
+
+&lt;span class=&quot;c&quot;&gt;# list processes running in a container&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# CONTAINERNAME could be part of the container ID as well&lt;/span&gt;
+docker container top CONTAINERNAME
+
+&lt;span class=&quot;c&quot;&gt;# show logs for a container&lt;/span&gt;
+docker container logs CONTAINERNAME
+
+&lt;span class=&quot;c&quot;&gt;# view all details about a container&lt;/span&gt;
+docker container inspect CONTAINERNAME
+
+&lt;span class=&quot;c&quot;&gt;# get stats on a particular container&lt;/span&gt;
+docker container stats CONTAINERNAME
+
+&lt;span class=&quot;c&quot;&gt;# special flags&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# --detach starts the container in the background&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# --publish publishes a port from the container to the computer&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# delete containers&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# the force flag shuts it down if still running&lt;/span&gt;
+docker container &lt;span class=&quot;nb&quot;&gt;rm&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--force&lt;/span&gt; CONTAINERNAME
+
+&lt;span class=&quot;c&quot;&gt;# the nuclear option&lt;/span&gt;
+docker container &lt;span class=&quot;nb&quot;&gt;rm&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--force&lt;/span&gt; &lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;docker container &lt;span class=&quot;nb&quot;&gt;ls&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--all&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--quiet&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h1 id=&quot;building-your-own-images-with-dockerfiles&quot;&gt;Building your own images with Dockerfiles&lt;/h1&gt;
+
+&lt;p&gt;Some commands which are useful for making your own images:&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# gets the image from DockerHub registry&lt;/span&gt;
+docker image pull IMAGENAME
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Key mental models for Docker images:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;images are made up of ‘layers’&lt;/li&gt;
+  &lt;li&gt;Docker images are stored as lots of small files, brought together as one image when you build with a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Dockerfile&lt;/code&gt;.&lt;/li&gt;
+  &lt;li&gt;each layer of an image corresponds to a line in your &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Dockerfile&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;layers are successively built on top of each other&lt;/li&gt;
+  &lt;li&gt;the order of the layers determines the cache invalidation. If something changes in a lower layer, then all subsequent layers are regenerated. It’s for this reason that it pays to be careful about the order in which you write the commands that make up your &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Dockerfile&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;It seems to be considered a good practice (at least where I am right now in the book) to pass in environment variables from the outside into your Docker image. This way you can keep configuration separate from how you actually run it. So you’d have a command something like this:&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker container run &lt;span class=&quot;nt&quot;&gt;--env&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;EPOCHS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;30 SOMEUSER/CONTAINERNAME
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;which would pass the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;EPOCHS&lt;/code&gt; environment variable into the runtime of the Docker image if it had been set up with something like this as a line inside the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Dockerfile&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ENV EPOCHS=&quot;1&quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Note that only the environment variables that you specifically select to be passed into the container get passed in.&lt;/p&gt;
+
+&lt;h2 id=&quot;dockerfile-layout&quot;&gt;Dockerfile layout&lt;/h2&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Dockerfile&lt;/code&gt;s seem to have some commonalities in terms of the structure:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;you start with a base image on which you’re building. These seem usually or often to be a base image containing a runtime for whatever language your application uses&lt;/li&gt;
+  &lt;li&gt;Then there’s often environment variables afterwards&lt;/li&gt;
+  &lt;li&gt;Then you can specify a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;WORKDIR&lt;/code&gt; which is the working directory for the application&lt;/li&gt;
+  &lt;li&gt;Then you can &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;COPY&lt;/code&gt; files from your local filesystem into that working directory&lt;/li&gt;
+  &lt;li&gt;Then at the end you specify which &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;CMD&lt;/code&gt; needs to be run in order to execute the application.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Once you’re done with writing your &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Dockerfile&lt;/code&gt;, use the following command to build your image:&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker image build &lt;span class=&quot;nt&quot;&gt;--tag&lt;/span&gt; SOMENAME &lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Note that final &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.&lt;/code&gt; trailing that command. The &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.&lt;/code&gt; states that the current directory is the ‘context’ and thus is used for when you’re copying in files using the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;COPY&lt;/code&gt; command.&lt;/p&gt;
+
+&lt;p&gt;You can view the layers of your Docker image with the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;docker image history IMAGENAME&lt;/code&gt; command (which will output them to the terminal).&lt;/p&gt;
+
+&lt;p&gt;To see how much disk space your containers and images are taking up, type &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;docker system df&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;When you rebuild an image, you can specify this with a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;:v2&lt;/code&gt; after the name, as in this command:&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker image build &lt;span class=&quot;nt&quot;&gt;-t&lt;/span&gt; web-app:v2 &lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;When it comes to optimising your &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Dockerfile&lt;/code&gt;, bear the following in mind:&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;“Any Dockerfile you write should be optimised so that the instructions are ordered by how frequently they change — with instructions that are unlikely to change at the start of the Dockerfile, and instructions most likely to change at the end. The goal is for most builds to only need to execute the last instruction, using the cache for everything else. That saves time, disk space, and network bandwidth when you start sharing your images.” (pp. 42-43)&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Some command tips and tricks:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;combine multiple commands onto the same line&lt;/li&gt;
+  &lt;li&gt;put the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;CMD&lt;/code&gt; instruction early on as it’s unlikely to change&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>Alex Strick van Linschoten</name></author><category term="tools" /><category term="dockerinamonthoflunches" /><category term="books-i-read" /><summary type="html">As far as software engineers go, I’m still barely a spring chicken, six months into my job with ZenML. Working at a startup is fairly fast-paced and the ability to get going quickly with any number of libraries and tools is a requirement of the work. The number of things I could study, learn or practice is vastly larger than the amount of time I have. Accordingly, it helps to try to pick things that will be long-lasting, teach a cross-cutting skill or that are somehow fundamental.</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://mlops.systems/images/diamol/diamol-cover.jpg" /><media:content medium="image" url="https://mlops.systems/images/diamol/diamol-cover.jpg" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Synthetic Images Debugging</title><link href="https://mlops.systems/redactionmodel/computervision/debugging/2022/03/20/synthetic-images-debugging.html" rel="alternate" type="text/html" title="Synthetic Images Debugging" /><published>2022-03-20T00:00:00-05:00</published><updated>2022-03-20T00:00:00-05:00</updated><id>https://mlops.systems/redactionmodel/computervision/debugging/2022/03/20/synthetic-images-debugging</id><content type="html" xml:base="https://mlops.systems/redactionmodel/computervision/debugging/2022/03/20/synthetic-images-debugging.html">&lt;p&gt;&lt;em&gt;(This is part of a series of blog posts documenting my work to train a model that detects redactions in documents. To read other posts, check out &lt;a href=&quot;https://mlops.systems/categories/#redactionmodel&quot;&gt;the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;redactionmodel&lt;/code&gt; taglist&lt;/a&gt;.)&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/synthetic-images-debugging/IMAGENAME.PNG&quot; alt=&quot;&quot; title=&quot;IMAGE CAPTION GOES HERE&quot; /&gt;&lt;/p&gt;</content><author><name>Alex Strick van Linschoten</name></author><category term="redactionmodel" /><category term="computervision" /><category term="debugging" /><summary type="html">(This is part of a series of blog posts documenting my work to train a model that detects redactions in documents. To read other posts, check out the redactionmodel taglist.)</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://mlops.systems/images/synthetic-images-debugging/synthetic-fiftyone.png" /><media:content medium="image" url="https://mlops.systems/images/synthetic-images-debugging/synthetic-fiftyone.png" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Figuring out why my object detection model is underperforming with FiftyOne, a great tool you probably haven’t heard of</title><link href="https://mlops.systems/redactionmodel/computervision/tools/debugging/jupyter/2022/03/12/fiftyone-computervision.html" rel="alternate" type="text/html" title="Figuring out why my object detection model is underperforming with FiftyOne, a great tool you probably haven’t heard of" /><published>2022-03-12T00:00:00-06:00</published><updated>2022-03-12T00:00:00-06:00</updated><id>https://mlops.systems/redactionmodel/computervision/tools/debugging/jupyter/2022/03/12/fiftyone-computervision</id><content type="html" xml:base="https://mlops.systems/redactionmodel/computervision/tools/debugging/jupyter/2022/03/12/fiftyone-computervision.html">&lt;p&gt;&lt;em&gt;(This is part of a series of blog posts documenting my work to train a model that detects redactions in documents. To read other posts, check out &lt;a href=&quot;https://mlops.systems/categories/#redactionmodel&quot;&gt;the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;redactionmodel&lt;/code&gt; taglist&lt;/a&gt;.)&lt;/em&gt;&lt;/p&gt;
 
 &lt;p&gt;So you’ve trained a computer vision model, but you think it could do better. What do you do next? This is a common scenario, especially for computer vision problems where fine-tuning someone else’s pre-trained model is a pretty normal initial step that gets taken. You emerge with a decent score on whatever metric you care about, but it also isn’t great.&lt;/p&gt;
 
