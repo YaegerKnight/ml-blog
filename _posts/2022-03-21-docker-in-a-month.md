@@ -2,7 +2,7 @@
 toc: true
 layout: post
 description:
-  "I'm reading Elton Stoneman's 'Learn Docker in a month of lunches' and blogging as I learn along the way. In chapters 1-3 we learn about the context for Docker as well as some basic commands."
+  "I'm reading Elton Stoneman's 'Learn Docker in a Month of Lunches' and blogging as I learn along the way. In chapters 1-3 we learn about the context for Docker as well as some basic commands for running and building containers."
 categories: [tools, dockerinamonthoflunches, books-i-read]
 comments: true
 author: Alex Strick van Linschoten
@@ -18,7 +18,7 @@ Two closely-connected technologies that I've realised I can no longer avoid are 
 
 I've had my eye on two Manning books by [Elton Stoneman](https://blog.sixeyed.com/) for a while, and now seems the perfect time to dive in. [Learn Docker in a Month of Lunches](https://www.amazon.com/Learn-Docker-Month-Lunches-Stoneman-ebook/dp/B097824MVJ/ref=tmm_kin_swatch_0?qid=&sr=&tag=soumet-20&_encoding=UTF8) and [Learn Kubernetes in a Month of Lunches](https://www.amazon.com/gp/product/B0978175TP/ref=dbs_a_def_rwt_bibl_vppi_i1?tag=soumet-20) are very practical introductions to their subjects, come with good reviews and feedback and were published relatively recently. I'm especially happy that both books are extremely hands-on and even though I won't in any way be an expert in either technology by the end, I'll at least have some experience of having encountered the core use cases of both and maybe have a strong idea of what I do and don't know.
 
-I'm not sure whether I'll complete each one in exactly a month, but I'll try to fast-track my reading. Stoneman says in the introduction to the Kubernetes book that it's best to start with the Docker one, which I suppose makes sense given that one builds on the other.
+I'm not sure whether I'll complete each one in exactly a month, but I'll try to fast-track my reading. The chapters are written in such a way as to be digestible (including exercises) in around an hour. Stoneman says in the introduction to the Kubernetes book that it's best to start with the Docker one, which I suppose makes sense given that one builds on the other.
 
 Just like [my posts as I read through Robust Python](https://mlops.systems/categories/#robustpython) (which I haven't stopped doing), I'll write up various things that I learn along the way, mainly as notes for myself but perhaps it will have value beyond this limited goal. So far I've read through the first three chapters of the Docker book, so what follows are some notes on the key points from that.
 
