@@ -432,42 +432,9 @@
 
   
   
-      ,"page0": {
-          "title": "",
-          "content": "(This is part of a series of blog posts documenting my work to train a model that detects redactions in documents. To read other posts, check out the redactionmodel taglist.) . redaction-model-annotations + prodigy_files is fine 2022-02-18-synthetic_annotations + prodigy_files_synthetic is also fine . .",
-          "url": "https://mlops.systems/drafts/2022-03-20-synthetic-images-debugging.html",
-          "relUrl": "/drafts/2022-03-20-synthetic-images-debugging.html",
-          "date": ""
-      }
-      
-  
 
   
       ,"page1": {
-          "title": "Performance boosts after training with synthetic data",
-          "content": "INSERT THE INTRO ITALIC THING . the story again till this point last post was about figuring out why model underperforming some also wrote about synthetic data creation BUT WHAT RESULTS? . show the graphs . my hunch even before I look at how fiftyone has interpreted things? . yes something was added into the mix, but since the crux of the model performance seems to relate to the hard examples (as we showed in previous post), our synthetic data needs to tackle that | . What does fiftyone analysis and views show? . hard images are still hard, even with the synthetic data | the model is already pretty good at single redactions in images, esp if they’re in the standard format | . Next steps .",
-          "url": "https://mlops.systems/drafts/2022-03-25-synthetic-data-results.html",
-          "relUrl": "/drafts/2022-03-25-synthetic-data-results.html",
-          "date": ""
-      }
-      
-  
-
-  
-      ,"page2": {
-          "title": "Multi-stage Docker builds and pushing to registries",
-          "content": "",
-          "url": "https://mlops.systems/drafts/2022-03-XX-multi-stage-docker-dockerhub.html",
-          "relUrl": "/drafts/2022-03-XX-multi-stage-docker-dockerhub.html",
-          "date": ""
-      }
-      
-  
-
-  
-
-  
-      ,"page4": {
           "title": "About Me",
           "content": "Hi, I’m Alex. . I am a software engineer based in London, UK. I recently built Ekko, an open-source framework allowing developers to easily add realtime infrastructure and in-transit message processing to web applications. . I have multiple years of experience in the Ruby and JavaScript ecosystems and am comfortable working with Go, PostgreSQL, AWS cloud infrastructure and Docker. . I have a PhD in History and authored several books based on my research work in Afghanistan. . I have a long-standing blog that I will combine with this one at some point, but for now I intend to post technical posts here. .",
           "url": "https://mlops.systems/about/",
@@ -503,7 +470,7 @@
   
 
   
-      ,"page15": {
+      ,"page12": {
           "title": "",
           "content": "Sitemap: {{ “sitemap.xml” | absolute_url }} | .",
           "url": "https://mlops.systems/robots.txt",
