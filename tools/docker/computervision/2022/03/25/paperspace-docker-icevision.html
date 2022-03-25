@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Building my own image to use IceVision with Paperspace | mlops.systems</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Building my own image to use IceVision with Paperspace" />
+<meta name="author" content="Alex Strick van Linschoten" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="I setup a new Paperspace project that uses a custom Docker image to provision its environment, saving me a bunch of initial installation time and dependency bug pain. A huge productivity win!" />
+<meta property="og:description" content="I setup a new Paperspace project that uses a custom Docker image to provision its environment, saving me a bunch of initial installation time and dependency bug pain. A huge productivity win!" />
+<link rel="canonical" href="https://mlops.systems/tools/docker/computervision/2022/03/25/paperspace-docker-icevision.html" />
+<meta property="og:url" content="https://mlops.systems/tools/docker/computervision/2022/03/25/paperspace-docker-icevision.html" />
+<meta property="og:site_name" content="mlops.systems" />
+<meta property="og:image" content="https://mlops.systems/images/paperspace-docker-icevision/docker-image-cover.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-03-25T00:00:00-05:00" />
+<script type="application/ld+json">
+{"datePublished":"2022-03-25T00:00:00-05:00","url":"https://mlops.systems/tools/docker/computervision/2022/03/25/paperspace-docker-icevision.html","@type":"BlogPosting","dateModified":"2022-03-25T00:00:00-05:00","image":"https://mlops.systems/images/paperspace-docker-icevision/docker-image-cover.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://mlops.systems/tools/docker/computervision/2022/03/25/paperspace-docker-icevision.html"},"author":{"@type":"Person","name":"Alex Strick van Linschoten"},"headline":"Building my own image to use IceVision with Paperspace","description":"I setup a new Paperspace project that uses a custom Docker image to provision its environment, saving me a bunch of initial installation time and dependency bug pain. A huge productivity win!","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://mlops.systems/feed.xml" title="mlops.systems" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script
+  defer
+  data-domain="mlops.systems"
+  src="https://plausible.io/js/plausible.js"
+></script>
+
+
+<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">mlops.systems</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/drafts/2022-03-25-synthetic-data-results.html">Performance boosts after training with synthetic data</a><a class="page-link" href="/drafts/2022-03-XX-multi-stage-docker-dockerhub.html">Multi-stage Docker builds and pushing to registries</a><a class="page-link" href="/about/">About Me</a><a class="page-link" href="/search/">Search</a><a class="page-link" href="/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Building my own image to use IceVision with Paperspace</h1><p class="page-description">I setup a new Paperspace project that uses a custom Docker image to provision its environment, saving me a bunch of initial installation time and dependency bug pain. A huge productivity win!</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-03-25T00:00:00-05:00" itemprop="datePublished">
+        Mar 25, 2022
+      </time>• 
+          <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+            <span class="p-author h-card" itemprop="name">Alex Strick van Linschoten</span></span>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      3 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/categories/#tools">tools</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#docker">docker</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#computervision">computervision</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+</ul><p>I’ve been using <a href="https://www.paperspace.com/">Paperspace</a> right to fuel my ML/Deep Learning experimentation since more or less the beginning. It was one of the recommended platforms that offered GPUs for the <a href="https://www.fast.ai/">fastai</a> course and when I started working on <a href="https://mlops.systems/categories/#redactionmodel">my redaction project</a> I chose to keep going since I had little reason to change.</p>
+
+<p>Fast-forward a few months, and I’ve had a few issues along the way. Paperspace works by provisioning a Docker image, connecting it to a fixed filesystem / storage backend and then serving this up to you in a web interface as a Jupyter notebook. I found that sometimes there were issues with dependencies breaking, or special <code class="language-plaintext highlighter-rouge">pip install</code> magic I had to include in my notebook so that things would work again.</p>
+
+<p>Included in this is the reality that a full install of IceVision — an amazing library for computer vision that handles a lot of the pain around integrating various libraries and use cases — simply takes a while as it has to download and setup some pretty hefty dependencies. I had found that going from zero to working on the day’s specific issue took around 20 minutes when you factored in all the setup, updates from the Github repo, syncing data and so on.</p>
+
+<p>Inspired by <a href="https://mlops.systems/tools/dockerinamonthoflunches/books-i-read/2022/03/21/docker-in-a-month.html">my reading and study of Docker</a> — and with <a href="https://github.com/joshua-paperspace/python-runtime/blob/main/Dockerfile">a tip from a Paperspace engineer</a> about how I could get started — I set out to build a custom image that handled most of the setup upfront and automatically updated with the latest changes and data.</p>
+
+<p>Amazingly, it worked more or less immediately! I created <a href="https://gist.github.com/strickvl/956f233ab53b3b56d463aebb95d7104c">a new Dockerfile</a> based of the original suggestion and the core additions were the following:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>RUN wget https://raw.githubusercontent.com/airctic/icevision/master/icevision_install.sh &amp;&amp; bash icevision_install.sh cuda11 &amp;&amp; rm icevision_install.sh
+
+RUN pip install torchtext==0.11.0 --upgrade
+RUN pip install opencv-python ipywidgets icevision-dashboards
+RUN apt update &amp;&amp; apt install -y libsm6 libxext6
+RUN apt-get install -y libxrender-dev
+
+CMD make lfs &amp;&amp; git lfs pull
+</code></pre></div></div>
+
+<p>In order to set this up with Paperspace, you first have to go to your notebooks inside a project and click to create a new Paperspace notebook.</p>
+
+<p><img src="/images/paperspace-docker-icevision/paperspace1.png" alt="" title="Creating a Paperspace notebook"></p>
+
+<p>Once there, you can ignore the suggestion to “select a runtime”, but rather select your machine from the available GPUs. I usually choose the RTX5000 and set it up for an auto-shutdown after 6 hours.</p>
+
+<p><img src="/images/paperspace-docker-icevision/paperspace2.png" alt="" title="Selecting a GPU within Paperspace"></p>
+
+<p>Then you want to click the ‘Advanced Options’ toggle so you can add in all the details of the image being used.</p>
+
+<p><img src="/images/paperspace-docker-icevision/paperspace3.png" alt="" title="Setting up the custom image in Paperspace"></p>
+
+<p>This is what worked for me. In order to use <a href="https://jupyter.org/">JupyterLab</a>, the container command should be:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>jupyter lab --allow-root --ip=0.0.0.0 --no-browser --ServerApp.trust_xheaders=True --ServerApp.disable_check_xsrf=False --ServerApp.allow_remote_access=True --ServerApp.allow_origin='*' --ServerApp.allow_credentials=True
+</code></pre></div></div>
+
+<p>I enter my private GitHub repo (along with my username and a custom token generated to allow Paperspace to download the repo) in the ‘Workspace’ section.</p>
+
+<p>Then when I click ‘Start Notebook’, it works! No more hanging around for IceVision to install. My Docker image already has this!</p>
+
+<p>I realise that I’m probably a little late to the party in terms of using Docker and seeing how it can bring some real improvements in terms of reproducibility of environments as well as these little quality-of-life perks like not hanging around to install everything each time you want to use it. This was a really useful experience for me to learn from, and I’ll certainly be using this going forward in other projects I work on.</p>
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="strickvl/ml-blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/tools/docker/computervision/2022/03/25/paperspace-docker-icevision.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>A place to share my technical learnings.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
