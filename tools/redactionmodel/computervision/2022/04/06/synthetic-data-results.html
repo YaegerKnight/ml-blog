@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>‘I guess this is what data-centric AI is!’: Performance boosts after training with synthetic data | mlops.systems</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="‘I guess this is what data-centric AI is!’: Performance boosts after training with synthetic data" />
+<meta name="author" content="Alex Strick van Linschoten" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="I show how adding synthetic data has improved my redaction model’s performance. Once I trained with the synthetic images added, I realised a more targeted approach would do even better." />
+<meta property="og:description" content="I show how adding synthetic data has improved my redaction model’s performance. Once I trained with the synthetic images added, I realised a more targeted approach would do even better." />
+<link rel="canonical" href="https://mlops.systems/tools/redactionmodel/computervision/2022/04/06/synthetic-data-results.html" />
+<meta property="og:url" content="https://mlops.systems/tools/redactionmodel/computervision/2022/04/06/synthetic-data-results.html" />
+<meta property="og:site_name" content="mlops.systems" />
+<meta property="og:image" content="https://mlops.systems/images/synthetic-data-results/synthetic-results-cover.jpg" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-04-06T00:00:00-05:00" />
+<script type="application/ld+json">
+{"datePublished":"2022-04-06T00:00:00-05:00","url":"https://mlops.systems/tools/redactionmodel/computervision/2022/04/06/synthetic-data-results.html","@type":"BlogPosting","dateModified":"2022-04-06T00:00:00-05:00","image":"https://mlops.systems/images/synthetic-data-results/synthetic-results-cover.jpg","mainEntityOfPage":{"@type":"WebPage","@id":"https://mlops.systems/tools/redactionmodel/computervision/2022/04/06/synthetic-data-results.html"},"author":{"@type":"Person","name":"Alex Strick van Linschoten"},"headline":"‘I guess this is what data-centric AI is!’: Performance boosts after training with synthetic data","description":"I show how adding synthetic data has improved my redaction model’s performance. Once I trained with the synthetic images added, I realised a more targeted approach would do even better.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://mlops.systems/feed.xml" title="mlops.systems" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script
+  defer
+  data-domain="mlops.systems"
+  src="https://plausible.io/js/plausible.js"
+></script>
+
+
+<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">mlops.systems</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About Me</a><a class="page-link" href="/search/">Search</a><a class="page-link" href="/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">&#39;I guess this is what data-centric AI is!&#39;: Performance boosts after training with synthetic data</h1><p class="page-description">I show how adding synthetic data has improved my redaction model's performance. Once I trained with the synthetic images added, I realised a more targeted approach would do even better.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-04-06T00:00:00-05:00" itemprop="datePublished">
+        Apr 6, 2022
+      </time>• 
+          <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+            <span class="p-author h-card" itemprop="name">Alex Strick van Linschoten</span></span>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      9 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/categories/#tools">tools</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#redactionmodel">redactionmodel</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#computervision">computervision</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h2"><a href="#a-failed-attempt-to-train-with-synthetic-data">A failed attempt to train with synthetic data</a></li>
+<li class="toc-entry toc-h2"><a href="#performance-boosts-after-adding-synthetic-data">Performance boosts after adding synthetic data</a></li>
+<li class="toc-entry toc-h2"><a href="#hard-examples-creating-targeted-synthetic-data">‘Hard examples’: creating targeted synthetic data</a></li>
+<li class="toc-entry toc-h2"><a href="#reflections-on-experimenting-with-synthetic-data">Reflections on experimenting with synthetic data</a></li>
+</ul><p><em>(This is part of a series of blog posts documenting my work to train a model
+that detects redactions in documents. To read other posts, check out
+<a href="https://mlops.systems/categories/#redactionmodel">the <code class="language-plaintext highlighter-rouge">redactionmodel</code> taglist</a>.)</em></p>
+
+<p>A clean and focused dataset is probably at the top of the list of things that
+would be nice to have when starting to tackle a machine learning problem. For
+object detection, there are some
+<a href="https://huggingface.co/datasets?task_categories=task_categories:object-detection&amp;sort=downloads">useful starting points</a>,
+but for many use cases you’re probably going to have to start from scratch. This
+is what I’ve been doing
+<a href="https://mlops.systems/categories/#redactionmodel">for the past few months</a>:
+working to bootstrap my way into a dataset that allows me to get decent
+performance training a model that can recognise redactions made on documents.</p>
+
+<p>As part of that journey so far, some of the big things that I’ve taken time to
+do include:</p>
+
+<ul>
+  <li>
+<a href="https://mlops.systems/redactionmodel/computervision/datalabelling/2021/11/29/prodigy-object-detection-training.html">manually annotating</a>
+~1000+ images</li>
+  <li>using a model-in-the-loop to help bootstrap that annotation process by
+<a href="https://mlops.systems/python/fastai/tools/redactionmodel/2022/01/16/midway-report-redaction-project.html">pre-filling annotation suggestions</a>
+on an image that I could then correct</li>
+  <li>
+<a href="https://mlops.systems/redactionmodel/computervision/python/tools/2022/02/10/synthetic-image-data.html">creating synthetic images</a>
+to increase the size of my dataset used in training</li>
+  <li>spending time
+<a href="https://mlops.systems/redactionmodel/computervision/tools/debugging/jupyter/2022/03/12/fiftyone-computervision.html">looking at what the model found difficult</a>,
+or what it got wrong</li>
+</ul>
+
+<p>At the end of my synthetic data creation blogpost, I mentioned that the next
+step would be to test the effect of adding in the new synthetic examples. Well…
+the results are in!</p>
+
+<h2 id="a-failed-attempt-to-train-with-synthetic-data">
+<a class="anchor" href="#a-failed-attempt-to-train-with-synthetic-data" aria-hidden="true"><span class="octicon octicon-link"></span></a>A failed attempt to train with synthetic data</h2>
+
+<p>I wasn’t sure exactly how much synthetic data would be appropriate or performant
+to use, so created a loose experiment where I started with 20% of the total
+images and increasing up until I reached 50%. (I figured that more than 50%
+synthetic data probably wasn’t a great idea and would probably not help my model
+perform out in the real world.)</p>
+
+<p><img src="/images/synthetic-data-results/synthetic-early-results.png" alt="" title="Results from the first phase using synthetic data"></p>
+
+<p>As you can see above: my initial experiment did not show great results. In fact,
+in several places, if I added synthetic data my model actually performed
+<em>worse</em>. This was a strong repudiation of my intuition of what would happen.
+After all, the whole point of adding the synthetic data was to get the model
+more of a chance to learn / train and thus improve its ability to recognise
+redaction object in documents.</p>
+
+<p>I dug into the data that I’d generated and the data I’d been using to train, and
+discovered a nasty bug which was tanking the performance. A week of debugging
+mislabelled bboxes in evenings after work and I was back with results that
+finally made sense.</p>
+
+<h2 id="performance-boosts-after-adding-synthetic-data">
+<a class="anchor" href="#performance-boosts-after-adding-synthetic-data" aria-hidden="true"><span class="octicon octicon-link"></span></a>Performance boosts after adding synthetic data</h2>
+
+<p><img src="/images/synthetic-data-results/synthetic-mid-results.png" alt="" title="Results from the first phase using synthetic data"></p>
+
+<p>In this chart, at the bottom you can see how training the model without the
+synthetic data (<code class="language-plaintext highlighter-rouge">no-synthetic-batch16</code>) performed. Ok, not great. Then the next
+best performing (<code class="language-plaintext highlighter-rouge">combined-75real-25synthetic-randomsplit</code>)was when 25% of the
+total number of images was synthetic, and the rest were real manually annotated
+images. At the top, with around an 81% COCO score, was the model where I used
+50% synthetic and 50% real images. This seemed to fit what my intuition said
+would happen.</p>
+
+<p>More synthetic data helped. I guessed that if I had millions of labelled images
+then the synthetic data would perhaps have been less useful, but starting from
+scratch it was really supporting the process.</p>
+
+<p>I was curious what would happen when I returned to FiftyOne to carry out some
+error analysis on the new model’s performance. Even before I had reached those
+results, I had a hunch that the synthetic images I’d created were perhaps too
+generic. I think they probably were helping boost some baseline performance of
+my model, but I knew they weren’t helping with the hard parts of detecting
+redactions.</p>
+
+<h2 id="hard-examples-creating-targeted-synthetic-data">
+<a class="anchor" href="#hard-examples-creating-targeted-synthetic-data" aria-hidden="true"><span class="octicon octicon-link"></span></a>‘Hard examples’: creating targeted synthetic data</h2>
+
+<p>As a reminder, this is the kind of image that is ‘hard’ for my model (or even a
+human) to be able to identify all the redactions:</p>
+
+<p><img src="/images/synthetic-data-results/hard-detection.png" alt="" title="White
+boxes on white backgrounds are hard to identify as redactions"></p>
+
+<p>The FiftyOne visualisations of what was and wasn’t working validated my hunch:
+yes, synthetic data helped somewhat, but the model’s low performance seemed much
+more vulnerable to misrecognition of the hard examples. Even with a 50/50 split
+between synthetic data and real manually annotated data, the hard examples were
+still hard! (And the converse was also true: the model was <em>already</em> pretty good
+at identifying ‘easy’ redactions (e.g. of the black box type).</p>
+
+<p>If we look back at the example of a ‘hard’ redaction above, two things stood
+out:</p>
+
+<ol>
+  <li>They’re hard, even for a human! This was borne out in the way I needed to
+take special care not to forget or mislabel when I was adding manual
+annotations.</li>
+  <li>There are <em>lots</em> of redactions on a single page/image.</li>
+</ol>
+
+<p>The second point was probably important, not only in the sense that there were
+more chances of getting something wrong on a single page, but also in the sense
+that the redactions were (relatively) small. The detection of small objects is
+almost its own field in the world of computer vision and I don’t know too much
+about it, but I do know it’s somewhat an unsolved problem. That said, finding a
+way to boost the performance of the models on these ‘hard’ examples (there were
+a few other types of hard image) seemed like it might tackle a significant
+shortcoming of my model.</p>
+
+<p>I decided to try creating a separate batch of synthetic image data, this time
+fully tailored to tackling some of the hardness mentioned above: it would have
+many small redactions on a single page, they would all be white boxes and there
+might also be things like tables with white box-like shapes coexisting next to
+redactions.</p>
+
+<p>Luckily, the work I’d done previously on creating synthetic data helped me get
+started quickly. I returned to <a href="https://borbpdf.com"><code class="language-plaintext highlighter-rouge">borb</code></a>, an open-source
+tool for quickly creating PDF documents that allows for a pretty flexible
+prototyping of layouts with all sorts of bells and whistles added. These were
+some of the documents I generated:</p>
+
+<p><img src="/images/synthetic-data-results/hard-synthetic.gif" alt=""></p>
+
+<p>The hard images were hard, and I had created some synthetic chimeras that (I
+believed) approximated some of the features of the original hard images. I did
+not want to overbalance my training data, however, and took care not to create
+too many of this type of image.</p>
+
+<p>My script — as with
+<a href="https://mlops.systems/redactionmodel/computervision/python/tools/2022/02/10/synthetic-image-data.html">the previous synthetic data</a>
+— also required me to create the annotation files at the same time as creating
+the document. With <code class="language-plaintext highlighter-rouge">borb</code> it was <em>relatively</em> trivial to get the bounding box
+data for objects created, and there was even in-built functionality to create
+and apply redactions onto a document. (I’m moving fairly quickly over the
+mechanics of how this all worked, but it’s not too far distant from how I
+described it in my previous post so I’d refer you there
+<a href="https://mlops.systems/redactionmodel/computervision/python/tools/2022/02/10/synthetic-image-data.html">for more details</a>).</p>
+
+<p>Once the images were created and added to my datasets, it was time to retrain
+the model and see what benefit it brought.</p>
+
+<p><img src="/images/synthetic-data-results/hard-synthetic-performance-boost.png" alt="" title="~3.5% boost when adding hard synthetic images into training data!"></p>
+
+<p>As you can see, the model jumped up from around 80.5 to 84% when I aded the hard
+synthetic examples in. That’s a pretty nice jump as far as I’m concerned,
+especially given that I only added in 300 images to the training data. I still
+had a little over a thousand of the original basic synthetic images that I was
+using, but this result showed me that tackling the badly performing parts of the
+model head-on seemed to have a positive outcome.</p>
+
+<p>At this point, I did some more experiments around the edges, applying other
+things I knew would probably boost the performance even more, notably first
+checking what would happen if I increased the image size from 512 to 640. I got
+up to an 86% COCO score with that improvement alone.</p>
+
+<p>In a final twist, I second-guessed myself and wondered whether the original
+synthetic data was even helping at all… I removed the thousand or so ‘basic’
+synthetic images from the data and retrained the model. To my surprise, I
+achieved more or less the same COCO score as I had WITH the basic synthetic
+images. I’m taking this as a strong suggestion that my basic synthetic images
+aren’t actually helping as much as I’d thought, and that probably a smaller
+number of them as a % of the total would be beneficial.</p>
+
+<h2 id="reflections-on-experimenting-with-synthetic-data">
+<a class="anchor" href="#reflections-on-experimenting-with-synthetic-data" aria-hidden="true"><span class="octicon octicon-link"></span></a>Reflections on experimenting with synthetic data</h2>
+
+<p>So, what can I conclude from this whole excursion into the world of synthetic
+image creation as a way of boosting model performance?</p>
+
+<ul>
+  <li>adding synthetic data really can help!</li>
+  <li>the world of synthetic data creation is a HUGE rabbit hole and potentially you
+can get lost trying to create the perfect synthetic versions of your original
+data. (I mean this both in the sense of ‘there’s lots to learn’ as well as
+‘you can spend or lose a TON of time here’.)</li>
+  <li>Targeted synthetic data designed to clear up issues where the model has been
+identified as underperforming is probably best. (Conversely, and I’ll be
+careful how much I generalise here, middle-of-the-road synthetic data that
+doesn’t resemble the original dataset may not be worth your time.)</li>
+  <li>Knowing your original data and domain really well helps. A lot. My intuition
+about what things the model would stumble on was fuelled by this knowledge of
+the documents and the domain, as well as by the experience of having done
+manual annotations for many hours.</li>
+</ul>
+
+<p>There are probably many (many) more things I can do to continually tinker away
+at this model to improve it:</p>
+
+<ul>
+  <li>continue down the path of more error analysis, which would fuel more targeted
+addition of annotations, and so on.</li>
+  <li>create better versions of synthetic data with more variation to encompass the
+various kinds of documents out in the real world.</li>
+  <li>more self-training with the model in the loop to fuel my manual annotation
+process.</li>
+  <li>further increases to the image size (perhaps in conjunction with progressive
+resizing).</li>
+  <li>increasing the backbone from <code class="language-plaintext highlighter-rouge">resnet50</code> to <code class="language-plaintext highlighter-rouge">resnet101</code>.</li>
+</ul>
+
+<p>In general, improving the quality of the data used to train my model seems to
+have been (by far) the best way to improve my model performance. Hyper-parameter
+tuning of the sort that is often referenced in courses or in blog posts does not
+seem to have had much of a benefit.</p>
+
+<p>It is probably (mostly) good enough for my use case and for where I want to be
+heading with this project. There are other things that need addressing around
+the edges, notably parts of the project that could be made more robust and
+‘production-ready’. More about that in due course, but for now please do comment
+below if you have suggestions for things that I haven’t thought of that might
+improve my model performance!</p>
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="strickvl/ml-blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/tools/redactionmodel/computervision/2022/04/06/synthetic-data-results.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>A place to share my technical learnings.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

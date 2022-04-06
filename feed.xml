@@ -1,4 +1,217 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://mlops.systems/feed.xml" rel="self" type="application/atom+xml" /><link href="https://mlops.systems/" rel="alternate" type="text/html" /><updated>2022-04-04T00:08:50-05:00</updated><id>https://mlops.systems/feed.xml</id><title type="html">mlops.systems</title><subtitle>A place to share my technical learnings.</subtitle><entry><title type="html">Some characteristics of best-in-class ML portfolio projects</title><link href="https://mlops.systems/computervision/skillbuilding/2022/04/04/ml-portfolio-best-practices.html" rel="alternate" type="text/html" title="Some characteristics of best-in-class ML portfolio projects" /><published>2022-04-04T00:00:00-05:00</published><updated>2022-04-04T00:00:00-05:00</updated><id>https://mlops.systems/computervision/skillbuilding/2022/04/04/ml-portfolio-best-practices</id><content type="html" xml:base="https://mlops.systems/computervision/skillbuilding/2022/04/04/ml-portfolio-best-practices.html">&lt;p&gt;&lt;a href=&quot;https://ekko-realtime.com&quot;&gt;Ekko&lt;/a&gt; was the last time I worked on a big project that would be presented publicly. An open-source framework that provided realtime infrastructure and
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://mlops.systems/feed.xml" rel="self" type="application/atom+xml" /><link href="https://mlops.systems/" rel="alternate" type="text/html" /><updated>2022-04-06T03:00:27-05:00</updated><id>https://mlops.systems/feed.xml</id><title type="html">mlops.systems</title><subtitle>A place to share my technical learnings.</subtitle><entry><title type="html">‘I guess this is what data-centric AI is!’: Performance boosts after training with synthetic data</title><link href="https://mlops.systems/tools/redactionmodel/computervision/2022/04/06/synthetic-data-results.html" rel="alternate" type="text/html" title="‘I guess this is what data-centric AI is!’: Performance boosts after training with synthetic data" /><published>2022-04-06T00:00:00-05:00</published><updated>2022-04-06T00:00:00-05:00</updated><id>https://mlops.systems/tools/redactionmodel/computervision/2022/04/06/synthetic-data-results</id><content type="html" xml:base="https://mlops.systems/tools/redactionmodel/computervision/2022/04/06/synthetic-data-results.html">&lt;p&gt;&lt;em&gt;(This is part of a series of blog posts documenting my work to train a model
+that detects redactions in documents. To read other posts, check out
+&lt;a href=&quot;https://mlops.systems/categories/#redactionmodel&quot;&gt;the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;redactionmodel&lt;/code&gt; taglist&lt;/a&gt;.)&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;A clean and focused dataset is probably at the top of the list of things that
+would be nice to have when starting to tackle a machine learning problem. For
+object detection, there are some
+&lt;a href=&quot;https://huggingface.co/datasets?task_categories=task_categories:object-detection&amp;amp;sort=downloads&quot;&gt;useful starting points&lt;/a&gt;,
+but for many use cases you’re probably going to have to start from scratch. This
+is what I’ve been doing
+&lt;a href=&quot;https://mlops.systems/categories/#redactionmodel&quot;&gt;for the past few months&lt;/a&gt;:
+working to bootstrap my way into a dataset that allows me to get decent
+performance training a model that can recognise redactions made on documents.&lt;/p&gt;
+
+&lt;p&gt;As part of that journey so far, some of the big things that I’ve taken time to
+do include:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://mlops.systems/redactionmodel/computervision/datalabelling/2021/11/29/prodigy-object-detection-training.html&quot;&gt;manually annotating&lt;/a&gt;
+~1000+ images&lt;/li&gt;
+  &lt;li&gt;using a model-in-the-loop to help bootstrap that annotation process by
+&lt;a href=&quot;https://mlops.systems/python/fastai/tools/redactionmodel/2022/01/16/midway-report-redaction-project.html&quot;&gt;pre-filling annotation suggestions&lt;/a&gt;
+on an image that I could then correct&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://mlops.systems/redactionmodel/computervision/python/tools/2022/02/10/synthetic-image-data.html&quot;&gt;creating synthetic images&lt;/a&gt;
+to increase the size of my dataset used in training&lt;/li&gt;
+  &lt;li&gt;spending time
+&lt;a href=&quot;https://mlops.systems/redactionmodel/computervision/tools/debugging/jupyter/2022/03/12/fiftyone-computervision.html&quot;&gt;looking at what the model found difficult&lt;/a&gt;,
+or what it got wrong&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;At the end of my synthetic data creation blogpost, I mentioned that the next
+step would be to test the effect of adding in the new synthetic examples. Well…
+the results are in!&lt;/p&gt;
+
+&lt;h2 id=&quot;a-failed-attempt-to-train-with-synthetic-data&quot;&gt;A failed attempt to train with synthetic data&lt;/h2&gt;
+
+&lt;p&gt;I wasn’t sure exactly how much synthetic data would be appropriate or performant
+to use, so created a loose experiment where I started with 20% of the total
+images and increasing up until I reached 50%. (I figured that more than 50%
+synthetic data probably wasn’t a great idea and would probably not help my model
+perform out in the real world.)&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/synthetic-data-results/synthetic-early-results.png&quot; alt=&quot;&quot; title=&quot;Results from the first phase using synthetic data&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;As you can see above: my initial experiment did not show great results. In fact,
+in several places, if I added synthetic data my model actually performed
+&lt;em&gt;worse&lt;/em&gt;. This was a strong repudiation of my intuition of what would happen.
+After all, the whole point of adding the synthetic data was to get the model
+more of a chance to learn / train and thus improve its ability to recognise
+redaction object in documents.&lt;/p&gt;
+
+&lt;p&gt;I dug into the data that I’d generated and the data I’d been using to train, and
+discovered a nasty bug which was tanking the performance. A week of debugging
+mislabelled bboxes in evenings after work and I was back with results that
+finally made sense.&lt;/p&gt;
+
+&lt;h2 id=&quot;performance-boosts-after-adding-synthetic-data&quot;&gt;Performance boosts after adding synthetic data&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/synthetic-data-results/synthetic-mid-results.png&quot; alt=&quot;&quot; title=&quot;Results from the first phase using synthetic data&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;In this chart, at the bottom you can see how training the model without the
+synthetic data (&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;no-synthetic-batch16&lt;/code&gt;) performed. Ok, not great. Then the next
+best performing (&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;combined-75real-25synthetic-randomsplit&lt;/code&gt;)was when 25% of the
+total number of images was synthetic, and the rest were real manually annotated
+images. At the top, with around an 81% COCO score, was the model where I used
+50% synthetic and 50% real images. This seemed to fit what my intuition said
+would happen.&lt;/p&gt;
+
+&lt;p&gt;More synthetic data helped. I guessed that if I had millions of labelled images
+then the synthetic data would perhaps have been less useful, but starting from
+scratch it was really supporting the process.&lt;/p&gt;
+
+&lt;p&gt;I was curious what would happen when I returned to FiftyOne to carry out some
+error analysis on the new model’s performance. Even before I had reached those
+results, I had a hunch that the synthetic images I’d created were perhaps too
+generic. I think they probably were helping boost some baseline performance of
+my model, but I knew they weren’t helping with the hard parts of detecting
+redactions.&lt;/p&gt;
+
+&lt;h2 id=&quot;hard-examples-creating-targeted-synthetic-data&quot;&gt;‘Hard examples’: creating targeted synthetic data&lt;/h2&gt;
+
+&lt;p&gt;As a reminder, this is the kind of image that is ‘hard’ for my model (or even a
+human) to be able to identify all the redactions:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/synthetic-data-results/hard-detection.png&quot; alt=&quot;&quot; title=&quot;White
+boxes on white backgrounds are hard to identify as redactions&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The FiftyOne visualisations of what was and wasn’t working validated my hunch:
+yes, synthetic data helped somewhat, but the model’s low performance seemed much
+more vulnerable to misrecognition of the hard examples. Even with a 50/50 split
+between synthetic data and real manually annotated data, the hard examples were
+still hard! (And the converse was also true: the model was &lt;em&gt;already&lt;/em&gt; pretty good
+at identifying ‘easy’ redactions (e.g. of the black box type).&lt;/p&gt;
+
+&lt;p&gt;If we look back at the example of a ‘hard’ redaction above, two things stood
+out:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;They’re hard, even for a human! This was borne out in the way I needed to
+take special care not to forget or mislabel when I was adding manual
+annotations.&lt;/li&gt;
+  &lt;li&gt;There are &lt;em&gt;lots&lt;/em&gt; of redactions on a single page/image.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;The second point was probably important, not only in the sense that there were
+more chances of getting something wrong on a single page, but also in the sense
+that the redactions were (relatively) small. The detection of small objects is
+almost its own field in the world of computer vision and I don’t know too much
+about it, but I do know it’s somewhat an unsolved problem. That said, finding a
+way to boost the performance of the models on these ‘hard’ examples (there were
+a few other types of hard image) seemed like it might tackle a significant
+shortcoming of my model.&lt;/p&gt;
+
+&lt;p&gt;I decided to try creating a separate batch of synthetic image data, this time
+fully tailored to tackling some of the hardness mentioned above: it would have
+many small redactions on a single page, they would all be white boxes and there
+might also be things like tables with white box-like shapes coexisting next to
+redactions.&lt;/p&gt;
+
+&lt;p&gt;Luckily, the work I’d done previously on creating synthetic data helped me get
+started quickly. I returned to &lt;a href=&quot;https://borbpdf.com&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;borb&lt;/code&gt;&lt;/a&gt;, an open-source
+tool for quickly creating PDF documents that allows for a pretty flexible
+prototyping of layouts with all sorts of bells and whistles added. These were
+some of the documents I generated:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/synthetic-data-results/hard-synthetic.gif&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The hard images were hard, and I had created some synthetic chimeras that (I
+believed) approximated some of the features of the original hard images. I did
+not want to overbalance my training data, however, and took care not to create
+too many of this type of image.&lt;/p&gt;
+
+&lt;p&gt;My script — as with
+&lt;a href=&quot;https://mlops.systems/redactionmodel/computervision/python/tools/2022/02/10/synthetic-image-data.html&quot;&gt;the previous synthetic data&lt;/a&gt;
+— also required me to create the annotation files at the same time as creating
+the document. With &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;borb&lt;/code&gt; it was &lt;em&gt;relatively&lt;/em&gt; trivial to get the bounding box
+data for objects created, and there was even in-built functionality to create
+and apply redactions onto a document. (I’m moving fairly quickly over the
+mechanics of how this all worked, but it’s not too far distant from how I
+described it in my previous post so I’d refer you there
+&lt;a href=&quot;https://mlops.systems/redactionmodel/computervision/python/tools/2022/02/10/synthetic-image-data.html&quot;&gt;for more details&lt;/a&gt;).&lt;/p&gt;
+
+&lt;p&gt;Once the images were created and added to my datasets, it was time to retrain
+the model and see what benefit it brought.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/synthetic-data-results/hard-synthetic-performance-boost.png&quot; alt=&quot;&quot; title=&quot;~3.5% boost when adding hard synthetic images into training data!&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;As you can see, the model jumped up from around 80.5 to 84% when I aded the hard
+synthetic examples in. That’s a pretty nice jump as far as I’m concerned,
+especially given that I only added in 300 images to the training data. I still
+had a little over a thousand of the original basic synthetic images that I was
+using, but this result showed me that tackling the badly performing parts of the
+model head-on seemed to have a positive outcome.&lt;/p&gt;
+
+&lt;p&gt;At this point, I did some more experiments around the edges, applying other
+things I knew would probably boost the performance even more, notably first
+checking what would happen if I increased the image size from 512 to 640. I got
+up to an 86% COCO score with that improvement alone.&lt;/p&gt;
+
+&lt;p&gt;In a final twist, I second-guessed myself and wondered whether the original
+synthetic data was even helping at all… I removed the thousand or so ‘basic’
+synthetic images from the data and retrained the model. To my surprise, I
+achieved more or less the same COCO score as I had WITH the basic synthetic
+images. I’m taking this as a strong suggestion that my basic synthetic images
+aren’t actually helping as much as I’d thought, and that probably a smaller
+number of them as a % of the total would be beneficial.&lt;/p&gt;
+
+&lt;h2 id=&quot;reflections-on-experimenting-with-synthetic-data&quot;&gt;Reflections on experimenting with synthetic data&lt;/h2&gt;
+
+&lt;p&gt;So, what can I conclude from this whole excursion into the world of synthetic
+image creation as a way of boosting model performance?&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;adding synthetic data really can help!&lt;/li&gt;
+  &lt;li&gt;the world of synthetic data creation is a HUGE rabbit hole and potentially you
+can get lost trying to create the perfect synthetic versions of your original
+data. (I mean this both in the sense of ‘there’s lots to learn’ as well as
+‘you can spend or lose a TON of time here’.)&lt;/li&gt;
+  &lt;li&gt;Targeted synthetic data designed to clear up issues where the model has been
+identified as underperforming is probably best. (Conversely, and I’ll be
+careful how much I generalise here, middle-of-the-road synthetic data that
+doesn’t resemble the original dataset may not be worth your time.)&lt;/li&gt;
+  &lt;li&gt;Knowing your original data and domain really well helps. A lot. My intuition
+about what things the model would stumble on was fuelled by this knowledge of
+the documents and the domain, as well as by the experience of having done
+manual annotations for many hours.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;There are probably many (many) more things I can do to continually tinker away
+at this model to improve it:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;continue down the path of more error analysis, which would fuel more targeted
+addition of annotations, and so on.&lt;/li&gt;
+  &lt;li&gt;create better versions of synthetic data with more variation to encompass the
+various kinds of documents out in the real world.&lt;/li&gt;
+  &lt;li&gt;more self-training with the model in the loop to fuel my manual annotation
+process.&lt;/li&gt;
+  &lt;li&gt;further increases to the image size (perhaps in conjunction with progressive
+resizing).&lt;/li&gt;
+  &lt;li&gt;increasing the backbone from &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;resnet50&lt;/code&gt; to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;resnet101&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;In general, improving the quality of the data used to train my model seems to
+have been (by far) the best way to improve my model performance. Hyper-parameter
+tuning of the sort that is often referenced in courses or in blog posts does not
+seem to have had much of a benefit.&lt;/p&gt;
+
+&lt;p&gt;It is probably (mostly) good enough for my use case and for where I want to be
+heading with this project. There are other things that need addressing around
+the edges, notably parts of the project that could be made more robust and
+‘production-ready’. More about that in due course, but for now please do comment
+below if you have suggestions for things that I haven’t thought of that might
+improve my model performance!&lt;/p&gt;</content><author><name>Alex Strick van Linschoten</name></author><category term="tools" /><category term="redactionmodel" /><category term="computervision" /><summary type="html">(This is part of a series of blog posts documenting my work to train a model that detects redactions in documents. To read other posts, check out the redactionmodel taglist.)</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://mlops.systems/images/synthetic-data-results/synthetic-results-cover.jpg" /><media:content medium="image" url="https://mlops.systems/images/synthetic-data-results/synthetic-results-cover.jpg" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Some characteristics of best-in-class ML portfolio projects</title><link href="https://mlops.systems/computervision/skillbuilding/2022/04/04/ml-portfolio-best-practices.html" rel="alternate" type="text/html" title="Some characteristics of best-in-class ML portfolio projects" /><published>2022-04-04T00:00:00-05:00</published><updated>2022-04-04T00:00:00-05:00</updated><id>https://mlops.systems/computervision/skillbuilding/2022/04/04/ml-portfolio-best-practices</id><content type="html" xml:base="https://mlops.systems/computervision/skillbuilding/2022/04/04/ml-portfolio-best-practices.html">&lt;p&gt;&lt;a href=&quot;https://ekko-realtime.com&quot;&gt;Ekko&lt;/a&gt; was the last time I worked on a big project that would be presented publicly. An open-source framework that provided realtime infrastructure and
 in-transit message processing for web applications was a group project that I worked on together with three other colleagues, and we took the time to really make the &lt;em&gt;how&lt;/em&gt; and the &lt;em&gt;why&lt;/em&gt; really explicit. We made animations, diagrams, charts, and I learned a lot about what’s hard when explaining technical projects, even when the audience is expected to be (mostly) technically literate.&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;/images/ml-portfolio-best-practices/ekko.png&quot; alt=&quot;&quot; title=&quot;A screenshot from the Ekko website&quot; /&gt;&lt;/p&gt;
@@ -287,7 +500,7 @@ docker image pull IMAGENAME
 
 &lt;p&gt;This view is sorted by total number of false positives in an image. False positives are where the model confidently has predicted something to be a redaction box, for example, that is not actually a redaction box.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/images/fiftyone-computervision/false-positives.png&quot; alt=&quot;&quot; title=&quot;Plotting the precision vs recall curves for our two classes&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/fiftyone-computervision/false-positives.png&quot; alt=&quot;&quot; title=&quot;Predicted false positives&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;In this image you can see that the model predicts a redaction box with 82% confidence that is clearly not a redaction. Note, too, how the smaller redactions to the right and the large partial redaction to the left were not detected.&lt;/p&gt;
 
@@ -1290,7 +1503,19 @@ understanding of the benefits of types, but it was useful to have this concept
 of ‘communicating intent’ to be reiterated. When I think back to how I’ve heard
 types mentioned in the past, they often get cast in a technical sense, whereas
 thinking about communication between developers I think is a more motivating
-framing.&lt;/p&gt;</content><author><name>Alex Strick van Linschoten</name></author><category term="robustpython" /><category term="python" /><category term="books-i-read" /><summary type="html">The first section of Robust Python dives into types. We begin by taking a step back to think about what exactly types are being used for, and what they might bring us. Python was not (until v3.5) a language with which you could easily use typing. I remember going to the Pylondinium conference in London in 2018 and going to a talk by Bernat Gabor about type hints in Python. Back then I didn’t have much of a sense of how new they were to many people, but even now I don’t get the feeling that they’ve been universally adopted. Hence Patrick’s book, I suppose…</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://mlops.systems/images/robust-python/robust-python-cover.jpeg" /><media:content medium="image" url="https://mlops.systems/images/robust-python/robust-python-cover.jpeg" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">What makes code robust?</title><link href="https://mlops.systems/robustpython/python/books-i-read/2021/12/29/robust-python-1.html" rel="alternate" type="text/html" title="What makes code robust?" /><published>2021-12-29T00:00:00-06:00</published><updated>2021-12-29T00:00:00-06:00</updated><id>https://mlops.systems/robustpython/python/books-i-read/2021/12/29/robust-python-1</id><content type="html" xml:base="https://mlops.systems/robustpython/python/books-i-read/2021/12/29/robust-python-1.html">&lt;p&gt;We use a lot of modern Python idioms, libraries and patterns at work, so I’ve been wanting to get up to speed on that and maybe even actively contribute to this general direction. A recently-published book, &lt;a href=&quot;https://www.amazon.com/Robust-Python-Patrick-Viafore-ebook-dp-B09982C9FX/dp/B09982C9FX/ref=mt_other?qid=&amp;amp;me=&amp;amp;tag=soumet-20&amp;amp;_encoding=UTF8&quot;&gt;Robust Python: Write Clean and Maintainable Code&lt;/a&gt; by &lt;a href=&quot;https://www.linkedin.com/in/patviafore/&quot;&gt;Patrick Viafore&lt;/a&gt;, seems like it answers many of the questions I have around this topic. It is quite dense in terms of the amount of new things per chapter, so I’ll be working my way through it in the coming months and reflecting on things as I encounter them.&lt;/p&gt;
+framing.&lt;/p&gt;</content><author><name>Alex Strick van Linschoten</name></author><category term="robustpython" /><category term="python" /><category term="books-i-read" /><summary type="html">The first section of Robust Python dives into types. We begin by taking a step back to think about what exactly types are being used for, and what they might bring us. Python was not (until v3.5) a language with which you could easily use typing. I remember going to the Pylondinium conference in London in 2018 and going to a talk by Bernat Gabor about type hints in Python. Back then I didn’t have much of a sense of how new they were to many people, but even now I don’t get the feeling that they’ve been universally adopted. Hence Patrick’s book, I suppose…</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://mlops.systems/images/robust-python/robust-python-cover.jpeg" /><media:content medium="image" url="https://mlops.systems/images/robust-python/robust-python-cover.jpeg" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Exploring J, an array programming language</title><link href="https://mlops.systems/j/2021/12/29/j-language.html" rel="alternate" type="text/html" title="Exploring J, an array programming language" /><published>2021-12-29T00:00:00-06:00</published><updated>2021-12-29T00:00:00-06:00</updated><id>https://mlops.systems/j/2021/12/29/j-language</id><content type="html" xml:base="https://mlops.systems/j/2021/12/29/j-language.html">&lt;p&gt;I’ve long wanted to explore &lt;a href=&quot;https://www.jsoftware.com&quot;&gt;the J programming language&lt;/a&gt;. I think I probably first heard about it from Jeremy Howard amidst one of the early iterations of the fastai course. He’s since spoken about it &lt;a href=&quot;https://youtu.be/J6XcP4JOHmk?t=505&quot;&gt;in other places&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;It is part of the family of programming languages that includes &lt;a href=&quot;https://en.wikipedia.org/wiki/APL_(programming_language)&quot;&gt;APL&lt;/a&gt;, &lt;a href=&quot;https://en.wikipedia.org/wiki/K_%28programming_language%29&quot;&gt;K&lt;/a&gt; and &lt;a href=&quot;https://en.wikipedia.org/wiki/Q_(programming_language_from_Kx_Systems)&quot;&gt;Q&lt;/a&gt;. These can broadly be categorised as array-programming languages, where arrays are generally the core data structure and mental model to keep in mind. They used to be extremely popular in the 1970s and 1980s, particularly among institutions or businesses with a requirement for performant calculation / computation. One of these, Q, continues to live on (as a closed-source language) &lt;a href=&quot;https://www.efinancialcareers.se/news/2020/10/kdb-finance-jobs&quot;&gt;in the world of finance and trading&lt;/a&gt;. (Q is popular alongside the proprietary database &lt;a href=&quot;https://en.wikipedia.org/wiki/Kdb%2B&quot;&gt;kdb+&lt;/a&gt;).&lt;/p&gt;
+
+&lt;p&gt;You’re probably wondering why someone would want to use this fairly specialised and niche language. When you look at examples of J code — like the ones &lt;a href=&quot;https://code.jsoftware.com/wiki/Studio/IdiosyncraticIntroduction&quot;&gt;here&lt;/a&gt;, for example — it’s easy to simply dismiss it as an unreadable (‘write-only’) language. Indeed, many do dismiss it for this reason. Code is often compact, with single letters or symbols doing all the work. Defenders of J hold this up as a feature, not a problem. The compactness of the language means that you can fit the entirety of the solution (space) of a complex problem on a single screen, whereas in many (most?) other languages you would have to be scrolling up and down through dozens or even hundreds of lines of code.&lt;/p&gt;
+
+&lt;p&gt;The array languages seem to come at solving problems from a particular perspective. The symbols and letters that transform the arrays in J function as a pattern language. For a simple example, think of what you have to do when you want to find the count of a particular element from within an array/list. The array language paradigm argues that you don’t want to waste your time and screen space writing out boilerplate code to carry out this calculation, when it’s a common pattern that you can just use from the language itself. When problem-solving, therefore, spend your time thinking about the problem and not messing around with syntax or repeating yourself.&lt;/p&gt;
+
+&lt;p&gt;J and its cousins are extremely efficient. It is written in C, and I recently heard someone quote one of the early J pioneers as having said that “it is not theoretically possible to write J code that is more performant than C, but it often ends up being so”. For some math- or statistics-heavy domains (think the world of finance), it is extremely helpful to have this highly abstracted language that works performantly on large datasets. Moreover, it seems to be even more helpful when you have a hard problem to work on that isn’t fully understood.&lt;/p&gt;
+
+&lt;p&gt;Kenneth Iverson’s wrote a paper (&lt;a href=&quot;https://www.jsoftware.com/papers/tot.htm&quot;&gt;“Notation as a Tool of Thought”&lt;/a&gt;) that is a classic in computer science and gets into some of the above arguments. (It is written using APL, but &lt;a href=&quot;https://www.hillelwayne.com/post/j-notation/&quot;&gt;it also applies to J&lt;/a&gt;). I will probably return to that at a future date, because it often comes up and is recommended as a particularly rich document worth taking time to explore in depth.&lt;/p&gt;
+
+&lt;p&gt;Very much as a project to indulge my curiosity, I will be exploring J over the coming months. I have been listening to the back catalogue of &lt;a href=&quot;https://www.arraycast.com&quot;&gt;The Array Cast&lt;/a&gt; podcast, and I will be slowly working my way through &lt;a href=&quot;https://code.jsoftware.com/wiki/Main_Page&quot;&gt;some of the resources&lt;/a&gt; listed on the official J site. Let me know if you have experience working with J!&lt;/p&gt;</content><author><name>Alex Strick van Linschoten</name></author><category term="j" /><summary type="html">I’ve long wanted to explore the J programming language. I think I probably first heard about it from Jeremy Howard amidst one of the early iterations of the fastai course. He’s since spoken about it in other places.</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://mlops.systems/images/j-language/jblue.png" /><media:content medium="image" url="https://mlops.systems/images/j-language/jblue.png" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">What makes code robust?</title><link href="https://mlops.systems/robustpython/python/books-i-read/2021/12/29/robust-python-1.html" rel="alternate" type="text/html" title="What makes code robust?" /><published>2021-12-29T00:00:00-06:00</published><updated>2021-12-29T00:00:00-06:00</updated><id>https://mlops.systems/robustpython/python/books-i-read/2021/12/29/robust-python-1</id><content type="html" xml:base="https://mlops.systems/robustpython/python/books-i-read/2021/12/29/robust-python-1.html">&lt;p&gt;We use a lot of modern Python idioms, libraries and patterns at work, so I’ve been wanting to get up to speed on that and maybe even actively contribute to this general direction. A recently-published book, &lt;a href=&quot;https://www.amazon.com/Robust-Python-Patrick-Viafore-ebook-dp-B09982C9FX/dp/B09982C9FX/ref=mt_other?qid=&amp;amp;me=&amp;amp;tag=soumet-20&amp;amp;_encoding=UTF8&quot;&gt;Robust Python: Write Clean and Maintainable Code&lt;/a&gt; by &lt;a href=&quot;https://www.linkedin.com/in/patviafore/&quot;&gt;Patrick Viafore&lt;/a&gt;, seems like it answers many of the questions I have around this topic. It is quite dense in terms of the amount of new things per chapter, so I’ll be working my way through it in the coming months and reflecting on things as I encounter them.&lt;/p&gt;
 
 &lt;p&gt;The first chapter is mainly about setting the scene for all the technical pieces that follow. Patrick asks the core questions: what is robust code and why do we even care? What problems does it solve to think about code in this way.&lt;/p&gt;
 
@@ -1310,19 +1535,7 @@ framing.&lt;/p&gt;</content><author><name>Alex Strick van Linschoten</name></aut
 
 &lt;p&gt;Moreover, the communication of intent needs to be done in a way that is asynchronous. The book goes into a bit more detail about why communication practices that require minimal cost and minimal proximity are to be preferred. These include: the code itself, in-code comments, tests, version control history, wikis, and in-project documentation.&lt;/p&gt;
 
-&lt;p&gt;The first part of the book is all about type annotation, using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mypy&lt;/code&gt;, and how working with types helps makes your code more robust. We use a lot of this at work so I’m excited to take a deep dive into this.&lt;/p&gt;</content><author><name>Alex Strick van Linschoten</name></author><category term="robustpython" /><category term="python" /><category term="books-i-read" /><summary type="html">We use a lot of modern Python idioms, libraries and patterns at work, so I’ve been wanting to get up to speed on that and maybe even actively contribute to this general direction. A recently-published book, Robust Python: Write Clean and Maintainable Code by Patrick Viafore, seems like it answers many of the questions I have around this topic. It is quite dense in terms of the amount of new things per chapter, so I’ll be working my way through it in the coming months and reflecting on things as I encounter them.</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://mlops.systems/images/robust-python/robust-python-cover.jpeg" /><media:content medium="image" url="https://mlops.systems/images/robust-python/robust-python-cover.jpeg" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Exploring J, an array programming language</title><link href="https://mlops.systems/j/2021/12/29/j-language.html" rel="alternate" type="text/html" title="Exploring J, an array programming language" /><published>2021-12-29T00:00:00-06:00</published><updated>2021-12-29T00:00:00-06:00</updated><id>https://mlops.systems/j/2021/12/29/j-language</id><content type="html" xml:base="https://mlops.systems/j/2021/12/29/j-language.html">&lt;p&gt;I’ve long wanted to explore &lt;a href=&quot;https://www.jsoftware.com&quot;&gt;the J programming language&lt;/a&gt;. I think I probably first heard about it from Jeremy Howard amidst one of the early iterations of the fastai course. He’s since spoken about it &lt;a href=&quot;https://youtu.be/J6XcP4JOHmk?t=505&quot;&gt;in other places&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;It is part of the family of programming languages that includes &lt;a href=&quot;https://en.wikipedia.org/wiki/APL_(programming_language)&quot;&gt;APL&lt;/a&gt;, &lt;a href=&quot;https://en.wikipedia.org/wiki/K_%28programming_language%29&quot;&gt;K&lt;/a&gt; and &lt;a href=&quot;https://en.wikipedia.org/wiki/Q_(programming_language_from_Kx_Systems)&quot;&gt;Q&lt;/a&gt;. These can broadly be categorised as array-programming languages, where arrays are generally the core data structure and mental model to keep in mind. They used to be extremely popular in the 1970s and 1980s, particularly among institutions or businesses with a requirement for performant calculation / computation. One of these, Q, continues to live on (as a closed-source language) &lt;a href=&quot;https://www.efinancialcareers.se/news/2020/10/kdb-finance-jobs&quot;&gt;in the world of finance and trading&lt;/a&gt;. (Q is popular alongside the proprietary database &lt;a href=&quot;https://en.wikipedia.org/wiki/Kdb%2B&quot;&gt;kdb+&lt;/a&gt;).&lt;/p&gt;
-
-&lt;p&gt;You’re probably wondering why someone would want to use this fairly specialised and niche language. When you look at examples of J code — like the ones &lt;a href=&quot;https://code.jsoftware.com/wiki/Studio/IdiosyncraticIntroduction&quot;&gt;here&lt;/a&gt;, for example — it’s easy to simply dismiss it as an unreadable (‘write-only’) language. Indeed, many do dismiss it for this reason. Code is often compact, with single letters or symbols doing all the work. Defenders of J hold this up as a feature, not a problem. The compactness of the language means that you can fit the entirety of the solution (space) of a complex problem on a single screen, whereas in many (most?) other languages you would have to be scrolling up and down through dozens or even hundreds of lines of code.&lt;/p&gt;
-
-&lt;p&gt;The array languages seem to come at solving problems from a particular perspective. The symbols and letters that transform the arrays in J function as a pattern language. For a simple example, think of what you have to do when you want to find the count of a particular element from within an array/list. The array language paradigm argues that you don’t want to waste your time and screen space writing out boilerplate code to carry out this calculation, when it’s a common pattern that you can just use from the language itself. When problem-solving, therefore, spend your time thinking about the problem and not messing around with syntax or repeating yourself.&lt;/p&gt;
-
-&lt;p&gt;J and its cousins are extremely efficient. It is written in C, and I recently heard someone quote one of the early J pioneers as having said that “it is not theoretically possible to write J code that is more performant than C, but it often ends up being so”. For some math- or statistics-heavy domains (think the world of finance), it is extremely helpful to have this highly abstracted language that works performantly on large datasets. Moreover, it seems to be even more helpful when you have a hard problem to work on that isn’t fully understood.&lt;/p&gt;
-
-&lt;p&gt;Kenneth Iverson’s wrote a paper (&lt;a href=&quot;https://www.jsoftware.com/papers/tot.htm&quot;&gt;“Notation as a Tool of Thought”&lt;/a&gt;) that is a classic in computer science and gets into some of the above arguments. (It is written using APL, but &lt;a href=&quot;https://www.hillelwayne.com/post/j-notation/&quot;&gt;it also applies to J&lt;/a&gt;). I will probably return to that at a future date, because it often comes up and is recommended as a particularly rich document worth taking time to explore in depth.&lt;/p&gt;
-
-&lt;p&gt;Very much as a project to indulge my curiosity, I will be exploring J over the coming months. I have been listening to the back catalogue of &lt;a href=&quot;https://www.arraycast.com&quot;&gt;The Array Cast&lt;/a&gt; podcast, and I will be slowly working my way through &lt;a href=&quot;https://code.jsoftware.com/wiki/Main_Page&quot;&gt;some of the resources&lt;/a&gt; listed on the official J site. Let me know if you have experience working with J!&lt;/p&gt;</content><author><name>Alex Strick van Linschoten</name></author><category term="j" /><summary type="html">I’ve long wanted to explore the J programming language. I think I probably first heard about it from Jeremy Howard amidst one of the early iterations of the fastai course. He’s since spoken about it in other places.</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://mlops.systems/images/j-language/jblue.png" /><media:content medium="image" url="https://mlops.systems/images/j-language/jblue.png" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">A Taxonomy of Redaction</title><link href="https://mlops.systems/redactionmodel/2021/12/15/redaction-taxonomy.html" rel="alternate" type="text/html" title="A Taxonomy of Redaction" /><published>2021-12-15T00:00:00-06:00</published><updated>2021-12-15T00:00:00-06:00</updated><id>https://mlops.systems/redactionmodel/2021/12/15/redaction-taxonomy</id><content type="html" xml:base="https://mlops.systems/redactionmodel/2021/12/15/redaction-taxonomy.html">&lt;p&gt;One of the things that makes it hard to train a model to detect redactions in documents is the fact that there are lots of kinds of redactions. Not only were different tools or methods used at different times, but even organisations and agencies from the same country or government didn’t always share redaction practices.&lt;/p&gt;
+&lt;p&gt;The first part of the book is all about type annotation, using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mypy&lt;/code&gt;, and how working with types helps makes your code more robust. We use a lot of this at work so I’m excited to take a deep dive into this.&lt;/p&gt;</content><author><name>Alex Strick van Linschoten</name></author><category term="robustpython" /><category term="python" /><category term="books-i-read" /><summary type="html">We use a lot of modern Python idioms, libraries and patterns at work, so I’ve been wanting to get up to speed on that and maybe even actively contribute to this general direction. A recently-published book, Robust Python: Write Clean and Maintainable Code by Patrick Viafore, seems like it answers many of the questions I have around this topic. It is quite dense in terms of the amount of new things per chapter, so I’ll be working my way through it in the coming months and reflecting on things as I encounter them.</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://mlops.systems/images/robust-python/robust-python-cover.jpeg" /><media:content medium="image" url="https://mlops.systems/images/robust-python/robust-python-cover.jpeg" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">A Taxonomy of Redaction</title><link href="https://mlops.systems/redactionmodel/2021/12/15/redaction-taxonomy.html" rel="alternate" type="text/html" title="A Taxonomy of Redaction" /><published>2021-12-15T00:00:00-06:00</published><updated>2021-12-15T00:00:00-06:00</updated><id>https://mlops.systems/redactionmodel/2021/12/15/redaction-taxonomy</id><content type="html" xml:base="https://mlops.systems/redactionmodel/2021/12/15/redaction-taxonomy.html">&lt;p&gt;One of the things that makes it hard to train a model to detect redactions in documents is the fact that there are lots of kinds of redactions. Not only were different tools or methods used at different times, but even organisations and agencies from the same country or government didn’t always share redaction practices.&lt;/p&gt;
 
 &lt;p&gt;I took a bit of time to try to understand the different kinds of redactions in my (pretty huge) data set. I didn’t have any special process for selecting these images; I randomly sorted the immediate ~70,000 images I have collected and looked through to try to identify some patterns.&lt;/p&gt;
 
@@ -1546,7 +1759,13 @@ unzip v2.16.0.zip
 &lt;p&gt;Everything we’re interested in is inside the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;spans&lt;/code&gt; attribute, and it actually contains both kinds of the annotation that I mentioned above.&lt;/p&gt;
 
 &lt;p&gt;As you can see, annotating images in this way is fairly painless, and it brings
-you in closer contact with your raw data which is an added bonus.&lt;/p&gt;</content><author><name>Alex Strick van Linschoten</name></author><category term="redactionmodel" /><category term="computervision" /><category term="datalabelling" /><summary type="html">I’m back to working on the redaction model, though this time with a slightly more focused objective: object detection.</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://mlops.systems/images/2021-11-29-prodigy-object-detection-training/prodigy-redaction.png" /><media:content medium="image" url="https://mlops.systems/images/2021-11-29-prodigy-object-detection-training/prodigy-redaction.png" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Launching a podcast about MLOps</title><link href="https://mlops.systems/zenml/podcast/appearances/2021/11/27/pipeline-conversations.html" rel="alternate" type="text/html" title="Launching a podcast about MLOps" /><published>2021-11-27T00:00:00-06:00</published><updated>2021-11-27T00:00:00-06:00</updated><id>https://mlops.systems/zenml/podcast/appearances/2021/11/27/pipeline-conversations</id><content type="html" xml:base="https://mlops.systems/zenml/podcast/appearances/2021/11/27/pipeline-conversations.html">&lt;p&gt;I’ll be co-hosting a new podcast about MLOps, with new episodes out every
+you in closer contact with your raw data which is an added bonus.&lt;/p&gt;</content><author><name>Alex Strick van Linschoten</name></author><category term="redactionmodel" /><category term="computervision" /><category term="datalabelling" /><summary type="html">I’m back to working on the redaction model, though this time with a slightly more focused objective: object detection.</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://mlops.systems/images/2021-11-29-prodigy-object-detection-training/prodigy-redaction.png" /><media:content medium="image" url="https://mlops.systems/images/2021-11-29-prodigy-object-detection-training/prodigy-redaction.png" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Check your security vulnerabilities with `safety`</title><link href="https://mlops.systems/security/tools/calmcode/2021/11/27/safety-vulnerability-checker.html" rel="alternate" type="text/html" title="Check your security vulnerabilities with `safety`" /><published>2021-11-27T00:00:00-06:00</published><updated>2021-11-27T00:00:00-06:00</updated><id>https://mlops.systems/security/tools/calmcode/2021/11/27/safety-vulnerability-checker</id><content type="html" xml:base="https://mlops.systems/security/tools/calmcode/2021/11/27/safety-vulnerability-checker.html">&lt;p&gt;&lt;a href=&quot;https://github.com/pyupio/safety&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;safety&lt;/code&gt;&lt;/a&gt; is a tiny tool that checks your package’s dependencies for security vulnerabilities. It is free to use for open-source projects, and using it is as a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pip install safety&lt;/code&gt; followed by &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;safety check&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;It checks a database of known security vulnerabilities. This database is only updated once every month, but if you are not open-source or you need access to the more frequently-updated database, then you can &lt;a href=&quot;https://pyup.io/pricing/&quot;&gt;subscribe via pyup&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;With that caveat, it’s not perfect, but it’s better than nothing. An easy CI win for open-source projects.&lt;/p&gt;
+
+&lt;p&gt;[I first learned of this tool &lt;a href=&quot;https://calmcode.io/shorts/safety.py.html&quot;&gt;here&lt;/a&gt;. Many thanks to &lt;a href=&quot;https://calmcode.io/&quot;&gt;calmcode&lt;/a&gt; for continuing to make these really useful videos.]&lt;/p&gt;</content><author><name>Alex Strick van Linschoten</name></author><category term="security" /><category term="tools" /><category term="calmcode" /><summary type="html">safety is a tiny tool that checks your package’s dependencies for security vulnerabilities. It is free to use for open-source projects, and using it is as a pip install safety followed by safety check.</summary></entry><entry><title type="html">Launching a podcast about MLOps</title><link href="https://mlops.systems/zenml/podcast/appearances/2021/11/27/pipeline-conversations.html" rel="alternate" type="text/html" title="Launching a podcast about MLOps" /><published>2021-11-27T00:00:00-06:00</published><updated>2021-11-27T00:00:00-06:00</updated><id>https://mlops.systems/zenml/podcast/appearances/2021/11/27/pipeline-conversations</id><content type="html" xml:base="https://mlops.systems/zenml/podcast/appearances/2021/11/27/pipeline-conversations.html">&lt;p&gt;I’ll be co-hosting a new podcast about MLOps, with new episodes out every
 fortnight.
 &lt;a href=&quot;https://podcast.zenml.io&quot;&gt;Pipeline Conversations: A Machine Learning Podcast by ZenML&lt;/a&gt;
 is the new podcast from &lt;a href=&quot;https://zenml.io/&quot;&gt;the company where I work&lt;/a&gt;. (We build
@@ -1558,13 +1777,7 @@ first place. Upcoming episodes will be discussions with guests from the data
 science and MLOps space.&lt;/p&gt;
 
 &lt;p&gt;I’m excited to get the opportunity to talk with so many interesting and smart
-people.&lt;/p&gt;</content><author><name>Alex Strick van Linschoten</name></author><category term="zenml" /><category term="podcast" /><category term="appearances" /><summary type="html">I’ll be co-hosting a new podcast about MLOps, with new episodes out every fortnight. Pipeline Conversations: A Machine Learning Podcast by ZenML is the new podcast from the company where I work. (We build an open-source tool for data scientists to empower them to take control of how their models live in production.)</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://mlops.systems/images/pipeline_cover_small.jpeg" /><media:content medium="image" url="https://mlops.systems/images/pipeline_cover_small.jpeg" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Check your security vulnerabilities with `safety`</title><link href="https://mlops.systems/security/tools/calmcode/2021/11/27/safety-vulnerability-checker.html" rel="alternate" type="text/html" title="Check your security vulnerabilities with `safety`" /><published>2021-11-27T00:00:00-06:00</published><updated>2021-11-27T00:00:00-06:00</updated><id>https://mlops.systems/security/tools/calmcode/2021/11/27/safety-vulnerability-checker</id><content type="html" xml:base="https://mlops.systems/security/tools/calmcode/2021/11/27/safety-vulnerability-checker.html">&lt;p&gt;&lt;a href=&quot;https://github.com/pyupio/safety&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;safety&lt;/code&gt;&lt;/a&gt; is a tiny tool that checks your package’s dependencies for security vulnerabilities. It is free to use for open-source projects, and using it is as a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pip install safety&lt;/code&gt; followed by &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;safety check&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;It checks a database of known security vulnerabilities. This database is only updated once every month, but if you are not open-source or you need access to the more frequently-updated database, then you can &lt;a href=&quot;https://pyup.io/pricing/&quot;&gt;subscribe via pyup&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;With that caveat, it’s not perfect, but it’s better than nothing. An easy CI win for open-source projects.&lt;/p&gt;
-
-&lt;p&gt;[I first learned of this tool &lt;a href=&quot;https://calmcode.io/shorts/safety.py.html&quot;&gt;here&lt;/a&gt;. Many thanks to &lt;a href=&quot;https://calmcode.io/&quot;&gt;calmcode&lt;/a&gt; for continuing to make these really useful videos.]&lt;/p&gt;</content><author><name>Alex Strick van Linschoten</name></author><category term="security" /><category term="tools" /><category term="calmcode" /><summary type="html">safety is a tiny tool that checks your package’s dependencies for security vulnerabilities. It is free to use for open-source projects, and using it is as a pip install safety followed by safety check.</summary></entry><entry><title type="html">How to set and get environment variables using Python</title><link href="https://mlops.systems/python/2021/11/26/environment-variables.html" rel="alternate" type="text/html" title="How to set and get environment variables using Python" /><published>2021-11-26T00:00:00-06:00</published><updated>2021-11-26T00:00:00-06:00</updated><id>https://mlops.systems/python/2021/11/26/environment-variables</id><content type="html" xml:base="https://mlops.systems/python/2021/11/26/environment-variables.html">&lt;p&gt;If you want to get and set environment variables using Python, simply use the relevant methods from &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;os&lt;/code&gt;. To set an environment variable, do this:&lt;/p&gt;
+people.&lt;/p&gt;</content><author><name>Alex Strick van Linschoten</name></author><category term="zenml" /><category term="podcast" /><category term="appearances" /><summary type="html">I’ll be co-hosting a new podcast about MLOps, with new episodes out every fortnight. Pipeline Conversations: A Machine Learning Podcast by ZenML is the new podcast from the company where I work. (We build an open-source tool for data scientists to empower them to take control of how their models live in production.)</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://mlops.systems/images/pipeline_cover_small.jpeg" /><media:content medium="image" url="https://mlops.systems/images/pipeline_cover_small.jpeg" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">How to set and get environment variables using Python</title><link href="https://mlops.systems/python/2021/11/26/environment-variables.html" rel="alternate" type="text/html" title="How to set and get environment variables using Python" /><published>2021-11-26T00:00:00-06:00</published><updated>2021-11-26T00:00:00-06:00</updated><id>https://mlops.systems/python/2021/11/26/environment-variables</id><content type="html" xml:base="https://mlops.systems/python/2021/11/26/environment-variables.html">&lt;p&gt;If you want to get and set environment variables using Python, simply use the relevant methods from &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;os&lt;/code&gt;. To set an environment variable, do this:&lt;/p&gt;
 
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;os&lt;/span&gt;
 
