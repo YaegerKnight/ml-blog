@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://mlops.systems/feed.xml" rel="self" type="application/atom+xml" /><link href="https://mlops.systems/" rel="alternate" type="text/html" /><updated>2022-04-06T03:04:26-05:00</updated><id>https://mlops.systems/feed.xml</id><title type="html">mlops.systems</title><subtitle>A place to share my technical learnings.</subtitle><entry><title type="html">‘I guess this is what data-centric AI is!’: Performance boosts after training with synthetic data</title><link href="https://mlops.systems/tools/redactionmodel/computervision/2022/04/06/synthetic-data-results.html" rel="alternate" type="text/html" title="‘I guess this is what data-centric AI is!’: Performance boosts after training with synthetic data" /><published>2022-04-06T00:00:00-05:00</published><updated>2022-04-06T00:00:00-05:00</updated><id>https://mlops.systems/tools/redactionmodel/computervision/2022/04/06/synthetic-data-results</id><content type="html" xml:base="https://mlops.systems/tools/redactionmodel/computervision/2022/04/06/synthetic-data-results.html">&lt;p&gt;&lt;em&gt;(This is part of a series of blog posts documenting my work to train a model
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://mlops.systems/feed.xml" rel="self" type="application/atom+xml" /><link href="https://mlops.systems/" rel="alternate" type="text/html" /><updated>2022-04-06T03:11:35-05:00</updated><id>https://mlops.systems/feed.xml</id><title type="html">mlops.systems</title><subtitle>A place to share my technical learnings.</subtitle><entry><title type="html">‘I guess this is what data-centric AI is!’: Performance boosts after training with synthetic data</title><link href="https://mlops.systems/tools/redactionmodel/computervision/2022/04/06/synthetic-data-results.html" rel="alternate" type="text/html" title="‘I guess this is what data-centric AI is!’: Performance boosts after training with synthetic data" /><published>2022-04-06T00:00:00-05:00</published><updated>2022-04-06T00:00:00-05:00</updated><id>https://mlops.systems/tools/redactionmodel/computervision/2022/04/06/synthetic-data-results</id><content type="html" xml:base="https://mlops.systems/tools/redactionmodel/computervision/2022/04/06/synthetic-data-results.html">&lt;p&gt;&lt;em&gt;(This is part of a series of blog posts documenting my work to train a model
 that detects redactions in documents. To read other posts, check out
 &lt;a href=&quot;https://mlops.systems/categories/#redactionmodel&quot;&gt;the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;redactionmodel&lt;/code&gt; taglist&lt;/a&gt;.)&lt;/em&gt;&lt;/p&gt;
 
@@ -17,7 +17,7 @@ do include:&lt;/p&gt;
 
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;https://mlops.systems/redactionmodel/computervision/datalabelling/2021/11/29/prodigy-object-detection-training.html&quot;&gt;manually annotating&lt;/a&gt;
-~1000+ images&lt;/li&gt;
+1000+ images&lt;/li&gt;
   &lt;li&gt;using a model-in-the-loop to help bootstrap that annotation process by
 &lt;a href=&quot;https://mlops.systems/python/fastai/tools/redactionmodel/2022/01/16/midway-report-redaction-project.html&quot;&gt;pre-filling annotation suggestions&lt;/a&gt;
 on an image that I could then correct&lt;/li&gt;
@@ -51,7 +51,7 @@ redaction object in documents.&lt;/p&gt;
 
 &lt;p&gt;I dug into the data that I’d generated and the data I’d been using to train, and
 discovered a nasty bug which was tanking the performance. A week of debugging
-mislabelled bboxes in evenings after work and I was back with results that
+mislabelled bounding boxes in evenings after work and I was back with results that
 finally made sense.&lt;/p&gt;
 
 &lt;h2 id=&quot;performance-boosts-after-adding-synthetic-data&quot;&gt;Performance boosts after adding synthetic data&lt;/h2&gt;
@@ -70,7 +70,7 @@ would happen.&lt;/p&gt;
 then the synthetic data would perhaps have been less useful, but starting from
 scratch it was really supporting the process.&lt;/p&gt;
 
-&lt;p&gt;I was curious what would happen when I returned to FiftyOne to carry out some
+&lt;p&gt;I was curious what would happen when I returned to &lt;a href=&quot;https://voxel51.com&quot;&gt;FiftyOne&lt;/a&gt; to carry out some
 error analysis on the new model’s performance. Even before I had reached those
 results, I had a hunch that the synthetic images I’d created were perhaps too
 generic. I think they probably were helping boost some baseline performance of
@@ -85,7 +85,7 @@ human) to be able to identify all the redactions:&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;/images/synthetic-data-results/hard-detection.png&quot; alt=&quot;&quot; title=&quot;White
 boxes on white backgrounds are hard to identify as redactions&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;The FiftyOne visualisations of what was and wasn’t working validated my hunch:
+&lt;p&gt;The &lt;a href=&quot;https://voxel51.com&quot;&gt;FiftyOne&lt;/a&gt; visualisations of what was and wasn’t working validated my hunch:
 yes, synthetic data helped somewhat, but the model’s low performance seemed much
 more vulnerable to misrecognition of the hard examples. Even with a 50/50 split
 between synthetic data and real manually annotated data, the hard examples were
@@ -160,7 +160,7 @@ up to an 86% COCO score with that improvement alone.&lt;/p&gt;
 &lt;p&gt;In a final twist, I second-guessed myself and wondered whether the original
 synthetic data was even helping at all… I removed the thousand or so ‘basic’
 synthetic images from the data and retrained the model. To my surprise, I
-achieved more or less the same COCO score as I had WITH the basic synthetic
+achieved more or less the same COCO score as I had &lt;em&gt;with&lt;/em&gt; the basic synthetic
 images. I’m taking this as a strong suggestion that my basic synthetic images
 aren’t actually helping as much as I’d thought, and that probably a smaller
 number of them as a % of the total would be beneficial.&lt;/p&gt;
@@ -172,10 +172,10 @@ image creation as a way of boosting model performance?&lt;/p&gt;
 
 &lt;ul&gt;
   &lt;li&gt;adding synthetic data really can help!&lt;/li&gt;
-  &lt;li&gt;the world of synthetic data creation is a HUGE rabbit hole and potentially you
+  &lt;li&gt;the world of synthetic data creation is a &lt;em&gt;huge&lt;/em&gt; rabbit hole and potentially you
 can get lost trying to create the perfect synthetic versions of your original
 data. (I mean this both in the sense of ‘there’s lots to learn’ as well as
-‘you can spend or lose a TON of time here’.)&lt;/li&gt;
+‘you can spend or lose a &lt;em&gt;ton&lt;/em&gt; of time here’.)&lt;/li&gt;
   &lt;li&gt;Targeted synthetic data designed to clear up issues where the model has been
 identified as underperforming is probably best. (Conversely, and I’ll be
 careful how much I generalise here, middle-of-the-road synthetic data that
