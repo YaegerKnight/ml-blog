@@ -7,7 +7,7 @@ categories: [tools, redactionmodel, computervision]
 comments: true
 author: Alex Strick van Linschoten
 title: "'I guess this is what data-centric AI is!': Performance boosts after training with synthetic data"
-image: images/synthetic-data-results/synthetic-results-cover.jpg
+image: images/synthetic-data-results/hard-synthetic-performance-boost.png
 ---
 
 _(This is part of a series of blog posts documenting my work to train a model
