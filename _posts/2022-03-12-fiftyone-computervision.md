@@ -89,7 +89,7 @@ The previous calculations also added some metadata to each image, denoting wheth
 
 This view is sorted by total number of false positives in an image. False positives are where the model confidently has predicted something to be a redaction box, for example, that is not actually a redaction box. 
 
-![]({{ site.baseurl }}/images/fiftyone-computervision/false-positives.png "Plotting the precision vs recall curves for our two classes")
+![]({{ site.baseurl }}/images/fiftyone-computervision/false-positives.png "Predicted false positives")
 
 In this image you can see that the model predicts a redaction box with 82% confidence that is clearly not a redaction. Note, too, how the smaller redactions to the right and the large partial redaction to the left were not detected.
 
