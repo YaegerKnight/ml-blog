@@ -28,7 +28,7 @@ As part of that journey so far, some of the big things that I've taken time to
 do include:
 
 - [manually annotating](https://mlops.systems/redactionmodel/computervision/datalabelling/2021/11/29/prodigy-object-detection-training.html)
-  ~1000+ images
+  1000+ images
 - using a model-in-the-loop to help bootstrap that annotation process by
   [pre-filling annotation suggestions](https://mlops.systems/python/fastai/tools/redactionmodel/2022/01/16/midway-report-redaction-project.html)
   on an image that I could then correct
@@ -62,7 +62,7 @@ redaction object in documents.
 
 I dug into the data that I'd generated and the data I'd been using to train, and
 discovered a nasty bug which was tanking the performance. A week of debugging
-mislabelled bboxes in evenings after work and I was back with results that
+mislabelled bounding boxes in evenings after work and I was back with results that
 finally made sense.
 
 ## Performance boosts after adding synthetic data
@@ -82,7 +82,7 @@ More synthetic data helped. I guessed that if I had millions of labelled images
 then the synthetic data would perhaps have been less useful, but starting from
 scratch it was really supporting the process.
 
-I was curious what would happen when I returned to FiftyOne to carry out some
+I was curious what would happen when I returned to [FiftyOne](https://voxel51.com) to carry out some
 error analysis on the new model's performance. Even before I had reached those
 results, I had a hunch that the synthetic images I'd created were perhaps too
 generic. I think they probably were helping boost some baseline performance of
@@ -97,7 +97,7 @@ human) to be able to identify all the redactions:
 ![]({{ site.baseurl }}/images/synthetic-data-results/hard-detection.png "White
 boxes on white backgrounds are hard to identify as redactions")
 
-The FiftyOne visualisations of what was and wasn't working validated my hunch:
+The [FiftyOne](https://voxel51.com) visualisations of what was and wasn't working validated my hunch:
 yes, synthetic data helped somewhat, but the model's low performance seemed much
 more vulnerable to misrecognition of the hard examples. Even with a 50/50 split
 between synthetic data and real manually annotated data, the hard examples were
@@ -171,7 +171,7 @@ up to an 86% COCO score with that improvement alone.
 In a final twist, I second-guessed myself and wondered whether the original
 synthetic data was even helping at all… I removed the thousand or so 'basic'
 synthetic images from the data and retrained the model. To my surprise, I
-achieved more or less the same COCO score as I had WITH the basic synthetic
+achieved more or less the same COCO score as I had *with* the basic synthetic
 images. I'm taking this as a strong suggestion that my basic synthetic images
 aren't actually helping as much as I'd thought, and that probably a smaller
 number of them as a % of the total would be beneficial.
@@ -182,10 +182,10 @@ So, what can I conclude from this whole excursion into the world of synthetic
 image creation as a way of boosting model performance?
 
 - adding synthetic data really can help!
-- the world of synthetic data creation is a HUGE rabbit hole and potentially you
+- the world of synthetic data creation is a *huge* rabbit hole and potentially you
   can get lost trying to create the perfect synthetic versions of your original
   data. (I mean this both in the sense of 'there's lots to learn' as well as
-  'you can spend or lose a TON of time here'.)
+  'you can spend or lose a *ton* of time here'.)
 - Targeted synthetic data designed to clear up issues where the model has been
   identified as underperforming is probably best. (Conversely, and I'll be
   careful how much I generalise here, middle-of-the-road synthetic data that
