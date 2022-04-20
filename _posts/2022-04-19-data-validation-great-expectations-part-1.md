@@ -12,6 +12,12 @@ image: images/great_expectations/g_e_logo.jpeg
 
 _(This is part of a series of blog posts documenting my work to train a model that detects redactions in documents. To read other posts, check out [the `redactionmodel` taglist](https://mlops.systems/categories/#redactionmodel).)_
 
+**Data validation is a process of verifying that data is accurate and consistent. It plays a crucial role in end-to-end machine learning pipelines.**
+
+**There is a lack of validation tools in Computer Vision (CV) due the complexity of the data used by the domain.**
+
+**In this series of articles, I will show you how to leverage the [Great Expectations](https://greatexpectations.io) open-source library to validate object detection data. This will help you to feed your model with data less prone to break your model performance.**
+
 When something goes wrong with a newly trained or newly deployed version of your model, where do you look first? Where does your gut tell you the bug or issue is likely to be found? For me, knee deep into my redaction model project, I immediately think of my data. For sure, I could probably have more in the way of testing to be sure my code is working how I expect it to work, but issues with the data are far more likely to be silent killers. Issues with data are unlikely to raise a loud exception and suddenly bring my training to a stop. Instead, my training will continue, but I'll either get really unsatisfactory results or I'll get results that are underperforming the real potential of the data I'm feeding into my model. That's the scary part: I most likely won't even know that my data is broken or faulty.
 
 <iframe src="https://giphy.com/embed/YTJXDIivNMPuNSMgc0" width="442" height="480" frameBorder="0" class="giphy-embed" allowFullScreen></iframe>
