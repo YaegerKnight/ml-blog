@@ -122,6 +122,12 @@ window.onload = wrap_img;
 <li class="toc-entry toc-h1"><a href="#a-simple-example-of-using-great-expectations-for-data-validation">A simple example of using Great Expectations for data validation</a></li>
 </ul><p><em>(This is part of a series of blog posts documenting my work to train a model that detects redactions in documents. To read other posts, check out <a href="https://mlops.systems/categories/#redactionmodel">the <code class="language-plaintext highlighter-rouge">redactionmodel</code> taglist</a>.)</em></p>
 
+<p><strong>Data validation is a process of verifying that data is accurate and consistent. It plays a crucial role in end-to-end machine learning pipelines.</strong></p>
+
+<p><strong>There is a lack of validation tools in Computer Vision (CV) due the complexity of the data used by the domain.</strong></p>
+
+<p><strong>In this series of articles, I will show you how to leverage the <a href="https://greatexpectations.io">Great Expectations</a> open-source library to validate object detection data. This will help you to feed your model with data less prone to break your model performance.</strong></p>
+
 <p>When something goes wrong with a newly trained or newly deployed version of your model, where do you look first? Where does your gut tell you the bug or issue is likely to be found? For me, knee deep into my redaction model project, I immediately think of my data. For sure, I could probably have more in the way of testing to be sure my code is working how I expect it to work, but issues with the data are far more likely to be silent killers. Issues with data are unlikely to raise a loud exception and suddenly bring my training to a stop. Instead, my training will continue, but I’ll either get really unsatisfactory results or I’ll get results that are underperforming the real potential of the data I’m feeding into my model. That’s the scary part: I most likely won’t even know that my data is broken or faulty.</p>
 
 <iframe src="https://giphy.com/embed/YTJXDIivNMPuNSMgc0" width="442" height="480" frameborder="0" class="giphy-embed" allowfullscreen=""></iframe>
