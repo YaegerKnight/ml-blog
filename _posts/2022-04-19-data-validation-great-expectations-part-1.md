@@ -3,7 +3,7 @@ toc: true
 layout: post
 description:
   "An overview of the problem that data validation seeks to solve, explored through the lens of an object detection problem and some of the tradeoffs that such an approach might bring. I introduce and simplify the high-level concepts you need to use the Great Expectations library."
-categories: [tools, redactionmodel, computervision]
+categories: [tools, redactionmodel, computervision, datavalidation]
 comments: true
 author: Alex Strick van Linschoten
 title: "How to trust the data you feed your model: data validation with Great Expectations in a computer vision context (part 1)"

@@ -3,7 +3,7 @@ toc: true
 layout: post
 description:
   "In this second post on data validation for the computer vision context, I show how you can use the automatic profiling feature of Great Expectations to get you started with increasing your confidence in your object detection annotations."
-categories: [tools, redactionmodel, computervision]
+categories: [tools, redactionmodel, computervision, datavalidation]
 comments: true
 author: Alex Strick van Linschoten
 title: "How to trust the data you feed your model: data validation with Great Expectations in a computer vision context (part 2)"
