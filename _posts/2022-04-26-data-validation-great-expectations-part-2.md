@@ -12,7 +12,7 @@ image: images/great_expectations/g_e_logo.jpeg
 
 _(This is part of a series of blog posts documenting my work to train a model that detects redactions in documents. To read other posts, check out [the `redactionmodel` taglist](https://mlops.systems/categories/#redactionmodel).)_
 
-In [the first part](https://mlops.systems/tools/redactionmodel/computervision/2022/04/19/data-validation-great-expectations-part-1.html) of this series, I made the case for why you might want to include some kind of data validation if you're working on training a model in general, and if your working on object detection in specific. There are many things that can go wrong with your data inputs and you ought to have some kind of safeguards in place to prevent some tricky failures and bugs.
+In [the first part](https://mlops.systems/tools/redactionmodel/computervision/datavalidation/2022/04/19/data-validation-great-expectations-part-1.html) of this series, I made the case for why you might want to include some kind of data validation if you're working on training a model in general, and if your working on object detection in specific. There are many things that can go wrong with your data inputs and you ought to have some kind of safeguards in place to prevent some tricky failures and bugs.
 
 ## TL;DR for data validation with Great Expectations
 
@@ -22,7 +22,7 @@ In [the first part](https://mlops.systems/tools/redactionmodel/computervision/20
 
 ## Initial notebook-based setup
 
-In [the last post](https://mlops.systems/tools/redactionmodel/computervision/2022/04/19/data-validation-great-expectations-part-1.html) I showed how you can easily use Great Expectations directly on a Pandas `DataFrame`, manually specifying values you expect to be the case for your data. For example, perhaps your data should always have certain columns, or the values of a certain column should always be a certain type or mostly range between certain values. You can [define all these fairly easily](https://docs.greatexpectations.io/docs/guides/expectations/how_to_create_and_edit_expectations_based_on_domain_knowledge_without_inspecting_data_directly), leveraging your domain knowledge of the data.
+In [the last post](https://mlops.systems/tools/redactionmodel/computervision/datavalidation/2022/04/19/data-validation-great-expectations-part-1.html) I showed how you can easily use Great Expectations directly on a Pandas `DataFrame`, manually specifying values you expect to be the case for your data. For example, perhaps your data should always have certain columns, or the values of a certain column should always be a certain type or mostly range between certain values. You can [define all these fairly easily](https://docs.greatexpectations.io/docs/guides/expectations/how_to_create_and_edit_expectations_based_on_domain_knowledge_without_inspecting_data_directly), leveraging your domain knowledge of the data.
 
 If you know you're going to want to use Great Expectations as a more fully-fledged part of your pipeline or workflow, you'll probably want to go through the more extensive setup stages and create a dedicated 'context' which can be longer-lasting than just length of your script runtime. Think of the 'context' as somewhere all your expectations and configuration of how to access your data is stored.
 
@@ -34,7 +34,7 @@ Once you have your context created and your data sources connected, you can move
 
 ## Using the Great Expectations Profiler
 
-Setting up your validations (i.e. your 'expectations') for your data can be done in a number of different ways. We saw [last time](https://mlops.systems/tools/redactionmodel/computervision/2022/04/19/data-validation-great-expectations-part-1.html) how you can define these manually, but in this post I want to show how you can follow another recommended workflow by allowing the profiler to review your data and to make an initial set of assumptions about the boundaries and patterns embedded in those values.
+Setting up your validations (i.e. your 'expectations') for your data can be done in a number of different ways. We saw [last time](https://mlops.systems/tools/redactionmodel/computervision/datavalidation/2022/04/19/data-validation-great-expectations-part-1.html) how you can define these manually, but in this post I want to show how you can follow another recommended workflow by allowing the profiler to review your data and to make an initial set of assumptions about the boundaries and patterns embedded in those values.
 
 Note, [as the docs mention](https://docs.greatexpectations.io/docs/guides/expectations/how_to_create_and_edit_expectations_with_a_profiler/), the expectations that are automatically generated from your dataset are "deliberately over-fitted on your data". This means that if your `DataFrame` has 10,321 rows, one of the expectations generated will be that datasets due for validation with this suite of expectations will also have exactly 10,321 rows:
 
