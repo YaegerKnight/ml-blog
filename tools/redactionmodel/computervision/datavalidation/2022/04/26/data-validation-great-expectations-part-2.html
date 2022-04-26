@@ -9,8 +9,8 @@
 <meta property="og:title" content="How to trust the data you feed your model: data validation with Great Expectations in a computer vision context (part 2)" />
 <meta name="author" content="Alex Strick van Linschoten" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="In this second post on data validation for the computer vision context, I show how you can use the automatic profiling feature of Great Expectations to get you started with increasing your confidence in your object detection annotations." />
-<meta property="og:description" content="In this second post on data validation for the computer vision context, I show how you can use the automatic profiling feature of Great Expectations to get you started with increasing your confidence in your object detection annotations." />
+<meta name="description" content="In this second post on data validation for the computer vision context, I show how you can use the automatic profiling feature of the Great Expectations library to get you started with increasing your confidence in your object detection annotations." />
+<meta property="og:description" content="In this second post on data validation for the computer vision context, I show how you can use the automatic profiling feature of the Great Expectations library to get you started with increasing your confidence in your object detection annotations." />
 <link rel="canonical" href="https://mlops.systems/tools/redactionmodel/computervision/datavalidation/2022/04/26/data-validation-great-expectations-part-2.html" />
 <meta property="og:url" content="https://mlops.systems/tools/redactionmodel/computervision/datavalidation/2022/04/26/data-validation-great-expectations-part-2.html" />
 <meta property="og:site_name" content="mlops.systems" />
@@ -18,7 +18,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2022-04-26T00:00:00-05:00" />
 <script type="application/ld+json">
-{"datePublished":"2022-04-26T00:00:00-05:00","url":"https://mlops.systems/tools/redactionmodel/computervision/datavalidation/2022/04/26/data-validation-great-expectations-part-2.html","@type":"BlogPosting","dateModified":"2022-04-26T00:00:00-05:00","image":"https://mlops.systems/images/great_expectations/g_e_logo.jpeg","mainEntityOfPage":{"@type":"WebPage","@id":"https://mlops.systems/tools/redactionmodel/computervision/datavalidation/2022/04/26/data-validation-great-expectations-part-2.html"},"author":{"@type":"Person","name":"Alex Strick van Linschoten"},"headline":"How to trust the data you feed your model: data validation with Great Expectations in a computer vision context (part 2)","description":"In this second post on data validation for the computer vision context, I show how you can use the automatic profiling feature of Great Expectations to get you started with increasing your confidence in your object detection annotations.","@context":"https://schema.org"}</script>
+{"datePublished":"2022-04-26T00:00:00-05:00","url":"https://mlops.systems/tools/redactionmodel/computervision/datavalidation/2022/04/26/data-validation-great-expectations-part-2.html","@type":"BlogPosting","dateModified":"2022-04-26T00:00:00-05:00","image":"https://mlops.systems/images/great_expectations/g_e_logo.jpeg","mainEntityOfPage":{"@type":"WebPage","@id":"https://mlops.systems/tools/redactionmodel/computervision/datavalidation/2022/04/26/data-validation-great-expectations-part-2.html"},"author":{"@type":"Person","name":"Alex Strick van Linschoten"},"headline":"How to trust the data you feed your model: data validation with Great Expectations in a computer vision context (part 2)","description":"In this second post on data validation for the computer vision context, I show how you can use the automatic profiling feature of the Great Expectations library to get you started with increasing your confidence in your object detection annotations.","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://mlops.systems/feed.xml" title="mlops.systems" /><!-- the google_analytics_id gets auto inserted from the config file -->
 
@@ -84,7 +84,7 @@ window.onload = wrap_img;
         <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">How to trust the data you feed your model: data validation with Great Expectations in a computer vision context (part 2)</h1><p class="page-description">In this second post on data validation for the computer vision context, I show how you can use the automatic profiling feature of Great Expectations to get you started with increasing your confidence in your object detection annotations.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-04-26T00:00:00-05:00" itemprop="datePublished">
+    <h1 class="post-title p-name" itemprop="name headline">How to trust the data you feed your model: data validation with Great Expectations in a computer vision context (part 2)</h1><p class="page-description">In this second post on data validation for the computer vision context, I show how you can use the automatic profiling feature of the Great Expectations library to get you started with increasing your confidence in your object detection annotations.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-04-26T00:00:00-05:00" itemprop="datePublished">
         Apr 26, 2022
       </time>• 
           <span itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -92,7 +92,7 @@ window.onload = wrap_img;
        • <span class="read-time" title="Estimated read time">
     
     
-      8 min read
+      9 min read
     
 </span></p>
 
@@ -130,15 +130,24 @@ window.onload = wrap_img;
 <a class="anchor" href="#tldr-for-data-validation-with-great-expectations" aria-hidden="true"><span class="octicon octicon-link"></span></a>TL;DR for data validation with Great Expectations</h2>
 
 <ul>
-  <li>👀 Data validation helps give you confidence in the raw ingredients that feed into your models, especially in scenarios where you retrain or fine-tune regularly.</li>
-  <li>✅ For object detection problems, there are many ways your data can fail in some silent way. You should want to be aware of when your training data isn’t meeting your assumptions of what it should look like.</li>
-  <li>🛠 Great Expectations is a general purpose data validation tool that goes a long way to restoring trust in your data, and their automatic profiling feature is really useful when getting started.</li>
+  <li>
+    <p>👀 Data validation helps give you confidence in the raw ingredients that feed into your models, especially in scenarios where you retrain or fine-tune regularly.</p>
+  </li>
+  <li>
+    <p>✅ For object detection problems, there are many ways your data can fail in some silent way. You should want to be aware of when your training data isn’t meeting your assumptions of what it should look like.</p>
+  </li>
+  <li>
+    <p>🛠 Great Expectations is a general purpose data validation tool that goes a long way to restoring trust in your data, and their automatic profiling feature is really useful when getting started.</p>
+  </li>
+  <li>
+    <p>💪 In this second post on data validation for the computer vision context, I show how you can use the automatic profiling feature of Great Expectations to get you started with increasing your confidence in your object detection annotations. I will show you a concrete example where I created some validation rules for my manually-annotated dataset. I then applied those rules to my synthetic dataset in order to validate it.</p>
+  </li>
 </ul>
 
 <h2 id="initial-notebook-based-setup">
 <a class="anchor" href="#initial-notebook-based-setup" aria-hidden="true"><span class="octicon octicon-link"></span></a>Initial notebook-based setup</h2>
 
-<p>In <a href="https://mlops.systems/tools/redactionmodel/computervision/datavalidation/2022/04/19/data-validation-great-expectations-part-1.html">the last post</a> I showed how you can easily use Great Expectations directly on a Pandas <code class="language-plaintext highlighter-rouge">DataFrame</code>, manually specifying values you expect to be the case for your data. For example, perhaps your data should always have certain columns, or the values of a certain column should always be a certain type or mostly range between certain values. You can <a href="https://docs.greatexpectations.io/docs/guides/expectations/how_to_create_and_edit_expectations_based_on_domain_knowledge_without_inspecting_data_directly">define all these fairly easily</a>, leveraging your domain knowledge of the data.</p>
+<p>In <a href="https://mlops.systems/tools/redactionmodel/computervision/datavalidation/2022/04/19/data-validation-great-expectations-part-1.html">the last post</a> I showed how you can easily use the Great Expectations library directly on a Pandas <code class="language-plaintext highlighter-rouge">DataFrame</code>, manually specifying values you expect to be the case for your data. For example, perhaps your data should always have certain columns, or the values of a certain column should always be a certain type or mostly range between certain values. You can <a href="https://docs.greatexpectations.io/docs/guides/expectations/how_to_create_and_edit_expectations_based_on_domain_knowledge_without_inspecting_data_directly">define all these fairly easily</a>, leveraging your domain knowledge of the data.</p>
 
 <p>If you know you’re going to want to use Great Expectations as a more fully-fledged part of your pipeline or workflow, you’ll probably want to go through the more extensive setup stages and create a dedicated ‘context’ which can be longer-lasting than just length of your script runtime. Think of the ‘context’ as somewhere all your expectations and configuration of how to access your data is stored.</p>
 
