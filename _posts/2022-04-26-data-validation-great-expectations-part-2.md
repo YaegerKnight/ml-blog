@@ -2,7 +2,7 @@
 toc: true
 layout: post
 description:
-  "In this second post on data validation for the computer vision context, I show how you can use the automatic profiling feature of Great Expectations to get you started with increasing your confidence in your object detection annotations."
+  "In this second post on data validation for the computer vision context, I show how you can use the automatic profiling feature of the Great Expectations library to get you started with increasing your confidence in your object detection annotations."
 categories: [tools, redactionmodel, computervision, datavalidation]
 comments: true
 author: Alex Strick van Linschoten
@@ -17,12 +17,16 @@ In [the first part](https://mlops.systems/tools/redactionmodel/computervision/da
 ## TL;DR for data validation with Great Expectations
 
 - 👀 Data validation helps give you confidence in the raw ingredients that feed into your models, especially in scenarios where you retrain or fine-tune regularly.
+
 - ✅ For object detection problems, there are many ways your data can fail in some silent way. You should want to be aware of when your training data isn't meeting your assumptions of what it should look like.
+
 - 🛠 Great Expectations is a general purpose data validation tool that goes a long way to restoring trust in your data, and their automatic profiling feature is really useful when getting started.
+
+- 💪 In this second post on data validation for the computer vision context, I show how you can use the automatic profiling feature of Great Expectations to get you started with increasing your confidence in your object detection annotations. I will show you a concrete example where I created some validation rules for my manually-annotated dataset. I then applied those rules to my synthetic dataset in order to validate it.
 
 ## Initial notebook-based setup
 
-In [the last post](https://mlops.systems/tools/redactionmodel/computervision/datavalidation/2022/04/19/data-validation-great-expectations-part-1.html) I showed how you can easily use Great Expectations directly on a Pandas `DataFrame`, manually specifying values you expect to be the case for your data. For example, perhaps your data should always have certain columns, or the values of a certain column should always be a certain type or mostly range between certain values. You can [define all these fairly easily](https://docs.greatexpectations.io/docs/guides/expectations/how_to_create_and_edit_expectations_based_on_domain_knowledge_without_inspecting_data_directly), leveraging your domain knowledge of the data.
+In [the last post](https://mlops.systems/tools/redactionmodel/computervision/datavalidation/2022/04/19/data-validation-great-expectations-part-1.html) I showed how you can easily use the Great Expectations library directly on a Pandas `DataFrame`, manually specifying values you expect to be the case for your data. For example, perhaps your data should always have certain columns, or the values of a certain column should always be a certain type or mostly range between certain values. You can [define all these fairly easily](https://docs.greatexpectations.io/docs/guides/expectations/how_to_create_and_edit_expectations_based_on_domain_knowledge_without_inspecting_data_directly), leveraging your domain knowledge of the data.
 
 If you know you're going to want to use Great Expectations as a more fully-fledged part of your pipeline or workflow, you'll probably want to go through the more extensive setup stages and create a dedicated 'context' which can be longer-lasting than just length of your script runtime. Think of the 'context' as somewhere all your expectations and configuration of how to access your data is stored.
 
