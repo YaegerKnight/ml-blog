@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>How to trust the data you feed your model: alternative data validation solutions in a computer vision context (part 3) | mlops.systems</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="How to trust the data you feed your model: alternative data validation solutions in a computer vision context (part 3)" />
+<meta name="author" content="Alex Strick van Linschoten" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="In this third and final post on data validation for the computer vision context, I cover some alternative tools that you might want to consider, from Evidently to the humble ‘assert’ statement. I conclude by setting out some guidelines for when you might want to be doing data validation and which tools might be more or less appropriate for your specific problem." />
+<meta property="og:description" content="In this third and final post on data validation for the computer vision context, I cover some alternative tools that you might want to consider, from Evidently to the humble ‘assert’ statement. I conclude by setting out some guidelines for when you might want to be doing data validation and which tools might be more or less appropriate for your specific problem." />
+<link rel="canonical" href="https://mlops.systems/tools/redactionmodel/computervision/datavalidation/2022/04/28/data-validation-great-expectations-part-3.html" />
+<meta property="og:url" content="https://mlops.systems/tools/redactionmodel/computervision/datavalidation/2022/04/28/data-validation-great-expectations-part-3.html" />
+<meta property="og:site_name" content="mlops.systems" />
+<meta property="og:image" content="https://mlops.systems/images/great_expectations/evidently_ai_logo_fi.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-04-28T00:00:00-05:00" />
+<script type="application/ld+json">
+{"datePublished":"2022-04-28T00:00:00-05:00","url":"https://mlops.systems/tools/redactionmodel/computervision/datavalidation/2022/04/28/data-validation-great-expectations-part-3.html","@type":"BlogPosting","dateModified":"2022-04-28T00:00:00-05:00","image":"https://mlops.systems/images/great_expectations/evidently_ai_logo_fi.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://mlops.systems/tools/redactionmodel/computervision/datavalidation/2022/04/28/data-validation-great-expectations-part-3.html"},"author":{"@type":"Person","name":"Alex Strick van Linschoten"},"headline":"How to trust the data you feed your model: alternative data validation solutions in a computer vision context (part 3)","description":"In this third and final post on data validation for the computer vision context, I cover some alternative tools that you might want to consider, from Evidently to the humble ‘assert’ statement. I conclude by setting out some guidelines for when you might want to be doing data validation and which tools might be more or less appropriate for your specific problem.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://mlops.systems/feed.xml" title="mlops.systems" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script
+  defer
+  data-domain="mlops.systems"
+  src="https://plausible.io/js/plausible.js"
+></script>
+
+
+<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">mlops.systems</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About Me</a><a class="page-link" href="/search/">Search</a><a class="page-link" href="/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">How to trust the data you feed your model: alternative data validation solutions in a computer vision context (part 3)</h1><p class="page-description">In this third and final post on data validation for the computer vision context, I cover some alternative tools that you might want to consider, from Evidently to the humble 'assert' statement. I conclude by setting out some guidelines for when you might want to be doing data validation and which tools might be more or less appropriate for your specific problem.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-04-28T00:00:00-05:00" itemprop="datePublished">
+        Apr 28, 2022
+      </time>• 
+          <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+            <span class="p-author h-card" itemprop="name">Alex Strick van Linschoten</span></span>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      11 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/categories/#tools">tools</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#redactionmodel">redactionmodel</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#computervision">computervision</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#datavalidation">datavalidation</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h2"><a href="#tldr-alternatives-for-data-validation-using-python">TL;DR: Alternatives for data validation using Python</a></li>
+<li class="toc-entry toc-h2"><a href="#alternatives-using-evidently-for-drift-detection">Alternatives: Using Evidently for drift detection</a></li>
+<li class="toc-entry toc-h2"><a href="#alternatives-some-other-options">Alternatives: some other options</a></li>
+<li class="toc-entry toc-h2"><a href="#when-to-do-data-validation-in-your-project">When to do data validation in your project</a></li>
+<li class="toc-entry toc-h2"><a href="#what-im-using-for-my-redaction-project">What I’m using for my redaction project</a></li>
+</ul><p><em>(This is part of a series of blog posts documenting my work to train a model that detects redactions in documents. To read other posts, check out <a href="https://mlops.systems/categories/#redactionmodel">the <code class="language-plaintext highlighter-rouge">redactionmodel</code> taglist</a>.)</em></p>
+
+<p>The <a href="https://mlops.systems/tools/redactionmodel/computervision/datavalidation/2022/04/19/data-validation-great-expectations-part-1.html">previous</a> <a href="https://mlops.systems/tools/redactionmodel/computervision/datavalidation/2022/04/26/data-validation-great-expectations-part-2.html">two</a> posts in this series have made the case for why you might want to consider adding a Great Expectations step or stage to your computer vision project, particularly once it becomes something you’re going to want to iterate on a few times.</p>
+
+<p>This post begins by showcasing how you can use Evidently’s open-source library to calculate and visualise comparisons between your data. I list some of the lighter alternatives to Great Expectations and Evidently, concluding with some thoughts on when you might use it as part of your computer vision pipeline.</p>
+
+<h2 id="tldr-alternatives-for-data-validation-using-python">
+<a class="anchor" href="#tldr-alternatives-for-data-validation-using-python" aria-hidden="true"><span class="octicon octicon-link"></span></a>TL;DR: Alternatives for data validation using Python</h2>
+
+<ul>
+  <li>
+    <p>🛠 Data validation tools come in many flavours, from full-featured libraries like eGreat Expectations down to the humble <code class="language-plaintext highlighter-rouge">assert</code> statement in Python.</p>
+  </li>
+  <li>
+    <p>⚠️ The tool you choose should be appropriate to your particular use case and situation. You might not need or want to add a large dependency or take on extra code / project complexity, in which case there are alternative options available to you.</p>
+  </li>
+  <li>
+    <p>⏰ You’ll also want to think about <em>when</em> you’re doing your validation. Two key moments stand out for machine learning projects: when you’re ingesting data prior to training or fine-tuning a model, and at the moment where you’re doing inference on a trained model.</p>
+  </li>
+  <li>
+    <p>📃 For my project, I’m using a variety of tools as part of my process because I’ve found it gives me confidence in the predictions my model is making and it gives me freedom to experiment and iterate, without needing to also worry that I’m silently breaking something with downstream effects on my model performance.</p>
+  </li>
+</ul>
+
+<h2 id="alternatives-using-evidently-for-drift-detection">
+<a class="anchor" href="#alternatives-using-evidently-for-drift-detection" aria-hidden="true"><span class="octicon octicon-link"></span></a>Alternatives: Using Evidently for drift detection</h2>
+
+<p>I’ve <a href="https://blog.zenml.io/zenml-loves-evidently/">previously written</a> about why <a href="https://evidentlyai.com">Evidently</a> is a great tool to use for drift detection and data monitoring over <a href="https://blog.zenml.io/zenml-loves-evidently/">on the ZenML blog</a>. At its core, Evidently takes two chunks of data and compares them. The statistical comparisons going on under the hood are quite sophisticated, but as an interface to be used it is extremely trivial to get going.</p>
+
+<p>In the case of my redaction project data, I did the work of transforming my annotation and image metadata into Pandas DataFrames for Great Expectations already, so using it with Evidently at this point is trivial:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">evidently.dashboard</span> <span class="kn">import</span> <span class="n">Dashboard</span>
+<span class="kn">from</span> <span class="nn">evidently.dashboard.tabs</span> <span class="kn">import</span> <span class="n">DataDriftTab</span>
+<span class="kn">from</span> <span class="nn">evidently.pipeline.column_mapping</span> <span class="kn">import</span> <span class="n">ColumnMapping</span>
+
+<span class="n">real_annotations</span> <span class="o">=</span> <span class="n">main_annotations_df</span><span class="p">[[</span><span class="s">'area'</span><span class="p">,</span> <span class="s">'category_name'</span><span class="p">,</span> <span class="s">'top_left_x'</span><span class="p">,</span> <span class="s">'top_left_y'</span><span class="p">,</span> <span class="s">'width'</span><span class="p">,</span> <span class="s">'height'</span><span class="p">,</span> <span class="s">'orientation'</span><span class="p">]]</span>
+<span class="n">easy_synth_annotations</span> <span class="o">=</span> <span class="n">easy_synth_annotations_df</span><span class="p">[[</span><span class="s">'area'</span><span class="p">,</span> <span class="s">'category_name'</span><span class="p">,</span> <span class="s">'top_left_x'</span><span class="p">,</span> <span class="s">'top_left_y'</span><span class="p">,</span> <span class="s">'width'</span><span class="p">,</span> <span class="s">'height'</span><span class="p">,</span> <span class="s">'orientation'</span><span class="p">]]</span>
+<span class="n">hard_synth_annotations</span> <span class="o">=</span> <span class="n">hard_synth_annotations_df</span><span class="p">[[</span><span class="s">'area'</span><span class="p">,</span> <span class="s">'category_name'</span><span class="p">,</span> <span class="s">'top_left_x'</span><span class="p">,</span> <span class="s">'top_left_y'</span><span class="p">,</span> <span class="s">'width'</span><span class="p">,</span> <span class="s">'height'</span><span class="p">,</span> <span class="s">'orientation'</span><span class="p">]]</span>
+
+<span class="n">column_mapping</span> <span class="o">=</span> <span class="n">ColumnMapping</span><span class="p">(</span>
+    <span class="n">numerical_features</span><span class="o">=</span><span class="p">[</span><span class="s">"area"</span><span class="p">,</span> <span class="s">"width"</span><span class="p">,</span> <span class="s">"height"</span><span class="p">,</span> <span class="s">'top_left_x'</span><span class="p">,</span> <span class="s">'top_left_y'</span><span class="p">],</span>
+    <span class="n">categorical_features</span><span class="o">=</span><span class="p">[</span><span class="s">"category_name"</span><span class="p">,</span> <span class="s">'orientation'</span><span class="p">],</span>
+<span class="p">)</span>
+
+<span class="n">drift_report</span> <span class="o">=</span> <span class="n">Dashboard</span><span class="p">(</span><span class="n">tabs</span><span class="o">=</span><span class="p">[</span><span class="n">DataDriftTab</span><span class="p">()])</span>
+<span class="n">drift_report</span><span class="p">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">real_annotations</span><span class="p">,</span> <span class="n">hard_synth_annotations</span><span class="p">,</span> <span class="n">column_mapping</span><span class="o">=</span><span class="n">column_mapping</span><span class="p">)</span>
+<span class="n">drift_report</span><span class="p">.</span><span class="n">save</span><span class="p">(</span><span class="s">"reports/my_report.html"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>In this code, I’m comparing between the real (i.e. manually annotated) annotations and the ‘hard’ synthetic annotations that I created (and <a href="https://mlops.systems/tools/redactionmodel/computervision/2022/04/06/synthetic-data-results.html">blogged about recently</a>). I choose the columns I care about, tell Evidently which columns are numerical vs categorical features and save the report. (I can also display the report directly within a Jupyter notebook.) When I open the report, I see this:</p>
+
+<p><img src="/images/great_expectations/evidently-drift-comparison.png" alt="" title="The drift detection report produced by Evidently."></p>
+
+<p>You can unfold the graphs to dive into the details for specific features, as in the following example where I take a look at the orientation of my annotations and see the difference between my manual annotations and the synthetically generated ‘hard’ batch:</p>
+
+<p><img src="/images/great_expectations/comparing-orientation.png" alt="" title="Comparing landscape vs portrait orientation of my redaction annotations using Evidently."></p>
+
+<p>It doesn’t surprise me too much that we have this disparity, since the only annotations that are portrait in the synthetically-generated set are those for the content box around the whole page. All the rest are landscape, and that’s by design. (Note: you can make the comparisons using different statistical tests depending on your use case. I’m told that the next Evidently release will increase the number of available options for this.)</p>
+
+<p>I can repeat the same test for the image DataFrame. I’ve included some metadata for each image such as how many annotations are associated with the image, or how many redaction vs content annotations are associated and so on. The code is basically the same, except now taking into account the different columns and their types:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># comparing between real images and hard_synth images
+</span>
+<span class="n">column_mapping</span> <span class="o">=</span> <span class="n">ColumnMapping</span><span class="p">(</span>
+    <span class="n">numerical_features</span><span class="o">=</span><span class="p">[</span><span class="s">"area"</span><span class="p">,</span> <span class="s">"width"</span><span class="p">,</span> <span class="s">"height"</span><span class="p">,</span> <span class="s">'annotation_count'</span><span class="p">,</span> <span class="s">'content_annotation_count'</span><span class="p">,</span> <span class="s">'redaction_annotation_count'</span><span class="p">,</span> <span class="s">'area'</span><span class="p">,</span> <span class="s">'file_size_bytes'</span><span class="p">],</span>
+    <span class="n">categorical_features</span><span class="o">=</span><span class="p">[</span><span class="s">'orientation'</span><span class="p">,</span> <span class="s">'format'</span><span class="p">,</span> <span class="s">'mode'</span><span class="p">],</span>
+<span class="p">)</span>
+
+<span class="n">drift_report</span> <span class="o">=</span> <span class="n">Dashboard</span><span class="p">(</span><span class="n">tabs</span><span class="o">=</span><span class="p">[</span><span class="n">DataDriftTab</span><span class="p">()])</span>
+<span class="n">drift_report</span><span class="p">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">main_images</span><span class="p">,</span> <span class="n">hard_synth_images</span><span class="p">,</span> <span class="n">column_mapping</span><span class="o">=</span><span class="n">column_mapping</span><span class="p">)</span>
+<span class="n">drift_report</span><span class="p">.</span><span class="n">save</span><span class="p">(</span><span class="s">"reports/my_report-real-vs-hard-images.html"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>And we get this report:</p>
+
+<p><img src="/images/great_expectations/images-drift.png" alt="" title="Viewing a drift report comparing the core image data with my synthetically-created images."></p>
+
+<p>You can immediately see how certain things like the number of annotations and the number of redactions in an image was a bit different when comparing the two. We also seem to have a far more even distribution of file sizes in the synthetically generated images and that makes sense since that was essentially randomly determined.</p>
+
+<p>Note that all the data that goes into making these reports can be accessed programatically as a Python object or <code class="language-plaintext highlighter-rouge">JSON</code> through <a href="https://docs.evidentlyai.com/features/profiling">Evidently’s <code class="language-plaintext highlighter-rouge">Profile</code> feature</a>, which is probably what you’re going to want when assessing for drift as part of a continuous training / continuous deployment cycle.</p>
+
+<p>If you change just a few things once more, you get a really useful <a href="https://docs.evidentlyai.com/reports/data-quality">data quality report</a> showing distributions, correlations, and various other features of your data at a single glance:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># profiling data quality
+</span>
+<span class="kn">from</span> <span class="nn">evidently.dashboard.tabs</span> <span class="kn">import</span> <span class="n">DataQualityTab</span>
+
+<span class="n">quality_dashboard</span> <span class="o">=</span> <span class="n">Dashboard</span><span class="p">(</span><span class="n">tabs</span><span class="o">=</span><span class="p">[</span><span class="n">DataQualityTab</span><span class="p">()])</span>
+<span class="n">quality_dashboard</span><span class="p">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">main_images</span><span class="p">,</span> <span class="n">hard_synth_images</span><span class="p">,</span> <span class="n">column_mapping</span><span class="o">=</span><span class="n">images_column_mapping</span><span class="p">)</span>
+<span class="n">quality_dashboard</span><span class="p">.</span><span class="n">save</span><span class="p">(</span><span class="s">"reports/quality-report.html"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>You can get an idea of the report that it produces in the following screen recording from my browser:</p>
+
+<p><img src="/images/great_expectations/evidently-data-quality.gif" alt="" title="The Evidently data quality report when comparing my real image data with what was synthetically created."></p>
+
+<p>As a place to get started with understanding a dataset, this is a pretty nice visualisation and report to have in your toolkit, but even after immersion in your data it can be useful to take a step back with something like this data quality overview. For instance, it reveals quite clearly how the average number of annotations in my manually annotated dataset is quite a bit lower than that of my synthetically generated examples. Of course, that was by intention, but it is nice to see that confirmed in the data.</p>
+
+<p>Once you have your model ready, there are other reports that Evidently offers which perhaps I’ll return to in a subsequent blogpost but for now I hope this has given you a flavour of the tool and how easy it is to get going with it.</p>
+
+<p>(As a side-note, <a href="https://evidentlyai.com/community">Evidently’s community</a> is friendly, welcoming and filled with interesting people thinking about these issues. I find it a welcome breath of fresh air when compared with some other tools’ forums or chat platforms, so it also has that going for it!)</p>
+
+<h2 id="alternatives-some-other-options">
+<a class="anchor" href="#alternatives-some-other-options" aria-hidden="true"><span class="octicon octicon-link"></span></a>Alternatives: some other options</h2>
+
+<p>With Evidently, we drifted a little into the ‘visualise your data’ territory which wasn’t really the point of this post, but you can see how they combined clear visualisation with the statistical validation working underneath to calculate whether data was drifting. The following are some other tools I’ve come across that might help you in validating data in a computer vision context. I haven’t found a use for them in my project, but it’s possible that they might gel with what you’re doing:</p>
+
+<ul>
+  <li>
+<a href="https://github.com/tensorflow/data-validation">TensorFlow Data Validation (TFDV)</a> — This is a part of TensorFlow and <code class="language-plaintext highlighter-rouge">tfx</code> which uses schemas to validate your data. If you’re using TensorFlow, you might have heard of this and might even be using it already, but I don’t get the sense that this is often much recommended. I include it as it is a prominent option available to you.</li>
+  <li>
+<a href="https://deepchecks.com">Deepchecks</a> — Deepchecks is adjacent to what Great Expectations offers, albeit with an emphasis on the kinds of tests you might want to do for ML model training code. It has some features and documented use cases for computer vision (object detection and classification) but I haven’t used it myself. Feels like a tool worth keeping your eye on, however. (Works on Pandas dataframes and numpy arrays.)</li>
+  <li>
+<a href="https://pandera.readthedocs.io/en/latest/index.html">pandera</a> — This is a statistical tool for validating data inside dataframes, and it overlaps quite a bit in its functionality with Great Expectations, particularly with the <a href="https://pandera.readthedocs.io/en/latest/hypothesis.html#hypothesis">hypothesis testing</a> functionality. Worth checking out.</li>
+  <li>
+<a href="https://docs.python-cerberus.org/en/stable/index.html">Cerberus</a> — Offers a lightweight schema-based validation functionality for Python objects.</li>
+  <li>
+<a href="https://python-jsonschema.readthedocs.io/en/latest/">jsonschema</a> — similar in approach to Cerberus, above, this is a lightweight way to test your JSON files based on how they conform to a defined schema. Useful in the case of annotations files, perhaps, if you really want something minimal.</li>
+  <li>
+<a href="https://github.com/keleshev/schema">schema</a> — More of the same: a Pythonic way to validate JSON or YAML files based on schema.</li>
+  <li>
+<code class="language-plaintext highlighter-rouge">assert</code> — We shouldn’t forget <a href="https://docs.python.org/3/reference/simple_stmts.html#the-assert-statement">the humble assert statement</a>, which I have sprinkled in various places within my code where it makes sense to make sure that data flowing through conforms to whatever implicit or explicit contracts exist.</li>
+</ul>
+
+<p>I mention these various options not to suggest that you should use them all, but rather to state that you have options ranging the whole spectrum of complexity and dependency.</p>
+
+<h2 id="when-to-do-data-validation-in-your-project">
+<a class="anchor" href="#when-to-do-data-validation-in-your-project" aria-hidden="true"><span class="octicon octicon-link"></span></a>When to do data validation in your project</h2>
+
+<p>Regularly! I’ve written previously about how you can think about data validation as testing for your data. Just like many (most?) engineering teams run their tests every time you add a new commit to the codebase, it’s worth thinking of these kinds of tests as something that get run at any point where the underlying data gets updated.</p>
+
+<p>There are three points where it might make sense to do some data validation:</p>
+
+<ul>
+  <li>at the point of data ingestion</li>
+  <li>at the point just prior to training a model, i.e. after your data has been split into training and validation sets</li>
+  <li>at the point of inference (i.e. using the data being passed into the trained model)</li>
+</ul>
+
+<p><img src="/images/great_expectations/validation-when.png" alt="" title="The times it might make sense to do some validation."></p>
+
+<p>The first (at data ingestion) is essential, especially if you have any kind of continuous training or continuous deployment loop going on. You don’t want to be training on data that clearly is unsuitable for training, or where the distribution has shifted so much that it’s going to cause hidden problems down the line.</p>
+
+<p>The second (at training-validation split time) may or may not be important depending on your use case. For my redaction project I don’t think there is a great deal of benefit from this and so haven’t incorporated it as such.</p>
+
+<p>The third (at inference time) is quite important to have, even though the behaviour when an anomaly is detected might be different from if you were to detect issues earlier on in the process. You might choose to just log the result of your validation check internally, or you could potentially also feed the result back to a user in the terms of some sort of warning (i.e. if the image that they were uploading was a very different kind of image from the data that had been used to train the model).</p>
+
+<h2 id="what-im-using-for-my-redaction-project">
+<a class="anchor" href="#what-im-using-for-my-redaction-project" aria-hidden="true"><span class="octicon octicon-link"></span></a>What I’m using for my redaction project</h2>
+
+<p>I don’t have any general advice as to which tool you should use as part of your computer vision model training pipeline. It’s likely to be heavily context-dependent and will differ based on the particular use case or problem you’re trying to solve. For my own project, however, I can be more specific.</p>
+
+<p>I’m using plain <code class="language-plaintext highlighter-rouge">assert</code> statements liberally scattered through my code, in part leftover from when writing the code but also as a failsafe should strange or anomalous data make its way into my functions. I’m not sure if this is a best practice or not — I could imagine someone telling me that it’s not advised — but for now it’s helpful, especially as I continue to change things in the innards of various parts of the process.</p>
+
+<p>I’m using <a href="https://greatexpectations.io/">Great Expectations</a> as a general-purpose validation tool to lay out my ‘expectations’ of my data in a assertive and declarative way, and even though it took a little longer to wrap my head round how it worked, I’m glad I made the effort as it seems really helpful.</p>
+
+<p>I’m using <a href="https://evidentlyai.com/">Evidently</a> to do similar things as Great Expectations, but I find they have different strengths and benefits even as they serve the same purpose. Evidently is a bit more of a lighter piece in the process, I feel, and as such it’s a bit more flexible and you can iterate faster with it. I am not quite at the point where I’m serving my model to accept inference requests from outside, but Evidently will be part of that process when I do, for sure.</p>
+
+<p>Finally, <a href="https://voxel51.com/docs/fiftyone/">FiftyOne</a> is also somehow part of the validation process. (I’ve <a href="https://mlops.systems/redactionmodel/computervision/tools/debugging/jupyter/2022/03/12/fiftyone-computervision.html">written about that previously</a>.) Having visual tools that allow you to quickly test out a hypothesis or debug something unexpected in your training results is an essential part of the work of developing computer vision models.</p>
+
+<p>This brings my short series on data validation for computer vision to a close. I’m fully conscious that I might have missed some obvious opportunities, tricks or workflows that may be widely used in this field, so I welcome any comments and feedback that you might have.</p>
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="strickvl/ml-blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/tools/redactionmodel/computervision/datavalidation/2022/04/28/data-validation-great-expectations-part-3.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>A place to share my technical learnings.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
