@@ -18,7 +18,7 @@ This post begins by showcasing how you can use Evidently's open-source library t
 
 ## TL;DR: Alternatives for data validation using Python
 
-- 🛠 Data validation tools come in many flavours, from full-featured libraries like eGreat Expectations down to the humble `assert` statement in Python.
+- 🛠 Data validation tools come in many flavours, from full-featured libraries like Great Expectations down to the humble `assert` statement in Python.
 
 - ⚠️ The tool you choose should be appropriate to your particular use case and situation. You might not need or want to add a large dependency or take on extra code / project complexity, in which case there are alternative options available to you.
 
