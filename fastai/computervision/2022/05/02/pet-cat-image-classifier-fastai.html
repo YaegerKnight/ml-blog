@@ -191,7 +191,7 @@ window.onload = wrap_img;
 
 <p>I discussed this when I presented this to those at the study group / meetup yesterday and we agreed that it’d be best if I held out some settings or locations from the training entirely. I took 30 minutes to do that in the evening and had a third ‘test’ dataset which consisted of 118 images of our cat in certain locations that the model wasn’t trained on and thus couldn’t use to cheat. I added a few more photos to the training data so that there were enough examples from which to learn.</p>
 
-<p><img src="/blupus_detection/training-data.png" alt="" title="Input data for the new model."></p>
+<p><img src="/images/blupus_detection/training-data.png" alt="" title="Input data for the new model."></p>
 
 <p>I was supposedly getting 98% accuracy now, but I knew that number to be false. I then needed to figure out how to get the accuracy for my held-out test set. With a lot of help from <a href="https://twitter.com/Fra_Pochetti">Francesco</a> and <a href="https://benjaminwarner.dev/2021/10/01/inference-with-fastai#batch-prediction">a really useful blogpost</a> on doing batch inference with fastai, I first got the predictions for my test data:</p>
 
