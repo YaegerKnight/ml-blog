@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>How my pet cat taught me a lesson about validation data for image classification | mlops.systems</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="How my pet cat taught me a lesson about validation data for image classification" />
+<meta name="author" content="Alex Strick van Linschoten" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="I learn a valuable lesson about how a model often will ‘cheat’ when training and sometimes the solution is a separate held-out set of ‘test’ data which can give a more accurate assessment of how well the model is performing." />
+<meta property="og:description" content="I learn a valuable lesson about how a model often will ‘cheat’ when training and sometimes the solution is a separate held-out set of ‘test’ data which can give a more accurate assessment of how well the model is performing." />
+<link rel="canonical" href="https://mlops.systems/fastai/computervision/2022/05/02/pet-cat-image-classifier-fastai.html" />
+<meta property="og:url" content="https://mlops.systems/fastai/computervision/2022/05/02/pet-cat-image-classifier-fastai.html" />
+<meta property="og:site_name" content="mlops.systems" />
+<meta property="og:image" content="https://mlops.systems/images/blupus_detection/blupus-training.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-05-02T00:00:00-05:00" />
+<script type="application/ld+json">
+{"datePublished":"2022-05-02T00:00:00-05:00","url":"https://mlops.systems/fastai/computervision/2022/05/02/pet-cat-image-classifier-fastai.html","@type":"BlogPosting","dateModified":"2022-05-02T00:00:00-05:00","image":"https://mlops.systems/images/blupus_detection/blupus-training.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://mlops.systems/fastai/computervision/2022/05/02/pet-cat-image-classifier-fastai.html"},"author":{"@type":"Person","name":"Alex Strick van Linschoten"},"headline":"How my pet cat taught me a lesson about validation data for image classification","description":"I learn a valuable lesson about how a model often will ‘cheat’ when training and sometimes the solution is a separate held-out set of ‘test’ data which can give a more accurate assessment of how well the model is performing.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://mlops.systems/feed.xml" title="mlops.systems" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script
+  defer
+  data-domain="mlops.systems"
+  src="https://plausible.io/js/plausible.js"
+></script>
+
+
+<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">mlops.systems</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About Me</a><a class="page-link" href="/search/">Search</a><a class="page-link" href="/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">How my pet cat taught me a lesson about validation data for image classification</h1><p class="page-description">I learn a valuable lesson about how a model often will 'cheat' when training and sometimes the solution is a separate held-out set of 'test' data which can give a more accurate assessment of how well the model is performing.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-05-02T00:00:00-05:00" itemprop="datePublished">
+        May 2, 2022
+      </time>• 
+          <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+            <span class="p-author h-card" itemprop="name">Alex Strick van Linschoten</span></span>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      8 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/categories/#fastai">fastai</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#computervision">computervision</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h1"><a href="#the-key-ingredients-what-goes-into-a-model">The key ingredients: what goes into a model?</a></li>
+<li class="toc-entry toc-h1"><a href="#image-classification-isnt-just-about-images">Image classification isn’t just about images</a></li>
+<li class="toc-entry toc-h1"><a href="#my-own-efforts-classifying-my-cat">My own efforts: classifying my cat</a></li>
+</ul><p>I’m participating in <a href="https://itee.uq.edu.au/event/2022/practical-deep-learning-coders-uq-fastai">the latest iteration</a> of <a href="https://www.fast.ai">the fastai course</a> as taught by Jeremy Howard. This past week we got a very high-level overview of some of the ways deep learning is proving very powerful in solving problems as well as how we can use its techniques to fairly quickly get great results on image classification problems.</p>
+
+<p>I’ve done the earlier parts of the course before, so some of these demonstrations were less mind-blowing than the first time I saw them. For this iteration of the course, Jeremy showcased <a href="https://www.kaggle.com/code/jhoward/is-it-a-bird-creating-a-model-from-your-own-data">a Kaggle notebook</a> which trains a model to distinguish whether an image is of a bird or not.</p>
+
+<p>Last time I did the course, I <a href="https://mlops.systems/fastai/redactionmodel/computervision/datalabelling/2021/09/06/redaction-classification-chapter-2.html#fn:3">trained an image classifier model</a> to distinguish whether an image was redacted or not to around 95% accuracy. (This actually was the genesis of <a href="https://mlops.systems/categories/#redactionmodel">my larger redaction object detection project</a> that I’ve been blogging about for the past few months.)</p>
+
+<h1 id="the-key-ingredients-what-goes-into-a-model">
+<a class="anchor" href="#the-key-ingredients-what-goes-into-a-model" aria-hidden="true"><span class="octicon octicon-link"></span></a>The key ingredients: what goes into a model?</h1>
+
+<p>The course teaches things top-down, so we start off with both the practical experience of training state-of-the-art models as well as the overall context to what goes into these high-level functions. These pieces include:</p>
+
+<ul>
+  <li>your input data — this style of programming differs from traditional software engineering where your functions take data in order to ‘learn’ how to make their predictions</li>
+  <li>the ‘weights’ — when we’re using pre-trained models, you can think of these as an initial set of variables that are already pretty useful in that configuration and can do a lot of things.</li>
+  <li>your model — this is what you’re training and, once trained, you can think of it as a function in and of itself that takes in inputs and outputs predictions.</li>
+  <li>the predictions — these are the guesses that your model makes, based on whatever you pass in as inputs. So if you pass in an image of a cat to a model (see below), the prediction could be whether that cat is one particular kind or another.</li>
+  <li>your ‘loss’ — this is a measure of checking how well your model is doing as it trains.</li>
+  <li>a means of updating your weights — depending on how well (or badly) the training goes, you’ll want a way of updating the weights so that each time it gets a bit better at optimising for whatever you’ve set up your model to do. In lesson one we learn about <em>stochastic gradient descent</em>, a way of optimising and updating these weights automatically.</li>
+  <li>your labels — these are the ground truth assertions that get used to determine how well the model is doing as it trains.</li>
+  <li>transformations &amp; augmentations — more on this will come in lesson two, but these allow you to squeeze more value out of your data. This is especially valuable when you’re fine-tuning a model and don’t have massive amounts of data to use for training.</li>
+</ul>
+
+<p>Represented in code, the classic fastai example where you train a model to distinguish between cats and dogs is as follows:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">fastai.vision.all</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">path</span> <span class="o">=</span> <span class="n">untar_data</span><span class="p">(</span><span class="n">URLs</span><span class="p">.</span><span class="n">PETS</span><span class="p">)</span><span class="o">/</span><span class="s">'images'</span>
+
+<span class="k">def</span> <span class="nf">is_cat</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="k">return</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">isupper</span><span class="p">()</span>
+<span class="n">dls</span> <span class="o">=</span> <span class="n">ImageDataLoaders</span><span class="p">.</span><span class="n">from_name_func</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">,</span> <span class="n">get_image_files</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">valid_pct</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
+    <span class="n">label_func</span><span class="o">=</span><span class="n">is_cat</span><span class="p">,</span> <span class="n">item_tfms</span><span class="o">=</span><span class="n">Resize</span><span class="p">(</span><span class="mi">224</span><span class="p">))</span>
+
+<span class="n">learn</span> <span class="o">=</span> <span class="n">vision_learner</span><span class="p">(</span><span class="n">dls</span><span class="p">,</span> <span class="n">resnet34</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">error_rate</span><span class="p">)</span>
+<span class="n">learn</span><span class="p">.</span><span class="n">fine_tune</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>This small code snippet contains all the various parts just mentioned. The high-level API and abstractions that fastai provides allows you to work with these concepts in a way that is fast and flexible, though if you need to dive into the details you can do so as well.</p>
+
+<h1 id="image-classification-isnt-just-about-images">
+<a class="anchor" href="#image-classification-isnt-just-about-images" aria-hidden="true"><span class="octicon octicon-link"></span></a>Image classification isn’t just about images</h1>
+
+<p>One of the parts of the first chapter I enjoy the most is the examples of projects where image classification was applied to problems or scenarios where it doesn’t first appear that the problem has anything to do with computer vision.</p>
+
+<p>We see <a href="https://ieeexplore.ieee.org/abstract/document/8328749">malware converted into images</a> and distinguished using classification. We see <a href="https://medium.com/@etown/great-results-on-audio-classification-with-fastai-library-ccaf906c5f52">sounds in an urban environment</a> converted into images and classified with fastai. In <a href="https://www.meetup.com/delft-fast-ai-study-group/">the study group</a> I host for some student on the course, one of our members presented <a href="https://kurianbenoy.com/ml-blog/fastai/fastbook/2022/05/01/AudioCNNDemo.html">an initial proof of concept</a> of using images of music to distinguish genre:</p>
+
+<div class="jekyll-twitter-plugin">
+<blockquote class="twitter-tweet">
+<p lang="en" dir="ltr">Saturday evening side-project: Trained a baseline ML model to classify audio files to identify their music genre using <a href="https://twitter.com/fastdotai?ref_src=twsrc%5Etfw">@fastdotai</a> based on a kaggle dataset.<br><br>Acheived only 50% accuracy, probably because problem is hard. Next job is to check what <a href="https://twitter.com/DienhoaT?ref_src=twsrc%5Etfw">@DienhoaT</a> has done to win a GPU. <a href="https://t.co/EahvgtYBDL">pic.twitter.com/EahvgtYBDL</a></p>— Kurian Benoy (@kurianbenoy2) <a href="https://twitter.com/kurianbenoy2/status/1520470393760272384?ref_src=twsrc%5Etfw">April 30, 2022</a>
+</blockquote>
+<script async="" src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</div>
+
+<p>I like the creativity needed to think of how to turn problems and data into a form such that they can become computer vision problems.</p>
+
+<h1 id="my-own-efforts-classifying-my-cat">
+<a class="anchor" href="#my-own-efforts-classifying-my-cat" aria-hidden="true"><span class="octicon octicon-link"></span></a>My own efforts: classifying my cat</h1>
+
+<p>True story: a few years ago my cat escaped from the vet and a reward was mentioned for anyone who found our cute ginger cat.  Throughout the course of the day, the vets were perplexed to see people coming in with random ginger cats that they’d found in the neighborhood, but none of them were ours! With this iteration of the course, therefore, I was curious to try out this simple but slightly silly example and see how well a deep learning model could do at recognising distinguishing Mr Blupus — don’t ask! — from other random photos of ginger cats.</p>
+
+<p>Training the model was pretty easy. Like any cat owner, I have thousands of photos of our cat so an initial dataset to use was quick to assemble. I downloaded a few hundred random ginger cat photos via DuckDuckGo using some code Jeremy had used in <a href="https://www.kaggle.com/code/jhoward/is-it-a-bird-creating-a-model-from-your-own-data">his bird vs forest Kaggle notebook</a>. A few minutes and ten epochs later, I had achieved 96.5% accuracy on my validation data after fine-tuning <code class="language-plaintext highlighter-rouge">resnet50</code>!</p>
+
+<div class="jekyll-twitter-plugin">
+<blockquote class="twitter-tweet">
+<p lang="en" dir="ltr">Little Saturday afternoon side-project: training an image classification model using <a href="https://twitter.com/fastdotai?ref_src=twsrc%5Etfw">@fastdotai</a> to distinguish my cat ('Mr Blupus' -- don't ask!) from other random ginger cat photos.<br><br>Achieved 96.5% accuracy on the validation set within a few minutes! <a href="https://t.co/by5ZlM0Kkp">pic.twitter.com/by5ZlM0Kkp</a></p>— Alex Strick van Linschoten (@strickvl) <a href="https://twitter.com/strickvl/status/1520405802091175936?ref_src=twsrc%5Etfw">April 30, 2022</a>
+</blockquote>
+<script async="" src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</div>
+
+<p>After the initial excitement died down, I realised that the result was probably an illusion. Our cat is an indoor cat and we have a relatively small house. Couple that with the fact that the backdrops to the photos of Mr Blupus are relatively distinctive (particular kinds of sheets or carpets) and it seems pretty clear that the model wasn’t learning how to identify our cat, but rather it was learning how to distinguish photos of our house or our carpets.</p>
+
+<p>☹️</p>
+
+<p>Luckily, chapter one gets into exactly this problem, showing an example of how exactly this validation issue can give you a false sense of confidence in your model. When I evaluated my model on the validation data it wasn’t a fair test, since in all likeliness may model had already seen a similar backdrop to whatever was found inside the validation set.</p>
+
+<p>I discussed this when I presented this to those at the study group / meetup yesterday and we agreed that it’d be best if I held out some settings or locations from the training entirely. I took 30 minutes to do that in the evening and had a third ‘test’ dataset which consisted of 118 images of our cat in certain locations that the model wasn’t trained on and thus couldn’t use to cheat. I added a few more photos to the training data so that there were enough examples from which to learn.</p>
+
+<p><img src="/blupus_detection/training-data.png" alt="" title="Input data for the new model."></p>
+
+<p>I was supposedly getting 98% accuracy now, but I knew that number to be false. I then needed to figure out how to get the accuracy for my held-out test set. With a lot of help from <a href="https://twitter.com/Fra_Pochetti">Francesco</a> and <a href="https://benjaminwarner.dev/2021/10/01/inference-with-fastai#batch-prediction">a really useful blogpost</a> on doing batch inference with fastai, I first got the predictions for my test data:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">test_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">fn</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">((</span><span class="n">Path</span><span class="p">(</span><span class="s">"/path/to/test_set_blupus_photos"</span><span class="p">)).</span><span class="n">glob</span><span class="p">(</span><span class="s">'**/*'</span><span class="p">))</span> <span class="k">if</span> <span class="n">fn</span><span class="p">.</span><span class="n">is_file</span><span class="p">()]</span>
+<span class="n">test_dl</span> <span class="o">=</span> <span class="n">learn</span><span class="p">.</span><span class="n">dls</span><span class="p">.</span><span class="n">test_dl</span><span class="p">(</span><span class="n">test_files</span><span class="p">)</span>
+<span class="n">preds</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">learn</span><span class="p">.</span><span class="n">get_preds</span><span class="p">(</span><span class="n">dl</span><span class="o">=</span><span class="n">test_dl</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>I then created a tensor with the ground truth predictions for my test set and compared them with what my model had predicted:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">gts</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">118</span><span class="p">)])</span>
+<span class="n">accuracy</span> <span class="o">=</span> <span class="p">(</span><span class="n">gts</span> <span class="o">==</span> <span class="n">preds</span><span class="p">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>At this point, getting the final accuracy was as simple as getting the proportion of correct guesses:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sum</span><span class="p">([</span><span class="mi">1</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">accuracy</span> <span class="k">if</span> <span class="n">item</span><span class="p">])</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">preds</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>This gave me an accuracy on my held-out test set of 93.2% which was surprisingly good.</p>
+
+<p>I half wonder whether there is still some cheating going on somehow, some quality of the photos or the iPhone camera I used to take them that is being used to distinguish the photos of my cat vs other ginger cats.</p>
+
+<p>Nevertheless, this was a useful lesson for me to learn. I realised while working with the tensors in the final step above that I’m not at all comfortable manipulating data with PyTorch so luckily that’ll get covered in future lessons.</p>
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="strickvl/ml-blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/fastai/computervision/2022/05/02/pet-cat-image-classifier-fastai.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>A place to share my technical learnings.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
