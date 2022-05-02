@@ -71,7 +71,7 @@ Luckily, chapter one gets into exactly this problem, showing an example of how e
 
 I discussed this when I presented this to those at the study group / meetup yesterday and we agreed that it'd be best if I held out some settings or locations from the training entirely. I took 30 minutes to do that in the evening and had a third 'test' dataset which consisted of 118 images of our cat in certain locations that the model wasn't trained on and thus couldn't use to cheat. I added a few more photos to the training data so that there were enough examples from which to learn.
 
-![]({{ site.baseurl }}/blupus_detection/training-data.png "Input data for the new model.")
+![]({{ site.baseurl }}/images/blupus_detection/training-data.png "Input data for the new model.")
 
 I was supposedly getting 98% accuracy now, but I knew that number to be false. I then needed to figure out how to get the accuracy for my held-out test set. With a lot of help from [Francesco](https://twitter.com/Fra_Pochetti) and [a really useful blogpost](https://benjaminwarner.dev/2021/10/01/inference-with-fastai#batch-prediction) on doing batch inference with fastai, I first got the predictions for my test data:
 
