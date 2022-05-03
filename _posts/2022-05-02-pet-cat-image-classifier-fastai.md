@@ -99,3 +99,9 @@ This gave me an accuracy on my held-out test set of 93.2% which was surprisingly
 I half wonder whether there is still some cheating going on somehow, some quality of the photos or the iPhone camera I used to take them that is being used to distinguish the photos of my cat vs other ginger cats.
 
 Nevertheless, this was a useful lesson for me to learn. I realised while working with the tensors in the final step above that I'm not at all comfortable manipulating data with PyTorch so luckily that'll get covered in future lessons.
+
+**UPDATE:**
+
+Following some discussion in the fastai forums, it was suggested that I take a look at [Grad-CAM](http://gradcam.cloudcv.org) in chapter 18. This is a technique to visualise the activations which allows you to see which parts of the image it is paying the most attention to (sort of). I ran the code using a sample Blupus image and this was the result. I don't understand how most (any?) of this works, but it was really cool to have a working result of sorts nonetheless!
+
+![]({{ site.baseurl }}/images/blupus_detection/gradcam.png "Mr Blupus activating the model.")
