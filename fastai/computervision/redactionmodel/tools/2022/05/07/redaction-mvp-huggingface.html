@@ -92,7 +92,7 @@ window.onload = wrap_img;
        • <span class="read-time" title="Estimated read time">
     
     
-      5 min read
+      6 min read
     
 </span></p>
 
@@ -118,14 +118,14 @@ window.onload = wrap_img;
 
   <div class="post-content e-content" itemprop="articleBody">
     <ul class="section-nav">
-<li class="toc-entry toc-h1"><a href="#step-by-step-iteration-by-iteration">Step by step, iteration by iteration</a></li>
-<li class="toc-entry toc-h1"><a href="#using-the-inference-api-for-more-flexibility">Using the inference API for more flexibility</a></li>
-<li class="toc-entry toc-h1"><a href="#building-an-mvp-of-a-redaction-detection-application">Building an MVP of a redaction detection application</a></li>
-<li class="toc-entry toc-h1"><a href="#lessons-learned">Lessons learned</a></li>
+<li class="toc-entry toc-h1"><a href="#-step-by-step-iteration-by-iteration">🐾 Step by step, iteration by iteration</a></li>
+<li class="toc-entry toc-h1"><a href="#️-using-the-inference-api-for-more-flexibility">⚡️ Using the inference API for more flexibility</a></li>
+<li class="toc-entry toc-h1"><a href="#-building-an-mvp-of-a-redaction-detection-application">🚀 Building an MVP of a redaction detection application</a></li>
+<li class="toc-entry toc-h1"><a href="#-lessons-learned">🤔 Lessons learned</a></li>
 </ul><p>After the second class of the fastai course, we’re encouraged to create mini-projects that result in models we can deploy online. Deployment is a huge field with its own complexities, of course, but having an option to get something out in the world that’s visible and usable is extremely useful.</p>
 
-<h1 id="step-by-step-iteration-by-iteration">
-<a class="anchor" href="#step-by-step-iteration-by-iteration" aria-hidden="true"><span class="octicon octicon-link"></span></a>Step by step, iteration by iteration</h1>
+<h1 id="-step-by-step-iteration-by-iteration">
+<a class="anchor" href="#-step-by-step-iteration-by-iteration" aria-hidden="true"><span class="octicon octicon-link"></span></a>🐾 Step by step, iteration by iteration</h1>
 
 <p>This week I chose to use my previous work on redacted images to leverage a dataset <a href="https://mlops.systems/fastai/redactionmodel/computervision/datalabelling/2021/09/06/redaction-classification-chapter-2.html">I’d previously collected</a>. I wanted to showcase something useful and interesting and I ended up slightly blocked as to what I was going to build. After discussing it with <a href="https://www.meetup.com/delft-fast-ai-study-group/">the study group</a> briefly, I was reminded not to try to bite off too much: start small with the smallest possible next version of what you want, and then continue from there.</p>
 
@@ -148,8 +148,8 @@ window.onload = wrap_img;
 
 <p>My model <a href="https://huggingface.co/strickvl/redaction-classifier-fastai">lives here</a> on the Huggingface model hub and can be directly saved or just used via the hosted Inference API.</p>
 
-<h1 id="using-the-inference-api-for-more-flexibility">
-<a class="anchor" href="#using-the-inference-api-for-more-flexibility" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using the inference API for more flexibility</h1>
+<h1 id="️-using-the-inference-api-for-more-flexibility">
+<a class="anchor" href="#%EF%B8%8F-using-the-inference-api-for-more-flexibility" aria-hidden="true"><span class="octicon octicon-link"></span></a>⚡️ Using the inference API for more flexibility</h1>
 
 <p>Buoyed on by Tanishq’s blog and the workflow we’d seen in the lecture that week, I thought it might be worth running my inference requests through the HTTP API instead of letting Huggingface handle all that.</p>
 
@@ -161,8 +161,8 @@ window.onload = wrap_img;
 
 <p>While the demo gives a sense of the model’s capabilities, in reality you would probably not find it very helpful to use a web app that required you to feed a document’s pages to it one by one. I started to think about a more complex application where you could upload a PDF and it would split the PDF for you and do all the inference behind the scenes.</p>
 
-<h1 id="building-an-mvp-of-a-redaction-detection-application">
-<a class="anchor" href="#building-an-mvp-of-a-redaction-detection-application" aria-hidden="true"><span class="octicon octicon-link"></span></a>Building an MVP of a redaction detection application</h1>
+<h1 id="-building-an-mvp-of-a-redaction-detection-application">
+<a class="anchor" href="#-building-an-mvp-of-a-redaction-detection-application" aria-hidden="true"><span class="octicon octicon-link"></span></a>🚀 Building an MVP of a redaction detection application</h1>
 
 <p>I spent a brief half-hour considering deploying a simple <a href="https://flask.palletsprojects.com/en/2.1.x/">Flask</a> web app hosted somewhere for free before realising I didn’t even need to go that far to create a proof of concept that would have the required functionality. I returned back to Huggingface Spaces hoping that I’d be able to build everything out.</p>
 
@@ -188,8 +188,13 @@ window.onload = wrap_img;
   <li>create a PDF that you can download that contains only the redacted images, with an overlay of the redactions that it was able to identify along with the confidence score for each item.</li>
 </ul>
 
-<h1 id="lessons-learned">
-<a class="anchor" href="#lessons-learned" aria-hidden="true"><span class="octicon octicon-link"></span></a>Lessons learned</h1>
+<h1 id="-lessons-learned">
+<a class="anchor" href="#-lessons-learned" aria-hidden="true"><span class="octicon octicon-link"></span></a>🤔 Lessons learned</h1>
+
+<div class="Toast">
+   <span class="Toast-icon"><svg class="octicon octicon-info octicon octicon-info octicon octicon-info" viewbox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8zm6.5-.25A.75.75 0 017.25 7h1a.75.75 0 01.75.75v2.75h.25a.75.75 0 010 1.5h-2a.75.75 0 010-1.5h.25v-2h-.25a.75.75 0 01-.75-.75zM8 6a1 1 0 100-2 1 1 0 000 2z"></path></svg></span>
+   <span class="Toast-content">In this post you learned:\n- to start with simple prototypes\n- how to easily deploy fastai models on Huggingface Spaces and the Hub\n- that you can create functional MVP demos of real products and applications</span>
+</div>
 
 <p>I was — and continue to be — surprised that the free Huggingface Spaces environment has no problem running all this fairly compute-intensive inference on their backend. (That said, if you try to upload a document containing dozens or hundreds of pages and you’ll quickly hit up against the edge of what they allow.)</p>
 
