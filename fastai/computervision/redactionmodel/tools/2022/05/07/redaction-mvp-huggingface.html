@@ -135,7 +135,7 @@ window.onload = wrap_img;
 
 <p>It’s an easy step to go from having a Gradio app deployed to then hosting that same demo as a Huggingface Space, so I then did that. You can <a href="https://huggingface.co/spaces/strickvl/fastai_redaction_classifier">access the demo here</a> at <a href="https://huggingface.co/spaces/strickvl/fastai_redaction_classifier"><code class="language-plaintext highlighter-rouge">strickvl/fastai_redaction_classifier</code></a>.</p>
 
-<p><img src="/images/redaction-mvp-huggingface/classification-demo.png" alt="" title="A Gradio app [hosted on Huggingface Spaces](https://huggingface.co/spaces/strickvl/fastai_redaction_classifier): an image classifier that detects whether an image input contains a redaction or not."></p>
+<p><img src="/images/redaction-mvp-huggingface/classification-demo.png" alt="" title="A Gradio app hosted on Huggingface Spaces: an image classifier that detects whether an image input contains a redaction or not."></p>
 
 <p>At this first stage I had the exported model itself uploaded inside the Spaces repository, but <a href="https://huggingface.co/blog/fastai">this useful blog</a> by Omar Espejel showed how I could just upload my model directly to the Huggingface model hub. Instead of calling <code class="language-plaintext highlighter-rouge">learn.export('model.pkl')</code> and uploading the model file itself, I could just run the following code after authentication:</p>
 
@@ -153,7 +153,9 @@ window.onload = wrap_img;
 
 <p>Buoyed on by Tanishq’s blog and the workflow we’d seen in the lecture that week, I thought it might be worth running my inference requests through the HTTP API instead of letting Huggingface handle all that.</p>
 
-<p>Thanks to a really simple and comprehensible <a href="https://github.com/nuvic/predict_image">example</a> made by <a href="https://github.com/nuvic">@Nuvic</a> I was quickly able to get something up and running. The forked source code is available <a href="https://github.com/strickvl/predict_redaction_classification">here</a> and the main website where you can try out the tool is here: <a href="https://strickvl.github.io/predict_redaction_classification/">https://strickvl.github.io/predict_redaction_classification/</a>. If you <a href="https://duckduckgo.com/?q=redacted+document&amp;t=osx&amp;iax=images&amp;ia=images">search for ‘redacted document’ images</a> and save one of them do your local computer you can use those to try it out.</p>
+<p>Thanks to a really simple and comprehensible <a href="https://github.com/nuvic/predict_image">example</a> made by <a href="https://github.com/nuvic">@Nuvic</a> I was quickly able to get something up and running. The forked source code is available <a href="https://github.com/strickvl/predict_redaction_classification">here</a> and the main website where you can try out the tool is here: <a href="https://strickvl.github.io/predict_redaction_classification/">https://strickvl.github.io/predict_redaction_classification/</a>.</p>
+
+<p>If you <a href="https://duckduckgo.com/?q=redacted+document&amp;t=osx&amp;iax=images&amp;ia=images">search for ‘redacted document’ images</a> and save one of them do your local computer you can use those to try it out. It uses simple Javascript code to pass the image you upload into the inference API using a simple HTTP request. It parses the results and displays them as shown here:</p>
 
 <p><img src="/images/redaction-mvp-huggingface/gh-pages-demo.png" alt="" title="A demo using Github Pages to host a simple app showcasing the model inference."></p>
 
@@ -167,7 +169,7 @@ window.onload = wrap_img;
 <p>You can access the demo / MVP app that I created here:
 <a href="https://huggingface.co/spaces/strickvl/redaction-detector">https://huggingface.co/spaces/strickvl/redaction-detector</a></p>
 
-<p><img src="/images/redaction-mvp-huggingface/demo-screenshot.png" alt="" title="[An MVP app](https://huggingface.co/spaces/strickvl/redaction-detector) for detection, extraction and analysis of PDF documents that contain redactions."></p>
+<p><img src="/images/redaction-mvp-huggingface/demo-screenshot.png" alt="" title="An MVP app for detection, extraction and analysis of PDF documents that contain redactions."></p>
 
 <p>This MVP app runs two models to mimic the experience of what a final deployed version of the project might look like.</p>
 
