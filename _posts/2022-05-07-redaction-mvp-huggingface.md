@@ -8,8 +8,15 @@ author: Alex Strick van Linschoten
 title: "A painless way to create an MVP demo using computer vision models"
 image: images/redaction-mvp-huggingface/demo-screenshot.png
 ---
+# 🚦 Motivation
 
 After the second class of the fastai course, we're encouraged to create mini-projects that result in models we can deploy online. Deployment is a huge field with its own complexities, of course, but having an option to get something out in the world that's visible and usable is extremely useful.
+
+In this post I will:
+
+- show how I went about thinking through the task
+- showcase some examples of small prototypes I built along the way
+- explore why you might want to have a minimal deployed version of your application in the first place!
 
 # 🐾 Step by step, iteration by iteration
 
@@ -71,7 +78,11 @@ This MVP app does several things:
 
 # 🤔 Lessons learned
 
-{% include info.html text="In this post you learned:\n- to start with simple prototypes\n- how to easily deploy fastai models on Huggingface Spaces and the Hub\n- that you can create functional MVP demos of real products and applications" %}
+{% include info.html text="In this post you learned:
+
+- to start with simple prototypes
+- how to easily deploy fastai models on Huggingface Spaces and the Hub
+- that you can create functional MVP demos of real products and applications" %}
 
 I was — and continue to be — surprised that the free Huggingface Spaces environment has no problem running all this fairly compute-intensive inference on their backend. (That said, if you try to upload a document containing dozens or hundreds of pages and you'll quickly hit up against the edge of what they allow.)
 
