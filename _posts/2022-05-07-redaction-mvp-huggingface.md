@@ -78,11 +78,7 @@ This MVP app does several things:
 
 # 🤔 Lessons learned
 
-{% include info.html text="In this post you learned:
-
-- to start with simple prototypes
-- how to easily deploy fastai models on Huggingface Spaces and the Hub
-- that you can create functional MVP demos of real products and applications" %}
+{% include info.html text="In this post you learned 1️⃣ to start with simple prototypes 2️⃣ how to easily deploy fastai models on Huggingface Spaces and the Hub and 3️⃣ that you can create functional MVP demos of real products and applications" %}
 
 I was — and continue to be — surprised that the free Huggingface Spaces environment has no problem running all this fairly compute-intensive inference on their backend. (That said, if you try to upload a document containing dozens or hundreds of pages and you'll quickly hit up against the edge of what they allow.)
 
