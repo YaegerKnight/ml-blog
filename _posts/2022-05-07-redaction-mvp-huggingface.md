@@ -21,7 +21,7 @@ With that model exported, it was then easy to get a simple [Gradio](https://grad
 
 It's an easy step to go from having a Gradio app deployed to then hosting that same demo as a Huggingface Space, so I then did that. You can [access the demo here](https://huggingface.co/spaces/strickvl/fastai_redaction_classifier) at [`strickvl/fastai_redaction_classifier`](https://huggingface.co/spaces/strickvl/fastai_redaction_classifier).
 
-![]({{ site.baseurl }}/images/redaction-mvp-huggingface/classification-demo.png "A Gradio app [hosted on Huggingface Spaces](https://huggingface.co/spaces/strickvl/fastai_redaction_classifier): an image classifier that detects whether an image input contains a redaction or not.")
+![]({{ site.baseurl }}/images/redaction-mvp-huggingface/classification-demo.png "A Gradio app hosted on Huggingface Spaces: an image classifier that detects whether an image input contains a redaction or not.")
 
 At this first stage I had the exported model itself uploaded inside the Spaces repository, but [this useful blog](https://huggingface.co/blog/fastai) by Omar Espejel showed how I could just upload my model directly to the Huggingface model hub. Instead of calling `learn.export('model.pkl')` and uploading the model file itself, I could just run the following code after authentication:
 
@@ -39,7 +39,9 @@ My model [lives here](https://huggingface.co/strickvl/redaction-classifier-fasta
 
 Buoyed on by Tanishq's blog and the workflow we'd seen in the lecture that week, I thought it might be worth running my inference requests through the HTTP API instead of letting Huggingface handle all that.
 
-Thanks to a really simple and comprehensible [example](https://github.com/nuvic/predict_image) made by [@Nuvic](https://github.com/nuvic) I was quickly able to get something up and running. The forked source code is available [here](https://github.com/strickvl/predict_redaction_classification) and the main website where you can try out the tool is here: [https://strickvl.github.io/predict_redaction_classification/](https://strickvl.github.io/predict_redaction_classification/). If you [search for 'redacted document' images](https://duckduckgo.com/?q=redacted+document&t=osx&iax=images&ia=images) and save one of them do your local computer you can use those to try it out.
+Thanks to a really simple and comprehensible [example](https://github.com/nuvic/predict_image) made by [@Nuvic](https://github.com/nuvic) I was quickly able to get something up and running. The forked source code is available [here](https://github.com/strickvl/predict_redaction_classification) and the main website where you can try out the tool is here: [https://strickvl.github.io/predict_redaction_classification/](https://strickvl.github.io/predict_redaction_classification/). 
+
+If you [search for 'redacted document' images](https://duckduckgo.com/?q=redacted+document&t=osx&iax=images&ia=images) and save one of them do your local computer you can use those to try it out. It uses simple Javascript code to pass the image you upload into the inference API using a simple HTTP request. It parses the results and displays them as shown here:
 
 ![]({{ site.baseurl }}/images/redaction-mvp-huggingface/gh-pages-demo.png "A demo using Github Pages to host a simple app showcasing the model inference.")
 
@@ -52,7 +54,7 @@ I spent a brief half-hour considering deploying a simple [Flask](https://flask.p
 You can access the demo / MVP app that I created here:
 [https://huggingface.co/spaces/strickvl/redaction-detector](https://huggingface.co/spaces/strickvl/redaction-detector)
 
-![]({{ site.baseurl }}/images/redaction-mvp-huggingface/demo-screenshot.png "[An MVP app](https://huggingface.co/spaces/strickvl/redaction-detector) for detection, extraction and analysis of PDF documents that contain redactions.")
+![]({{ site.baseurl }}/images/redaction-mvp-huggingface/demo-screenshot.png "An MVP app for detection, extraction and analysis of PDF documents that contain redactions.")
 
 This MVP app runs two models to mimic the experience of what a final deployed version of the project might look like.
 
