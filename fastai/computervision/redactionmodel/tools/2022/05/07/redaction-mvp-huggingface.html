@@ -118,11 +118,23 @@ window.onload = wrap_img;
 
   <div class="post-content e-content" itemprop="articleBody">
     <ul class="section-nav">
+<li class="toc-entry toc-h1"><a href="#-motivation">🚦 Motivation</a></li>
 <li class="toc-entry toc-h1"><a href="#-step-by-step-iteration-by-iteration">🐾 Step by step, iteration by iteration</a></li>
 <li class="toc-entry toc-h1"><a href="#️-using-the-inference-api-for-more-flexibility">⚡️ Using the inference API for more flexibility</a></li>
 <li class="toc-entry toc-h1"><a href="#-building-an-mvp-of-a-redaction-detection-application">🚀 Building an MVP of a redaction detection application</a></li>
 <li class="toc-entry toc-h1"><a href="#-lessons-learned">🤔 Lessons learned</a></li>
-</ul><p>After the second class of the fastai course, we’re encouraged to create mini-projects that result in models we can deploy online. Deployment is a huge field with its own complexities, of course, but having an option to get something out in the world that’s visible and usable is extremely useful.</p>
+</ul><h1 id="-motivation">
+<a class="anchor" href="#-motivation" aria-hidden="true"><span class="octicon octicon-link"></span></a>🚦 Motivation</h1>
+
+<p>After the second class of the fastai course, we’re encouraged to create mini-projects that result in models we can deploy online. Deployment is a huge field with its own complexities, of course, but having an option to get something out in the world that’s visible and usable is extremely useful.</p>
+
+<p>In this post I will:</p>
+
+<ul>
+  <li>show how I went about thinking through the task</li>
+  <li>showcase some examples of small prototypes I built along the way</li>
+  <li>explore why you might want to have a minimal deployed version of your application in the first place!</li>
+</ul>
 
 <h1 id="-step-by-step-iteration-by-iteration">
 <a class="anchor" href="#-step-by-step-iteration-by-iteration" aria-hidden="true"><span class="octicon octicon-link"></span></a>🐾 Step by step, iteration by iteration</h1>
@@ -193,7 +205,11 @@ window.onload = wrap_img;
 
 <div class="Toast">
    <span class="Toast-icon"><svg class="octicon octicon-info octicon octicon-info octicon octicon-info" viewbox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8zm6.5-.25A.75.75 0 017.25 7h1a.75.75 0 01.75.75v2.75h.25a.75.75 0 010 1.5h-2a.75.75 0 010-1.5h.25v-2h-.25a.75.75 0 01-.75-.75zM8 6a1 1 0 100-2 1 1 0 000 2z"></path></svg></span>
-   <span class="Toast-content">In this post you learned:\n- to start with simple prototypes\n- how to easily deploy fastai models on Huggingface Spaces and the Hub\n- that you can create functional MVP demos of real products and applications</span>
+   <span class="Toast-content">In this post you learned:
+
+- to start with simple prototypes
+- how to easily deploy fastai models on Huggingface Spaces and the Hub
+- that you can create functional MVP demos of real products and applications</span>
 </div>
 
 <p>I was — and continue to be — surprised that the free Huggingface Spaces environment has no problem running all this fairly compute-intensive inference on their backend. (That said, if you try to upload a document containing dozens or hundreds of pages and you’ll quickly hit up against the edge of what they allow.)</p>
