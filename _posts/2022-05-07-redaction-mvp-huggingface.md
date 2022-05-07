@@ -11,7 +11,7 @@ image: images/redaction-mvp-huggingface/demo-screenshot.png
 
 After the second class of the fastai course, we're encouraged to create mini-projects that result in models we can deploy online. Deployment is a huge field with its own complexities, of course, but having an option to get something out in the world that's visible and usable is extremely useful.
 
-# Step by step, iteration by iteration
+# 🐾 Step by step, iteration by iteration
 
 This week I chose to use my previous work on redacted images to leverage a dataset [I'd previously collected](https://mlops.systems/fastai/redactionmodel/computervision/datalabelling/2021/09/06/redaction-classification-chapter-2.html). I wanted to showcase something useful and interesting and I ended up slightly blocked as to what I was going to build. After discussing it with [the study group](https://www.meetup.com/delft-fast-ai-study-group/) briefly, I was reminded not to try to bite off too much: start small with the smallest possible next version of what you want, and then continue from there.
 
@@ -35,7 +35,7 @@ push_to_hub_fastai(learner=learn, repo_id=repo_id)
 
 My model [lives here](https://huggingface.co/strickvl/redaction-classifier-fastai) on the Huggingface model hub and can be directly saved or just used via the hosted Inference API.
 
-# Using the inference API for more flexibility
+# ⚡️ Using the inference API for more flexibility
 
 Buoyed on by Tanishq's blog and the workflow we'd seen in the lecture that week, I thought it might be worth running my inference requests through the HTTP API instead of letting Huggingface handle all that.
 
@@ -47,7 +47,7 @@ If you [search for 'redacted document' images](https://duckduckgo.com/?q=redacte
 
 While the demo gives a sense of the model's capabilities, in reality you would probably not find it very helpful to use a web app that required you to feed a document's pages to it one by one. I started to think about a more complex application where you could upload a PDF and it would split the PDF for you and do all the inference behind the scenes.
 
-# Building an MVP of a redaction detection application
+# 🚀 Building an MVP of a redaction detection application
 
 I spent a brief half-hour considering deploying a simple [Flask](https://flask.palletsprojects.com/en/2.1.x/) web app hosted somewhere for free before realising I didn't even need to go that far to create a proof of concept that would have the required functionality. I returned back to Huggingface Spaces hoping that I'd be able to build everything out.
 
@@ -69,7 +69,9 @@ This MVP app does several things:
 - calculate what proportion of the total area of the image was redacted as well as what proportion of the actual content (i.e. excluding margins etc where there is no content)
 - create a PDF that you can download that contains only the redacted images, with an overlay of the redactions that it was able to identify along with the confidence score for each item.
 
-# Lessons learned
+# 🤔 Lessons learned
+
+{% include info.html text="In this post you learned:\n- to start with simple prototypes\n- how to easily deploy fastai models on Huggingface Spaces and the Hub\n- that you can create functional MVP demos of real products and applications" %}
 
 I was — and continue to be — surprised that the free Huggingface Spaces environment has no problem running all this fairly compute-intensive inference on their backend. (That said, if you try to upload a document containing dozens or hundreds of pages and you'll quickly hit up against the edge of what they allow.)
 
