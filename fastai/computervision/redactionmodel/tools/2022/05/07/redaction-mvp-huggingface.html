@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>A painless way to create an MVP demo using computer vision models | mlops.systems</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="A painless way to create an MVP demo using computer vision models" />
+<meta name="author" content="Alex Strick van Linschoten" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="I created a few deployed MVP demos showcasing models I’d created while participating in the fastai course, uploading them to the Huggingface Hub and using a Gradio Demo hosted on Huggingface Spaces." />
+<meta property="og:description" content="I created a few deployed MVP demos showcasing models I’d created while participating in the fastai course, uploading them to the Huggingface Hub and using a Gradio Demo hosted on Huggingface Spaces." />
+<link rel="canonical" href="https://mlops.systems/fastai/computervision/redactionmodel/tools/2022/05/07/redaction-mvp-huggingface.html" />
+<meta property="og:url" content="https://mlops.systems/fastai/computervision/redactionmodel/tools/2022/05/07/redaction-mvp-huggingface.html" />
+<meta property="og:site_name" content="mlops.systems" />
+<meta property="og:image" content="https://mlops.systems/images/redaction-mvp-huggingface/demo-screenshot.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-05-07T00:00:00-05:00" />
+<script type="application/ld+json">
+{"datePublished":"2022-05-07T00:00:00-05:00","url":"https://mlops.systems/fastai/computervision/redactionmodel/tools/2022/05/07/redaction-mvp-huggingface.html","@type":"BlogPosting","dateModified":"2022-05-07T00:00:00-05:00","image":"https://mlops.systems/images/redaction-mvp-huggingface/demo-screenshot.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://mlops.systems/fastai/computervision/redactionmodel/tools/2022/05/07/redaction-mvp-huggingface.html"},"author":{"@type":"Person","name":"Alex Strick van Linschoten"},"headline":"A painless way to create an MVP demo using computer vision models","description":"I created a few deployed MVP demos showcasing models I’d created while participating in the fastai course, uploading them to the Huggingface Hub and using a Gradio Demo hosted on Huggingface Spaces.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://mlops.systems/feed.xml" title="mlops.systems" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script
+  defer
+  data-domain="mlops.systems"
+  src="https://plausible.io/js/plausible.js"
+></script>
+
+
+<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">mlops.systems</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About Me</a><a class="page-link" href="/search/">Search</a><a class="page-link" href="/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">A painless way to create an MVP demo using computer vision models</h1><p class="page-description">I created a few deployed MVP demos showcasing models I'd created while participating in the fastai course, uploading them to the Huggingface Hub and using a Gradio Demo hosted on Huggingface Spaces.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-05-07T00:00:00-05:00" itemprop="datePublished">
+        May 7, 2022
+      </time>• 
+          <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+            <span class="p-author h-card" itemprop="name">Alex Strick van Linschoten</span></span>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      5 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/categories/#fastai">fastai</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#computervision">computervision</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#redactionmodel">redactionmodel</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#tools">tools</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h1"><a href="#step-by-step-iteration-by-iteration">Step by step, iteration by iteration</a></li>
+<li class="toc-entry toc-h1"><a href="#using-the-inference-api-for-more-flexibility">Using the inference API for more flexibility</a></li>
+<li class="toc-entry toc-h1"><a href="#building-an-mvp-of-a-redaction-detection-application">Building an MVP of a redaction detection application</a></li>
+<li class="toc-entry toc-h1"><a href="#lessons-learned">Lessons learned</a></li>
+</ul><p>After the second class of the fastai course, we’re encouraged to create mini-projects that result in models we can deploy online. Deployment is a huge field with its own complexities, of course, but having an option to get something out in the world that’s visible and usable is extremely useful.</p>
+
+<h1 id="step-by-step-iteration-by-iteration">
+<a class="anchor" href="#step-by-step-iteration-by-iteration" aria-hidden="true"><span class="octicon octicon-link"></span></a>Step by step, iteration by iteration</h1>
+
+<p>This week I chose to use my previous work on redacted images to leverage a dataset <a href="https://mlops.systems/fastai/redactionmodel/computervision/datalabelling/2021/09/06/redaction-classification-chapter-2.html">I’d previously collected</a>. I wanted to showcase something useful and interesting and I ended up slightly blocked as to what I was going to build. After discussing it with <a href="https://www.meetup.com/delft-fast-ai-study-group/">the study group</a> briefly, I was reminded not to try to bite off too much: start small with the smallest possible next version of what you want, and then continue from there.</p>
+
+<p>Since I already had a large dataset of redacted and unredacted images (extracted from PDF documents available online), I used this to train a classification model that could tell whether a page contained redactions or not.</p>
+
+<p>With that model exported, it was then easy to get a simple <a href="https://gradio.app">Gradio</a> app demo up and running, particularly with the suggestions in Tanishq Abraham’s <a href="https://tmabraham.github.io/blog/gradio_hf_spaces_tutorial">really useful tutorial blogpost</a>.</p>
+
+<p>It’s an easy step to go from having a Gradio app deployed to then hosting that same demo as a Huggingface Space, so I then did that. You can <a href="https://huggingface.co/spaces/strickvl/fastai_redaction_classifier">access the demo here</a> at <a href="https://huggingface.co/spaces/strickvl/fastai_redaction_classifier"><code class="language-plaintext highlighter-rouge">strickvl/fastai_redaction_classifier</code></a>.</p>
+
+<p><img src="/images/redaction-mvp-huggingface/classification-demo.png" alt="" title="A Gradio app [hosted on Huggingface Spaces](https://huggingface.co/spaces/strickvl/fastai_redaction_classifier): an image classifier that detects whether an image input contains a redaction or not."></p>
+
+<p>At this first stage I had the exported model itself uploaded inside the Spaces repository, but <a href="https://huggingface.co/blog/fastai">this useful blog</a> by Omar Espejel showed how I could just upload my model directly to the Huggingface model hub. Instead of calling <code class="language-plaintext highlighter-rouge">learn.export('model.pkl')</code> and uploading the model file itself, I could just run the following code after authentication:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">huggingface_hub</span> <span class="kn">import</span> <span class="n">push_to_hub_fastai</span>
+
+<span class="n">repo_id</span> <span class="o">=</span> <span class="s">"MY_USERNAME/MY_LEARNER_NAME"</span>
+
+<span class="n">push_to_hub_fastai</span><span class="p">(</span><span class="n">learner</span><span class="o">=</span><span class="n">learn</span><span class="p">,</span> <span class="n">repo_id</span><span class="o">=</span><span class="n">repo_id</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>My model <a href="https://huggingface.co/strickvl/redaction-classifier-fastai">lives here</a> on the Huggingface model hub and can be directly saved or just used via the hosted Inference API.</p>
+
+<h1 id="using-the-inference-api-for-more-flexibility">
+<a class="anchor" href="#using-the-inference-api-for-more-flexibility" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using the inference API for more flexibility</h1>
+
+<p>Buoyed on by Tanishq’s blog and the workflow we’d seen in the lecture that week, I thought it might be worth running my inference requests through the HTTP API instead of letting Huggingface handle all that.</p>
+
+<p>Thanks to a really simple and comprehensible <a href="https://github.com/nuvic/predict_image">example</a> made by <a href="https://github.com/nuvic">@Nuvic</a> I was quickly able to get something up and running. The forked source code is available <a href="https://github.com/strickvl/predict_redaction_classification">here</a> and the main website where you can try out the tool is here: <a href="https://strickvl.github.io/predict_redaction_classification/">https://strickvl.github.io/predict_redaction_classification/</a>. If you <a href="https://duckduckgo.com/?q=redacted+document&amp;t=osx&amp;iax=images&amp;ia=images">search for ‘redacted document’ images</a> and save one of them do your local computer you can use those to try it out.</p>
+
+<p><img src="/images/redaction-mvp-huggingface/gh-pages-demo.png" alt="" title="A demo using Github Pages to host a simple app showcasing the model inference."></p>
+
+<p>While the demo gives a sense of the model’s capabilities, in reality you would probably not find it very helpful to use a web app that required you to feed a document’s pages to it one by one. I started to think about a more complex application where you could upload a PDF and it would split the PDF for you and do all the inference behind the scenes.</p>
+
+<h1 id="building-an-mvp-of-a-redaction-detection-application">
+<a class="anchor" href="#building-an-mvp-of-a-redaction-detection-application" aria-hidden="true"><span class="octicon octicon-link"></span></a>Building an MVP of a redaction detection application</h1>
+
+<p>I spent a brief half-hour considering deploying a simple <a href="https://flask.palletsprojects.com/en/2.1.x/">Flask</a> web app hosted somewhere for free before realising I didn’t even need to go that far to create a proof of concept that would have the required functionality. I returned back to Huggingface Spaces hoping that I’d be able to build everything out.</p>
+
+<p>You can access the demo / MVP app that I created here:
+<a href="https://huggingface.co/spaces/strickvl/redaction-detector">https://huggingface.co/spaces/strickvl/redaction-detector</a></p>
+
+<p><img src="/images/redaction-mvp-huggingface/demo-screenshot.png" alt="" title="[An MVP app](https://huggingface.co/spaces/strickvl/redaction-detector) for detection, extraction and analysis of PDF documents that contain redactions."></p>
+
+<p>This MVP app runs two models to mimic the experience of what a final deployed version of the project might look like.</p>
+
+<ul>
+  <li>The first model (a classification model trained with fastai, available on the Huggingface Hub <a href="https://huggingface.co/strickvl/redaction-classifier-fastai">here</a> and testable as a standalone demo <a href="https://huggingface.co/spaces/strickvl/fastai_redaction_classifier">here</a>), classifies and determines which pages of the PDF are redacted. I’ve written about how I trained this model <a href="https://mlops.systems/fastai/redactionmodel/computervision/datalabelling/2021/09/06/redaction-classification-chapter-2.html">here</a>.</li>
+  <li>The second model (an object detection model trained using <a href="https://airctic.com/">IceVision</a> (itself built partly on top of fastai)) detects which parts of the image are redacted. This is a model I’ve been working on for a while and I described my process in <a href="https://mlops.systems/categories/#redactionmodel">a series of blog posts</a>.</li>
+</ul>
+
+<p>This MVP app does several things:</p>
+
+<ul>
+  <li>it extracts any pages it considers to contain redactions and displays that subset as an <a href="https://gradio.app/docs/#o_carousel">image carousel</a>. It also displays some text alerting you to which specific pages were redacted.</li>
+  <li>if you click the “Analyse and extract redacted images” checkbox, it will:</li>
+  <li>pass the pages it considered redacted through the object detection model</li>
+  <li>calculate what proportion of the total area of the image was redacted as well as what proportion of the actual content (i.e. excluding margins etc where there is no content)</li>
+  <li>create a PDF that you can download that contains only the redacted images, with an overlay of the redactions that it was able to identify along with the confidence score for each item.</li>
+</ul>
+
+<h1 id="lessons-learned">
+<a class="anchor" href="#lessons-learned" aria-hidden="true"><span class="octicon octicon-link"></span></a>Lessons learned</h1>
+
+<p>I was — and continue to be — surprised that the free Huggingface Spaces environment has no problem running all this fairly compute-intensive inference on their backend. (That said, if you try to upload a document containing dozens or hundreds of pages and you’ll quickly hit up against the edge of what they allow.)</p>
+
+<p>I became very familiar with the <a href="https://gradio.app/docs/">Gradio interface docs</a> while creating this app and was impressed by how customisable the final application could be. You don’t have as much freedom as a web application written from scratch, but you still <em>do</em> have a lot of freedom.</p>
+
+<p>Given how much inference is going on behind the scenes, I’m surprised that it runs as fast as it does. For a document with 4 or 5 redacted pages, it takes around 10 seconds to do all the steps described above. 10 seconds is still far too long for a scenario where you wanted to run inference over millions of pages, but in that scenario you wouldn’t be manually uploading them on a web app either.</p>
+
+<p>It’s extremely gratifying to have these kinds of tools available to use for free, and really exciting that you get to build out prototypes of this kind after just two weeks of study on the fastai course.</p>
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="strickvl/ml-blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/fastai/computervision/redactionmodel/tools/2022/05/07/redaction-mvp-huggingface.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>A place to share my technical learnings.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
