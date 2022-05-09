@@ -12,14 +12,20 @@ image: images/redaction-mvp-huggingface/demo-screenshot.png
 
 After the second class of the fastai course, we're encouraged to create mini-projects that result in models we can deploy online. Deployment is a huge field with its own complexities, of course, but having an option to get something out in the world that's visible and usable is extremely useful.
 
-In this post I will:
+In this post, I will walk you through how I built a super quick MVP of my redacted document detector project:
 
-- show how I went about thinking through the task
-- showcase some examples of small prototypes I built along the way, including the final stage where I built:
-	- an app including everything that would be needed by a final 'deployed' use case of my model
-	- two models working in tandem in the same app (one classification, one object detection)
-	- optional PDF generation of items detected by the model (!)
-- explore why you might want to have a minimal deployed version of your application in the first place!
+I used:
+
+• `fastai` to classify and extract redacted pages extracted from PDFs 
+• [`icevision`](https://airctic.com/) ([@ai_fast_track](https://twitter.com/ai_fast_track)) to detect the redacted areas
+• [HuggingFace Spaces](https://huggingface.co/spaces) (with [Gradio](https://gradio.app) and [Streamlit](https://streamlit.io)) to deploy my MVP
+
+The post shows how I went about thinking through the task, showcasing some examples of small prototypes I built along the way, including the final stage where I built:
+- an app including everything that would be needed by a final 'deployed' use case of my model
+- two models working in tandem in the same app (one classification, one object detection)
+- optional PDF generation of items detected by the model (!)
+
+I also explore why you might want to have a minimal deployed version of your application in the first place!
 
 # 🐾 Step by step, iteration by iteration
 
@@ -81,7 +87,7 @@ This MVP app does several things:
 
 # 🤔 Lessons learned
 
-{% include info.html text="In this post you learned <p>1️⃣ to start with simple prototypes</p> <p>2️⃣ how to easily deploy fastai models on Huggingface Spaces and the Hub and</p> <p>3️⃣ that you can create functional MVP demos of real products and applications</p>" %}
+{% include info.html text="<p>In this post you learned:</p><p>1️⃣ to start with simple prototypes</p> <p>2️⃣ how to easily deploy fastai models on Huggingface Spaces and the Hub and</p> <p>3️⃣ that you can create functional MVP demos of real products and applications</p>" %}
 
 I was — and continue to be — surprised that the free Huggingface Spaces environment has no problem running all this fairly compute-intensive inference on their backend. (That said, if you try to upload a document containing dozens or hundreds of pages and you'll quickly hit up against the edge of what they allow.)
 
