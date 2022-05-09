@@ -1,20 +1,23 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://mlops.systems/feed.xml" rel="self" type="application/atom+xml" /><link href="https://mlops.systems/" rel="alternate" type="text/html" /><updated>2022-05-08T23:43:54-05:00</updated><id>https://mlops.systems/feed.xml</id><title type="html">mlops.systems</title><subtitle>A place to share my technical learnings.</subtitle><entry><title type="html">A painless way to create an MVP demo using computer vision models</title><link href="https://mlops.systems/fastai/computervision/redactionmodel/tools/2022/05/07/redaction-mvp-huggingface.html" rel="alternate" type="text/html" title="A painless way to create an MVP demo using computer vision models" /><published>2022-05-07T00:00:00-05:00</published><updated>2022-05-07T00:00:00-05:00</updated><id>https://mlops.systems/fastai/computervision/redactionmodel/tools/2022/05/07/redaction-mvp-huggingface</id><content type="html" xml:base="https://mlops.systems/fastai/computervision/redactionmodel/tools/2022/05/07/redaction-mvp-huggingface.html">&lt;h1 id=&quot;-motivation&quot;&gt;🚦 Motivation&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://mlops.systems/feed.xml" rel="self" type="application/atom+xml" /><link href="https://mlops.systems/" rel="alternate" type="text/html" /><updated>2022-05-08T23:49:12-05:00</updated><id>https://mlops.systems/feed.xml</id><title type="html">mlops.systems</title><subtitle>A place to share my technical learnings.</subtitle><entry><title type="html">A painless way to create an MVP demo using computer vision models</title><link href="https://mlops.systems/fastai/computervision/redactionmodel/tools/2022/05/07/redaction-mvp-huggingface.html" rel="alternate" type="text/html" title="A painless way to create an MVP demo using computer vision models" /><published>2022-05-07T00:00:00-05:00</published><updated>2022-05-07T00:00:00-05:00</updated><id>https://mlops.systems/fastai/computervision/redactionmodel/tools/2022/05/07/redaction-mvp-huggingface</id><content type="html" xml:base="https://mlops.systems/fastai/computervision/redactionmodel/tools/2022/05/07/redaction-mvp-huggingface.html">&lt;h1 id=&quot;-motivation&quot;&gt;🚦 Motivation&lt;/h1&gt;
 
 &lt;p&gt;After the second class of the fastai course, we’re encouraged to create mini-projects that result in models we can deploy online. Deployment is a huge field with its own complexities, of course, but having an option to get something out in the world that’s visible and usable is extremely useful.&lt;/p&gt;
 
-&lt;p&gt;In this post I will:&lt;/p&gt;
+&lt;p&gt;In this post, I will walk you through how I built a super quick MVP of my redacted document detector project:&lt;/p&gt;
 
+&lt;p&gt;I used:&lt;/p&gt;
+
+&lt;p&gt;• &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;fastai&lt;/code&gt; to classify and extract redacted pages extracted from PDFs 
+• &lt;a href=&quot;https://airctic.com/&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;icevision&lt;/code&gt;&lt;/a&gt; (&lt;a href=&quot;https://twitter.com/ai_fast_track&quot;&gt;@ai_fast_track&lt;/a&gt;) to detect the redacted areas
+• &lt;a href=&quot;https://huggingface.co/spaces&quot;&gt;HuggingFace Spaces&lt;/a&gt; (with &lt;a href=&quot;https://gradio.app&quot;&gt;Gradio&lt;/a&gt; and &lt;a href=&quot;https://streamlit.io&quot;&gt;Streamlit&lt;/a&gt;) to deploy my MVP&lt;/p&gt;
+
+&lt;p&gt;The post shows how I went about thinking through the task, showcasing some examples of small prototypes I built along the way, including the final stage where I built:&lt;/p&gt;
 &lt;ul&gt;
-  &lt;li&gt;show how I went about thinking through the task&lt;/li&gt;
-  &lt;li&gt;showcase some examples of small prototypes I built along the way, including the final stage where I built:
-    &lt;ul&gt;
-      &lt;li&gt;an app including everything that would be needed by a final ‘deployed’ use case of my model&lt;/li&gt;
-      &lt;li&gt;two models working in tandem in the same app (one classification, one object detection)&lt;/li&gt;
-      &lt;li&gt;optional PDF generation of items detected by the model (!)&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;explore why you might want to have a minimal deployed version of your application in the first place!&lt;/li&gt;
+  &lt;li&gt;an app including everything that would be needed by a final ‘deployed’ use case of my model&lt;/li&gt;
+  &lt;li&gt;two models working in tandem in the same app (one classification, one object detection)&lt;/li&gt;
+  &lt;li&gt;optional PDF generation of items detected by the model (!)&lt;/li&gt;
 &lt;/ul&gt;
+
+&lt;p&gt;I also explore why you might want to have a minimal deployed version of your application in the first place!&lt;/p&gt;
 
 &lt;h1 id=&quot;-step-by-step-iteration-by-iteration&quot;&gt;🐾 Step by step, iteration by iteration&lt;/h1&gt;
 
@@ -81,7 +84,7 @@
 
 &lt;div class=&quot;Toast&quot;&gt;
    &lt;span class=&quot;Toast-icon&quot;&gt;&lt;svg class=&quot;octicon octicon-info octicon octicon-info octicon octicon-info&quot; viewBox=&quot;0 0 16 16&quot; version=&quot;1.1&quot; width=&quot;16&quot; height=&quot;16&quot; aria-hidden=&quot;true&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8zm6.5-.25A.75.75 0 017.25 7h1a.75.75 0 01.75.75v2.75h.25a.75.75 0 010 1.5h-2a.75.75 0 010-1.5h.25v-2h-.25a.75.75 0 01-.75-.75zM8 6a1 1 0 100-2 1 1 0 000 2z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/span&gt;
-   &lt;span class=&quot;Toast-content&quot;&gt;In this post you learned &lt;p&gt;1️⃣ to start with simple prototypes&lt;/p&gt; &lt;p&gt;2️⃣ how to easily deploy fastai models on Huggingface Spaces and the Hub and&lt;/p&gt; &lt;p&gt;3️⃣ that you can create functional MVP demos of real products and applications&lt;/p&gt;&lt;/span&gt;
+   &lt;span class=&quot;Toast-content&quot;&gt;&lt;p&gt;In this post you learned:&lt;/p&gt;&lt;p&gt;1️⃣ to start with simple prototypes&lt;/p&gt; &lt;p&gt;2️⃣ how to easily deploy fastai models on Huggingface Spaces and the Hub and&lt;/p&gt; &lt;p&gt;3️⃣ that you can create functional MVP demos of real products and applications&lt;/p&gt;&lt;/span&gt;
 &lt;/div&gt;
 
 &lt;p&gt;I was — and continue to be — surprised that the free Huggingface Spaces environment has no problem running all this fairly compute-intensive inference on their backend. (That said, if you try to upload a document containing dozens or hundreds of pages and you’ll quickly hit up against the edge of what they allow.)&lt;/p&gt;
