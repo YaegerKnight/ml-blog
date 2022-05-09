@@ -15,7 +15,10 @@ After the second class of the fastai course, we're encouraged to create mini-pro
 In this post I will:
 
 - show how I went about thinking through the task
-- showcase some examples of small prototypes I built along the way
+- showcase some examples of small prototypes I built along the way, including the final stage where I built:
+	- an app including everything that would be needed by a final 'deployed' use case of my model
+	- two models working in tandem in the same app (one classification, one object detection)
+	- optional PDF generation of items detected by the model (!)
 - explore why you might want to have a minimal deployed version of your application in the first place!
 
 # 🐾 Step by step, iteration by iteration
@@ -78,10 +81,7 @@ This MVP app does several things:
 
 # 🤔 Lessons learned
 
-{% include info.html text="In this post you learned 
-1️⃣ to start with simple prototypes 
-2️⃣ how to easily deploy fastai models on Huggingface Spaces and the Hub and 
-3️⃣ that you can create functional MVP demos of real products and applications" %}
+{% include info.html text="In this post you learned <p>1️⃣ to start with simple prototypes</p> <p>2️⃣ how to easily deploy fastai models on Huggingface Spaces and the Hub and</p> <p>3️⃣ that you can create functional MVP demos of real products and applications</p>" %}
 
 I was — and continue to be — surprised that the free Huggingface Spaces environment has no problem running all this fairly compute-intensive inference on their backend. (That said, if you try to upload a document containing dozens or hundreds of pages and you'll quickly hit up against the edge of what they allow.)
 
