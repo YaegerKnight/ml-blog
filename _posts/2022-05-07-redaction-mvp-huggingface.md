@@ -97,9 +97,11 @@ There are two easy ways to deploy a Streamlit app: either host it natively on St
 
 I didn't convert all the various parts of my Gradio app over to work on Streamlit — in particular extraction of images and display as a carousel was non-trivial — but you can get a sense of the flexibility with this image:
 
-IMAGE
+![]({{ site.baseurl }}/images/redaction-mvp-huggingface/demo-streamlit.png "A partly converted version of my demo app using Streamlit.")
 
-Alternatively, you can try it out over on Huggingface Spaces [here](https://huggingface.co/spaces/strickvl/redaction-detector-streamlit).
+(Alternatively, you can try it out over on Huggingface Spaces [here](https://huggingface.co/spaces/strickvl/redaction-detector-streamlit).)
+
+You can see that I was able to insert a chart to display the proportion calculations. This is much more pleasant than the pure text version. Streamlit's [documentation](https://docs.streamlit.io) is pretty great and their basic ['Get started' tutorial](https://docs.streamlit.io/library/get-started) should indeed be your first port of call.
 
 # 🤔 Lessons learned
 
