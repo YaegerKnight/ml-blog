@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://mlops.systems/feed.xml" rel="self" type="application/atom+xml" /><link href="https://mlops.systems/" rel="alternate" type="text/html" /><updated>2022-05-09T00:32:35-05:00</updated><id>https://mlops.systems/feed.xml</id><title type="html">mlops.systems</title><subtitle>A place to share my technical learnings.</subtitle><entry><title type="html">A painless way to create an MVP demo using computer vision models</title><link href="https://mlops.systems/fastai/computervision/redactionmodel/tools/2022/05/07/redaction-mvp-huggingface.html" rel="alternate" type="text/html" title="A painless way to create an MVP demo using computer vision models" /><published>2022-05-07T00:00:00-05:00</published><updated>2022-05-07T00:00:00-05:00</updated><id>https://mlops.systems/fastai/computervision/redactionmodel/tools/2022/05/07/redaction-mvp-huggingface</id><content type="html" xml:base="https://mlops.systems/fastai/computervision/redactionmodel/tools/2022/05/07/redaction-mvp-huggingface.html">&lt;h1 id=&quot;-motivation&quot;&gt;🚦 Motivation&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://mlops.systems/feed.xml" rel="self" type="application/atom+xml" /><link href="https://mlops.systems/" rel="alternate" type="text/html" /><updated>2022-05-09T00:35:37-05:00</updated><id>https://mlops.systems/feed.xml</id><title type="html">mlops.systems</title><subtitle>A place to share my technical learnings.</subtitle><entry><title type="html">A painless way to create an MVP demo using computer vision models</title><link href="https://mlops.systems/fastai/computervision/redactionmodel/tools/2022/05/07/redaction-mvp-huggingface.html" rel="alternate" type="text/html" title="A painless way to create an MVP demo using computer vision models" /><published>2022-05-07T00:00:00-05:00</published><updated>2022-05-07T00:00:00-05:00</updated><id>https://mlops.systems/fastai/computervision/redactionmodel/tools/2022/05/07/redaction-mvp-huggingface</id><content type="html" xml:base="https://mlops.systems/fastai/computervision/redactionmodel/tools/2022/05/07/redaction-mvp-huggingface.html">&lt;h1 id=&quot;-motivation&quot;&gt;🚦 Motivation&lt;/h1&gt;
 
 &lt;p&gt;After the second class of the fastai course, we’re encouraged to create mini-projects that result in models we can deploy online. Deployment is a huge field with its own complexities, of course, but having an option to get something out in the world that’s visible and usable is extremely useful.&lt;/p&gt;
 
 &lt;p&gt;In this post, I will walk you through how I built a super quick MVP of my redacted document detector project. I used:&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;fastai&lt;/code&gt; to classify and extract redacted pages extracted from PDFs&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/fastai/fastai&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;fastai&lt;/code&gt;&lt;/a&gt; to classify and extract redacted pages extracted from PDFs&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://airctic.com/&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;icevision&lt;/code&gt;&lt;/a&gt; (&lt;a href=&quot;https://twitter.com/ai_fast_track&quot;&gt;@ai_fast_track&lt;/a&gt;) to detect the redacted areas&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://huggingface.co/spaces&quot;&gt;HuggingFace Spaces&lt;/a&gt; (with &lt;a href=&quot;https://gradio.app&quot;&gt;Gradio&lt;/a&gt; and &lt;a href=&quot;https://streamlit.io&quot;&gt;Streamlit&lt;/a&gt;) to deploy my MVP&lt;/li&gt;
 &lt;/ul&gt;
@@ -115,7 +115,7 @@
 
 &lt;p&gt;I became very familiar with the &lt;a href=&quot;https://gradio.app/docs/&quot;&gt;Gradio interface docs&lt;/a&gt; while creating this app and was impressed by how customisable the final application could be. You don’t have as much freedom as a web application written from scratch, but you still &lt;em&gt;do&lt;/em&gt; have a lot of freedom.&lt;/p&gt;
 
-&lt;h2 id=&quot;-when-to-use-gradio&quot;&gt;📐 When to use Gradio:&lt;/h2&gt;
+&lt;h2 id=&quot;-when-to-use-gradio&quot;&gt;📐 When to use Gradio&lt;/h2&gt;
 
 &lt;ul&gt;
   &lt;li&gt;if you have a simple use case that you want to highlight&lt;/li&gt;
@@ -124,7 +124,7 @@
   &lt;li&gt;if you want to get something quickly deployed&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&quot;-when-to-use-streamlit&quot;&gt;🌊 When to use Streamlit:&lt;/h2&gt;
+&lt;h2 id=&quot;-when-to-use-streamlit&quot;&gt;🌊 When to use Streamlit&lt;/h2&gt;
 
 &lt;ul&gt;
   &lt;li&gt;if your use case is more interactive or less simple than just basic input-then-output&lt;/li&gt;
