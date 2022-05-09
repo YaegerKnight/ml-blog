@@ -83,6 +83,24 @@ This MVP app does several things:
 - calculate what proportion of the total area of the image was redacted as well as what proportion of the actual content (i.e. excluding margins etc where there is no content)
 - create a PDF that you can download that contains only the redacted images, with an overlay of the redactions that it was able to identify along with the confidence score for each item.
 
+# Converting a Gradio app over to Streamlit
+
+I was curious about the differences between the main two options enabled by Huggingface Spaces, so I then worked a little on converting my Gradio app to a Streamlit app. The process of conversion was fairly easy for the most part; the only difference is the style of programming expected by Streamlit:
+
+- Streamlit is a less declarative style of creating your app. It runs your code from top to bottom, rendering whatever elements you specify.
+- This seems to result in more verbose code (e.g. compare [this](https://huggingface.co/spaces/strickvl/redaction-detector/blob/main/app.py) with [this](https://huggingface.co/spaces/strickvl/redaction-detector-streamlit/blob/main/streamlit_app.py)).
+
+There are two easy ways to deploy a Streamlit app: either host it natively on Streamlit itself, or host it on Huggingface Spaces. The advantage of hosting natively on Streamlit is that you essentially have what looks and feels like a custom website that is 100% your application. In the end, I didn't go down this route for two reasons:
+
+1. Hosting via Huggingface Spaces keeps the connection between your demo app and your username. You can click through to view all of my demos and applications [here](https://huggingface.co/strickvl), for example. On Streamlit there is currently no concept of a user's portfolio. If you're trying to showcase your work, Huggingface Spaces is the clear winner in this regard.
+2. Hosting on Streamlit seems to have restrictive memory constraints. I frequently ran into restrictions on the machine that was running my application and would quite often be encouraged to reboot my app, clearing its cache, and instructed to refer to [docs on how to make my application more efficient](https://blog.streamlit.io/common-app-problems-resource-limits/). The docs were useful, but I ran into issues using the Streamlit cache (the main solution offered) because of the models I was using. Luckily, Huggingface Spaces' backend instances seem far more generous in terms of resources. For small / trivial apps not doing much you'll be fine with Streamlit, but for anything more involved there's more of a decision to be made.
+
+I didn't convert all the various parts of my Gradio app over to work on Streamlit — in particular extraction of images and display as a carousel was non-trivial — but you can get a sense of the flexibility with this image:
+
+IMAGE
+
+Alternatively, you can try it out over on Huggingface Spaces [here](https://huggingface.co/spaces/strickvl/redaction-detector-streamlit).
+
 # 🤔 Lessons learned
 
 {% include info.html text="<p>In this post you learned:</p><p>1️⃣ to start with simple prototypes</p> <p>2️⃣ how to easily deploy fastai models on Huggingface Spaces and the Hub and</p> <p>3️⃣ that you can create functional MVP demos of real products and applications</p>" %}
@@ -91,6 +109,19 @@ I was — and continue to be — surprised that the free Huggingface Spaces envi
 
 I became very familiar with the [Gradio interface docs](https://gradio.app/docs/) while creating this app and was impressed by how customisable the final application could be. You don't have as much freedom as a web application written from scratch, but you still *do* have a lot of freedom.
 
-Given how much inference is going on behind the scenes, I'm surprised that it runs as fast as it does. For a document with 4 or 5 redacted pages, it takes around 10 seconds to do all the steps described above. 10 seconds is still far too long for a scenario where you wanted to run inference over millions of pages, but in that scenario you wouldn't be manually uploading them on a web app either.
+## 📐 When to use Gradio:
+
+- if you have a simple use case that you want to highlight
+- if your inputs and outputs are clearly defined
+- if you have a single model to showcase
+- if you want to get something quickly deployed
+
+## 🌊 When to use Streamlit:
+
+- if your use case is more interactive or less simple than just basic input-then-output
+- if you want more control on how your demo application is displayed
+- if you enjoy a more imperative style of programming
+
+Given how much inference is going on behind the scenes, I'm surprised that these applications run as fast as it does. For a document with 4 or 5 redacted pages, it takes around 10 seconds to do all the steps described above. 10 seconds is still far too long for a scenario where you wanted to run inference over millions of pages, but in that scenario you wouldn't be manually uploading them on a web app either.
 
 It's extremely gratifying to have these kinds of tools available to use for free, and really exciting that you get to build out prototypes of this kind after just two weeks of study on the fastai course.
