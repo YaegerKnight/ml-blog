@@ -14,7 +14,7 @@ After the second class of the fastai course, we're encouraged to create mini-pro
 
 In this post, I will walk you through how I built a super quick MVP of my redacted document detector project. I used:
 
-- `fastai` to classify and extract redacted pages extracted from PDFs
+- [`fastai`](https://github.com/fastai/fastai) to classify and extract redacted pages extracted from PDFs
 - [`icevision`](https://airctic.com/) ([@ai_fast_track](https://twitter.com/ai_fast_track)) to detect the redacted areas
 - [HuggingFace Spaces](https://huggingface.co/spaces) (with [Gradio](https://gradio.app) and [Streamlit](https://streamlit.io)) to deploy my MVP
 
@@ -111,14 +111,14 @@ I was — and continue to be — surprised that the free Huggingface Spaces envi
 
 I became very familiar with the [Gradio interface docs](https://gradio.app/docs/) while creating this app and was impressed by how customisable the final application could be. You don't have as much freedom as a web application written from scratch, but you still *do* have a lot of freedom.
 
-## 📐 When to use Gradio:
+## 📐 When to use Gradio
 
 - if you have a simple use case that you want to highlight
 - if your inputs and outputs are clearly defined
 - if you have a single model to showcase
 - if you want to get something quickly deployed
 
-## 🌊 When to use Streamlit:
+## 🌊 When to use Streamlit
 
 - if your use case is more interactive or less simple than just basic input-then-output
 - if you want more control on how your demo application is displayed
