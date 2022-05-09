@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://mlops.systems/feed.xml" rel="self" type="application/atom+xml" /><link href="https://mlops.systems/" rel="alternate" type="text/html" /><updated>2022-05-08T23:55:51-05:00</updated><id>https://mlops.systems/feed.xml</id><title type="html">mlops.systems</title><subtitle>A place to share my technical learnings.</subtitle><entry><title type="html">A painless way to create an MVP demo using computer vision models</title><link href="https://mlops.systems/fastai/computervision/redactionmodel/tools/2022/05/07/redaction-mvp-huggingface.html" rel="alternate" type="text/html" title="A painless way to create an MVP demo using computer vision models" /><published>2022-05-07T00:00:00-05:00</published><updated>2022-05-07T00:00:00-05:00</updated><id>https://mlops.systems/fastai/computervision/redactionmodel/tools/2022/05/07/redaction-mvp-huggingface</id><content type="html" xml:base="https://mlops.systems/fastai/computervision/redactionmodel/tools/2022/05/07/redaction-mvp-huggingface.html">&lt;h1 id=&quot;-motivation&quot;&gt;🚦 Motivation&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://mlops.systems/feed.xml" rel="self" type="application/atom+xml" /><link href="https://mlops.systems/" rel="alternate" type="text/html" /><updated>2022-05-09T00:28:23-05:00</updated><id>https://mlops.systems/feed.xml</id><title type="html">mlops.systems</title><subtitle>A place to share my technical learnings.</subtitle><entry><title type="html">A painless way to create an MVP demo using computer vision models</title><link href="https://mlops.systems/fastai/computervision/redactionmodel/tools/2022/05/07/redaction-mvp-huggingface.html" rel="alternate" type="text/html" title="A painless way to create an MVP demo using computer vision models" /><published>2022-05-07T00:00:00-05:00</published><updated>2022-05-07T00:00:00-05:00</updated><id>https://mlops.systems/fastai/computervision/redactionmodel/tools/2022/05/07/redaction-mvp-huggingface</id><content type="html" xml:base="https://mlops.systems/fastai/computervision/redactionmodel/tools/2022/05/07/redaction-mvp-huggingface.html">&lt;h1 id=&quot;-motivation&quot;&gt;🚦 Motivation&lt;/h1&gt;
 
 &lt;p&gt;After the second class of the fastai course, we’re encouraged to create mini-projects that result in models we can deploy online. Deployment is a huge field with its own complexities, of course, but having an option to get something out in the world that’s visible and usable is extremely useful.&lt;/p&gt;
 
@@ -80,6 +80,28 @@
   &lt;li&gt;create a PDF that you can download that contains only the redacted images, with an overlay of the redactions that it was able to identify along with the confidence score for each item.&lt;/li&gt;
 &lt;/ul&gt;
 
+&lt;h1 id=&quot;converting-a-gradio-app-over-to-streamlit&quot;&gt;Converting a Gradio app over to Streamlit&lt;/h1&gt;
+
+&lt;p&gt;I was curious about the differences between the main two options enabled by Huggingface Spaces, so I then worked a little on converting my Gradio app to a Streamlit app. The process of conversion was fairly easy for the most part; the only difference is the style of programming expected by Streamlit:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Streamlit is a less declarative style of creating your app. It runs your code from top to bottom, rendering whatever elements you specify.&lt;/li&gt;
+  &lt;li&gt;This seems to result in more verbose code (e.g. compare &lt;a href=&quot;https://huggingface.co/spaces/strickvl/redaction-detector/blob/main/app.py&quot;&gt;this&lt;/a&gt; with &lt;a href=&quot;https://huggingface.co/spaces/strickvl/redaction-detector-streamlit/blob/main/streamlit_app.py&quot;&gt;this&lt;/a&gt;).&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;There are two easy ways to deploy a Streamlit app: either host it natively on Streamlit itself, or host it on Huggingface Spaces. The advantage of hosting natively on Streamlit is that you essentially have what looks and feels like a custom website that is 100% your application. In the end, I didn’t go down this route for two reasons:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Hosting via Huggingface Spaces keeps the connection between your demo app and your username. You can click through to view all of my demos and applications &lt;a href=&quot;https://huggingface.co/strickvl&quot;&gt;here&lt;/a&gt;, for example. On Streamlit there is currently no concept of a user’s portfolio. If you’re trying to showcase your work, Huggingface Spaces is the clear winner in this regard.&lt;/li&gt;
+  &lt;li&gt;Hosting on Streamlit seems to have restrictive memory constraints. I frequently ran into restrictions on the machine that was running my application and would quite often be encouraged to reboot my app, clearing its cache, and instructed to refer to &lt;a href=&quot;https://blog.streamlit.io/common-app-problems-resource-limits/&quot;&gt;docs on how to make my application more efficient&lt;/a&gt;. The docs were useful, but I ran into issues using the Streamlit cache (the main solution offered) because of the models I was using. Luckily, Huggingface Spaces’ backend instances seem far more generous in terms of resources. For small / trivial apps not doing much you’ll be fine with Streamlit, but for anything more involved there’s more of a decision to be made.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;I didn’t convert all the various parts of my Gradio app over to work on Streamlit — in particular extraction of images and display as a carousel was non-trivial — but you can get a sense of the flexibility with this image:&lt;/p&gt;
+
+&lt;p&gt;IMAGE&lt;/p&gt;
+
+&lt;p&gt;Alternatively, you can try it out over on Huggingface Spaces &lt;a href=&quot;https://huggingface.co/spaces/strickvl/redaction-detector-streamlit&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
 &lt;h1 id=&quot;-lessons-learned&quot;&gt;🤔 Lessons learned&lt;/h1&gt;
 
 &lt;div class=&quot;Toast&quot;&gt;
@@ -91,7 +113,24 @@
 
 &lt;p&gt;I became very familiar with the &lt;a href=&quot;https://gradio.app/docs/&quot;&gt;Gradio interface docs&lt;/a&gt; while creating this app and was impressed by how customisable the final application could be. You don’t have as much freedom as a web application written from scratch, but you still &lt;em&gt;do&lt;/em&gt; have a lot of freedom.&lt;/p&gt;
 
-&lt;p&gt;Given how much inference is going on behind the scenes, I’m surprised that it runs as fast as it does. For a document with 4 or 5 redacted pages, it takes around 10 seconds to do all the steps described above. 10 seconds is still far too long for a scenario where you wanted to run inference over millions of pages, but in that scenario you wouldn’t be manually uploading them on a web app either.&lt;/p&gt;
+&lt;h2 id=&quot;-when-to-use-gradio&quot;&gt;📐 When to use Gradio:&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;if you have a simple use case that you want to highlight&lt;/li&gt;
+  &lt;li&gt;if your inputs and outputs are clearly defined&lt;/li&gt;
+  &lt;li&gt;if you have a single model to showcase&lt;/li&gt;
+  &lt;li&gt;if you want to get something quickly deployed&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;-when-to-use-streamlit&quot;&gt;🌊 When to use Streamlit:&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;if your use case is more interactive or less simple than just basic input-then-output&lt;/li&gt;
+  &lt;li&gt;if you want more control on how your demo application is displayed&lt;/li&gt;
+  &lt;li&gt;if you enjoy a more imperative style of programming&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Given how much inference is going on behind the scenes, I’m surprised that these applications run as fast as it does. For a document with 4 or 5 redacted pages, it takes around 10 seconds to do all the steps described above. 10 seconds is still far too long for a scenario where you wanted to run inference over millions of pages, but in that scenario you wouldn’t be manually uploading them on a web app either.&lt;/p&gt;
 
 &lt;p&gt;It’s extremely gratifying to have these kinds of tools available to use for free, and really exciting that you get to build out prototypes of this kind after just two weeks of study on the fastai course.&lt;/p&gt;</content><author><name>Alex Strick van Linschoten</name></author><category term="fastai" /><category term="computervision" /><category term="redactionmodel" /><category term="tools" /><summary type="html">🚦 Motivation</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://mlops.systems/images/redaction-mvp-huggingface/demo-screenshot.png" /><media:content medium="image" url="https://mlops.systems/images/redaction-mvp-huggingface/demo-screenshot.png" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">How my pet cat taught me a lesson about validation data for image classification</title><link href="https://mlops.systems/fastai/computervision/2022/05/02/pet-cat-image-classifier-fastai.html" rel="alternate" type="text/html" title="How my pet cat taught me a lesson about validation data for image classification" /><published>2022-05-02T00:00:00-05:00</published><updated>2022-05-02T00:00:00-05:00</updated><id>https://mlops.systems/fastai/computervision/2022/05/02/pet-cat-image-classifier-fastai</id><content type="html" xml:base="https://mlops.systems/fastai/computervision/2022/05/02/pet-cat-image-classifier-fastai.html">&lt;p&gt;I’m participating in &lt;a href=&quot;https://itee.uq.edu.au/event/2022/practical-deep-learning-coders-uq-fastai&quot;&gt;the latest iteration&lt;/a&gt; of &lt;a href=&quot;https://www.fast.ai&quot;&gt;the fastai course&lt;/a&gt; as taught by Jeremy Howard. This past week we got a very high-level overview of some of the ways deep learning is proving very powerful in solving problems as well as how we can use its techniques to fairly quickly get great results on image classification problems.&lt;/p&gt;
 
