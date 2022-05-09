@@ -12,13 +12,11 @@ image: images/redaction-mvp-huggingface/demo-screenshot.png
 
 After the second class of the fastai course, we're encouraged to create mini-projects that result in models we can deploy online. Deployment is a huge field with its own complexities, of course, but having an option to get something out in the world that's visible and usable is extremely useful.
 
-In this post, I will walk you through how I built a super quick MVP of my redacted document detector project:
+In this post, I will walk you through how I built a super quick MVP of my redacted document detector project. I used:
 
-I used:
-
-• `fastai` to classify and extract redacted pages extracted from PDFs 
-• [`icevision`](https://airctic.com/) ([@ai_fast_track](https://twitter.com/ai_fast_track)) to detect the redacted areas
-• [HuggingFace Spaces](https://huggingface.co/spaces) (with [Gradio](https://gradio.app) and [Streamlit](https://streamlit.io)) to deploy my MVP
+- `fastai` to classify and extract redacted pages extracted from PDFs
+- [`icevision`](https://airctic.com/) ([@ai_fast_track](https://twitter.com/ai_fast_track)) to detect the redacted areas
+- [HuggingFace Spaces](https://huggingface.co/spaces) (with [Gradio](https://gradio.app) and [Streamlit](https://streamlit.io)) to deploy my MVP
 
 The post shows how I went about thinking through the task, showcasing some examples of small prototypes I built along the way, including the final stage where I built:
 - an app including everything that would be needed by a final 'deployed' use case of my model
