@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Redaction Image Classifier: NLP Edition | mlops.systems</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Redaction Image Classifier: NLP Edition" />
+<meta name="author" content="Alex Strick van Linschoten" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="I train an NLP model to see how well it does at predicting whether an OCRed text contains a redaction or not. I run into a bunch of issues when training, leading me to conclude that training NLP models is more complicated than I’d at first suspected." />
+<meta property="og:description" content="I train an NLP model to see how well it does at predicting whether an OCRed text contains a redaction or not. I run into a bunch of issues when training, leading me to conclude that training NLP models is more complicated than I’d at first suspected." />
+<link rel="canonical" href="https://mlops.systems/fastai/nlp/redactionmodel/computervision/huggingface/2022/05/21/nlp-redaction-classifier.html" />
+<meta property="og:url" content="https://mlops.systems/fastai/nlp/redactionmodel/computervision/huggingface/2022/05/21/nlp-redaction-classifier.html" />
+<meta property="og:site_name" content="mlops.systems" />
+<meta property="og:image" content="https://mlops.systems/images/nlp-redaction-classifier/filenames.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-05-21T00:00:00-05:00" />
+<script type="application/ld+json">
+{"datePublished":"2022-05-21T00:00:00-05:00","url":"https://mlops.systems/fastai/nlp/redactionmodel/computervision/huggingface/2022/05/21/nlp-redaction-classifier.html","@type":"BlogPosting","dateModified":"2022-05-21T00:00:00-05:00","image":"https://mlops.systems/images/nlp-redaction-classifier/filenames.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://mlops.systems/fastai/nlp/redactionmodel/computervision/huggingface/2022/05/21/nlp-redaction-classifier.html"},"author":{"@type":"Person","name":"Alex Strick van Linschoten"},"headline":"Redaction Image Classifier: NLP Edition","description":"I train an NLP model to see how well it does at predicting whether an OCRed text contains a redaction or not. I run into a bunch of issues when training, leading me to conclude that training NLP models is more complicated than I’d at first suspected.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://mlops.systems/feed.xml" title="mlops.systems" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script
+  defer
+  data-domain="mlops.systems"
+  src="https://plausible.io/js/plausible.js"
+></script>
+
+
+<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">mlops.systems</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About Me</a><a class="page-link" href="/search/">Search</a><a class="page-link" href="/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Redaction Image Classifier: NLP Edition</h1><p class="page-description">I train an NLP model to see how well it does at predicting whether an OCRed text contains a redaction or not. I run into a bunch of issues when training, leading me to conclude that training NLP models is more complicated than I'd at first suspected.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-05-21T00:00:00-05:00" itemprop="datePublished">
+        May 21, 2022
+      </time>• 
+          <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+            <span class="p-author h-card" itemprop="name">Alex Strick van Linschoten</span></span>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      14 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/categories/#fastai">fastai</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#nlp">nlp</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#redactionmodel">redactionmodel</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#computervision">computervision</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#huggingface">huggingface</a>
+        
+      
+      </p>
+    
+
+    
+      
+        <div class="pb-5 d-flex flex-wrap flex-justify-end">
+          <div class="px-2">
+
+    <a href="https://github.com/strickvl/ml-blog/tree/master/_notebooks/2022-05-21-nlp-redaction-classifier.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://mybinder.org/v2/gh/strickvl/ml-blog/master?filepath=_notebooks%2F2022-05-21-nlp-redaction-classifier.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/assets/badges/binder.svg" alt="Open In Binder"/>
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/strickvl/ml-blog/blob/master/_notebooks/2022-05-21-nlp-redaction-classifier.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h2"><a href="#Converting-text-files-into-a-Pandas-DataFrame">Converting text files into a Pandas DataFrame </a></li>
+<li class="toc-entry toc-h2"><a href="#Moving-into-HF-Transformers-Land">Moving into HF Transformers Land </a></li>
+<li class="toc-entry toc-h2"><a href="#What-did-I-learn?">What did I learn? </a></li>
+</ul><!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2022-05-21-nlp-redaction-classifier.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>I've <a href="https://mlops.systems/fastai/redactionmodel/computervision/datalabelling/2021/09/06/redaction-classification-chapter-2.html">previously
+written</a>
+about my use of fastai's <code>vision_learner</code> to create a classification model that
+was pretty good (&gt; 95% accuracy) at detecting whether an image contained
+redactions or not.</p>
+<p>This week in the course we switched domains and got to know HuggingFace's
+<a href="https://github.com/huggingface/transformers"><code>transformers</code> library</a> as a
+pathway into NLP (natural language processing) which is all about text inputs. I
+struggled quite a bit trying to think of interesting yet self-contained / small
+uses of NLP that I could try out this week. A lot of the common uses for simple
+NLP modelling seem to be in the area of things like 'sentiment analysis' where I
+couldn't really see something I could build. Also there are a lot of NLP uses
+cases which feel unethical or creepy (perhaps more so than in the computer
+vision, it felt to me).</p>
+<p>I emerged at the end of this thought process with the idea to try to pit image
+classification and text classification against one another: could I train an NLP
+model that would outperform my image classifier in detecting whether a specific
+document or page contains a redaction or not?</p>
+<p>Of course, the first thing I had to do was to OCR all the pages in my image
+dataset and convert this all into a text dataset. When it comes to OCR tools,
+there are a number of different options available and I'd luckily experimented
+around with them. (A pretty useful overview of three leading options can be
+found in <a href="https://francescopochetti.com/easyocr-vs-tesseract-vs-amazon-textract-an-ocr-engine-comparison/">this
+blogpost</a>
+by Francesco Pochetti.) I went with Tesseract as I knew had pretty good
+performance and accuracy for English-language documents.</p>
+<p>My process for converting the documents wasn't particularly inspired.
+Essentially I just loop over the image files one by one, run the OCR engine over
+them to extract the text and then create a new <code>.txt</code> file with the extracted
+text. At the end, I had two folders with my data, one containing texts whose
+corresponding images I knew had contained redactions, and one where there were
+no redactions.</p>
+<p>I had two hunches that I hoped would help my NLP model.</p>
+<ol>
+<li>I hoped that the redactions would maybe create some kind of noise in the
+extracted text that the training process could leverage to learn to
+distinguish redacted from unredacted.</li>
+<li>I knew that certain kinds of subjects were more likely to warrant redaction
+than others, so perhaps even the noise of the OCR trying to deal with a
+missing chunk of the image wouldn't be as important as just grasping the
+contents of the document.</li>
+</ol>
+<p>What follows is my attempt to follow steps initially outlined in Jeremy Howard's
+<a href="https://www.kaggle.com/code/jhoward/getting-started-with-nlp-for-absolute-beginners">Kaggle
+notebook</a>
+that the course reviewed this week in the live lesson. My code doesn't depart
+from the original notebook much.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<details class="description">
+      <summary class="btn btn-sm" data-open="Hide Code" data-close="Show Code"></summary>
+        <p></p>
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>pip install datasets transformers tokenizers -Uqq
+
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+    </details>
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>I save my <code>.txt</code> files on the machine and I get a list of all the paths of those files.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"redaction_texts"</span><span class="p">)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"**/*.txt"</span><span class="p">)</span>
+<span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">p</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">is_file</span><span class="p">()]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>I iterate through all the paths, making of list of all the redacted texts as strings.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">texts</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">texts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>ls <span class="o">{</span>path<span class="o">}</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre><span class="ansi-cyan-intense-fg ansi-bold">redacted</span>   <span class="ansi-cyan-intense-fg ansi-bold">unredacted</span>
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Converting-text-files-into-a-Pandas-DataFrame">
+<a class="anchor" href="#Converting-text-files-into-a-Pandas-DataFrame" aria-hidden="true"><span class="octicon octicon-link"></span></a>Converting text files into a Pandas DataFrame<a class="anchor-link" href="#Converting-text-files-into-a-Pandas-DataFrame"> </a>
+</h2>
+<p>I needed a way of obtaining the labels for my dataset. These labels were the
+parent label for each path name. The training process below needed the labels to
+be floats.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">is_redacted</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="s2">"Extracts the label for a specific filepath"</span>
+    <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"redacted"</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">is_redacted</span><span class="p">(</span><span class="n">files</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>0.0</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Converting a Python <code>dict</code> into a Pandas DataFrame is pretty simple as long as
+you provide the data in the right formats. I had to play around with this a
+little when I was getting this to work.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"input"</span><span class="p">:</span> <span class="n">texts</span><span class="p">,</span>
+    <span class="s2">"labels"</span><span class="p">:</span> <span class="p">[</span><span class="n">is_redacted</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">files</span><span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"input"</span><span class="p">,</span> <span class="s2">"labels"</span><span class="p">],</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+<span class="c1"># df</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">describe</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="s1">'object'</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>input</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>count</th>
+      <td>3886</td>
+    </tr>
+    <tr>
+      <th>unique</th>
+      <td>3830</td>
+    </tr>
+    <tr>
+      <th>top</th>
+      <td></td>
+    </tr>
+    <tr>
+      <th>freq</th>
+      <td>35</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We now have a DataFrame containing 3886 rows of data. You can see here that 35
+rows have no visible text. Potentially something went wrong with the OCR
+extraction, or the redaction covered the entire image. I didn't really know or
+want to fiddle around with that too much, so I left those rows in.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Moving-into-HF-Transformers-Land">
+<a class="anchor" href="#Moving-into-HF-Transformers-Land" aria-hidden="true"><span class="octicon octicon-link"></span></a>Moving into HF Transformers Land<a class="anchor-link" href="#Moving-into-HF-Transformers-Land"> </a>
+</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We create a <code>Dataset</code> object from our DataFrame. It requires that our targets
+have the column name <code>labels</code>.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DatasetDict</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_pandas</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ds</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Dataset({
+    features: ['input', 'labels'],
+    num_rows: 3886
+})</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We're finetuning a pre-trained model here, so I start with the small version of
+Deberta which will allow me (I hope!) to iterate quickly and come up with an
+initial baseline and sense of whether this is even a viable approach to solving
+the problem.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model_nm</span> <span class="o">=</span> <span class="s1">'microsoft/deberta-v3-small'</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Before we finetune our model, we have to do two things to our text data in order
+that it works within our gradient descent powered training process:</p>
+<ul>
+<li>we have to tokenise our text data</li>
+<li>we have to turn those tokens into numbers so they can be crunched within our
+GPU as numbers.</li>
+</ul>
+<p>Tokenisation is the process of splitting our words into shorter stubs of text --
+there are varying schools of thought and use cases on the extent to which you
+break the words down. We have to use the same tokenisation process that was used
+by our pretrained model, so we let <code>transformers</code> grab the original tokenisers
+that was used with <code>deberta-v3-small</code>.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoModelForSequenceClassification</span><span class="p">,</span> <span class="n">AutoTokenizer</span>
+
+<span class="n">tokz</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_nm</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
+/opt/conda/lib/python3.8/site-packages/transformers/convert_slow_tokenizer.py:434: UserWarning: The sentencepiece tokenizer that you are converting to a fast tokenizer uses the byte fallback option which is not implemented in the fast tokenizers. In practice this means that the fast version of the tokenizer can produce unknown tokens whereas the sentencepiece version would have converted these unknown tokens into a sequence of byte tokens matching the original piece of text.
+  warnings.warn(
+Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">tok_func</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="k">return</span> <span class="n">tokz</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s2">"input"</span><span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tok_ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">tok_func</span><span class="p">,</span> <span class="n">batched</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We split our data into training and validation subsets as per usual so that we
+know how our model is doing while training.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">dds</span> <span class="o">=</span> <span class="n">tok_ds</span><span class="o">.</span><span class="n">train_test_split</span><span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">dds</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>DatasetDict({
+    train: Dataset({
+        features: ['input', 'labels', 'input_ids', 'token_type_ids', 'attention_mask'],
+        num_rows: 2914
+    })
+    test: Dataset({
+        features: ['input', 'labels', 'input_ids', 'token_type_ids', 'attention_mask'],
+        num_rows: 972
+    })
+})</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We define our metric as Pearson's <code>r</code> AKA <a href="https://en.wikipedia.org/wiki/Pearson_correlation_coefficient">the Pearson correlation
+coefficient</a>, a
+metric I don't feel an immense instinctual understanding for, but suffice it for
+this blogpost to know that a higher value (up to a maximum of 1) is better.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">corr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">corr_d</span><span class="p">(</span><span class="n">eval_pred</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"pearson"</span><span class="p">:</span> <span class="n">corr</span><span class="p">(</span><span class="o">*</span><span class="n">eval_pred</span><span class="p">)}</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">TrainingArguments</span><span class="p">,</span><span class="n">Trainer</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Here we define our batch size, the number of epochs we want to train for as well
+as the learning rate. The defaults in Jeremy's NLP notebook were far higher than
+what you see here. His batch size was 128. When I ran the cells that follow, I
+hit the infamous "CUDA out of memory" error more or less immediately. I was
+running on a machine with a 16GB RAM GPU, but this apparently wasn't enough and
+the batch size was <strong>far</strong> too large. I had to reduce it down to 4, as you can
+see, in order to even be able to train the model. There are tradeoffs to this in
+terms of how well the model learns, but without spending lots of money on fancy
+machines this was the compromise I had to make.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">bs</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">epochs</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">lr</span> <span class="o">=</span> <span class="mf">1e-4</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">args</span> <span class="o">=</span> <span class="n">TrainingArguments</span><span class="p">(</span>
+    <span class="s2">"outputs"</span><span class="p">,</span>
+    <span class="n">learning_rate</span><span class="o">=</span><span class="n">lr</span><span class="p">,</span>
+    <span class="n">warmup_ratio</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">lr_scheduler_type</span><span class="o">=</span><span class="s2">"cosine"</span><span class="p">,</span>
+    <span class="n">fp16</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">evaluation_strategy</span><span class="o">=</span><span class="s2">"epoch"</span><span class="p">,</span>
+    <span class="n">per_device_train_batch_size</span><span class="o">=</span><span class="n">bs</span><span class="p">,</span>
+    <span class="n">per_device_eval_batch_size</span><span class="o">=</span><span class="n">bs</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">num_train_epochs</span><span class="o">=</span><span class="n">epochs</span><span class="p">,</span>
+    <span class="n">weight_decay</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+    <span class="n">report_to</span><span class="o">=</span><span class="s2">"none"</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForSequenceClassification</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+    <span class="n">model_nm</span><span class="p">,</span> <span class="n">num_labels</span><span class="o">=</span><span class="mi">1</span>
+<span class="p">)</span>
+<span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">args</span><span class="p">,</span>
+    <span class="n">train_dataset</span><span class="o">=</span><span class="n">dds</span><span class="p">[</span><span class="s2">"train"</span><span class="p">],</span>
+    <span class="n">eval_dataset</span><span class="o">=</span><span class="n">dds</span><span class="p">[</span><span class="s2">"test"</span><span class="p">],</span>
+    <span class="n">tokenizer</span><span class="o">=</span><span class="n">tokz</span><span class="p">,</span>
+    <span class="n">compute_metrics</span><span class="o">=</span><span class="n">corr_d</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>Some weights of the model checkpoint at microsoft/deberta-v3-small were not used when initializing DebertaV2ForSequenceClassification: ['lm_predictions.lm_head.dense.weight', 'lm_predictions.lm_head.LayerNorm.weight', 'mask_predictions.dense.bias', 'lm_predictions.lm_head.LayerNorm.bias', 'mask_predictions.classifier.weight', 'lm_predictions.lm_head.bias', 'mask_predictions.LayerNorm.bias', 'lm_predictions.lm_head.dense.bias', 'mask_predictions.dense.weight', 'mask_predictions.classifier.bias', 'mask_predictions.LayerNorm.weight']
+- This IS expected if you are initializing DebertaV2ForSequenceClassification from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing DebertaV2ForSequenceClassification from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of DebertaV2ForSequenceClassification were not initialized from the model checkpoint at microsoft/deberta-v3-small and are newly initialized: ['classifier.weight', 'classifier.bias', 'pooler.dense.bias', 'pooler.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Using amp half precision backend
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">();</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>The following columns in the training set don't have a corresponding argument in `DebertaV2ForSequenceClassification.forward` and have been ignored: input. If input are not expected by `DebertaV2ForSequenceClassification.forward`,  you can safely ignore this message.
+/opt/conda/lib/python3.8/site-packages/transformers/optimization.py:306: FutureWarning: This implementation of AdamW is deprecated and will be removed in a future version. Use the PyTorch implementation torch.optim.AdamW instead, or set `no_deprecation_warning=True` to disable this warning
+  warnings.warn(
+***** Running training *****
+  Num examples = 2914
+  Num Epochs = 5
+  Instantaneous batch size per device = 4
+  Total train batch size (w. parallel, distributed &amp; accumulation) = 4
+  Gradient Accumulation steps = 1
+  Total optimization steps = 3645
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea ">
+
+    <div>
+      
+      <progress value="3645" max="3645" style="width:300px; height:20px; vertical-align: middle;"></progress>
+      [3645/3645 09:15, Epoch 5/5]
+    </div>
+    <table border="1" class="dataframe">
+  <thead>
+ <tr style="text-align: left;">
+      <th>Epoch</th>
+      <th>Training Loss</th>
+      <th>Validation Loss</th>
+      <th>Pearson</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>0.250100</td>
+      <td>0.168366</td>
+      <td>0.705429</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>0.171600</td>
+      <td>0.134761</td>
+      <td>0.748499</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>0.118200</td>
+      <td>0.114869</td>
+      <td>0.784274</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>0.089600</td>
+      <td>0.093946</td>
+      <td>0.818484</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>0.063100</td>
+      <td>0.091717</td>
+      <td>0.822977</td>
+    </tr>
+  </tbody>
+</table>
+<p>
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+</p>
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>Saving model checkpoint to outputs/checkpoint-500
+Configuration saved in outputs/checkpoint-500/config.json
+Model weights saved in outputs/checkpoint-500/pytorch_model.bin
+tokenizer config file saved in outputs/checkpoint-500/tokenizer_config.json
+Special tokens file saved in outputs/checkpoint-500/special_tokens_map.json
+The following columns in the evaluation set don't have a corresponding argument in `DebertaV2ForSequenceClassification.forward` and have been ignored: input. If input are not expected by `DebertaV2ForSequenceClassification.forward`,  you can safely ignore this message.
+***** Running Evaluation *****
+  Num examples = 972
+  Batch size = 8
+Saving model checkpoint to outputs/checkpoint-1000
+Configuration saved in outputs/checkpoint-1000/config.json
+Model weights saved in outputs/checkpoint-1000/pytorch_model.bin
+tokenizer config file saved in outputs/checkpoint-1000/tokenizer_config.json
+Special tokens file saved in outputs/checkpoint-1000/special_tokens_map.json
+The following columns in the evaluation set don't have a corresponding argument in `DebertaV2ForSequenceClassification.forward` and have been ignored: input. If input are not expected by `DebertaV2ForSequenceClassification.forward`,  you can safely ignore this message.
+***** Running Evaluation *****
+  Num examples = 972
+  Batch size = 8
+Saving model checkpoint to outputs/checkpoint-1500
+Configuration saved in outputs/checkpoint-1500/config.json
+Model weights saved in outputs/checkpoint-1500/pytorch_model.bin
+tokenizer config file saved in outputs/checkpoint-1500/tokenizer_config.json
+Special tokens file saved in outputs/checkpoint-1500/special_tokens_map.json
+Saving model checkpoint to outputs/checkpoint-2000
+Configuration saved in outputs/checkpoint-2000/config.json
+Model weights saved in outputs/checkpoint-2000/pytorch_model.bin
+tokenizer config file saved in outputs/checkpoint-2000/tokenizer_config.json
+Special tokens file saved in outputs/checkpoint-2000/special_tokens_map.json
+The following columns in the evaluation set don't have a corresponding argument in `DebertaV2ForSequenceClassification.forward` and have been ignored: input. If input are not expected by `DebertaV2ForSequenceClassification.forward`,  you can safely ignore this message.
+***** Running Evaluation *****
+  Num examples = 972
+  Batch size = 8
+Saving model checkpoint to outputs/checkpoint-2500
+Configuration saved in outputs/checkpoint-2500/config.json
+Model weights saved in outputs/checkpoint-2500/pytorch_model.bin
+tokenizer config file saved in outputs/checkpoint-2500/tokenizer_config.json
+Special tokens file saved in outputs/checkpoint-2500/special_tokens_map.json
+The following columns in the evaluation set don't have a corresponding argument in `DebertaV2ForSequenceClassification.forward` and have been ignored: input. If input are not expected by `DebertaV2ForSequenceClassification.forward`,  you can safely ignore this message.
+***** Running Evaluation *****
+  Num examples = 972
+  Batch size = 8
+Saving model checkpoint to outputs/checkpoint-3000
+Configuration saved in outputs/checkpoint-3000/config.json
+Model weights saved in outputs/checkpoint-3000/pytorch_model.bin
+tokenizer config file saved in outputs/checkpoint-3000/tokenizer_config.json
+Special tokens file saved in outputs/checkpoint-3000/special_tokens_map.json
+Saving model checkpoint to outputs/checkpoint-3500
+Configuration saved in outputs/checkpoint-3500/config.json
+Model weights saved in outputs/checkpoint-3500/pytorch_model.bin
+tokenizer config file saved in outputs/checkpoint-3500/tokenizer_config.json
+Special tokens file saved in outputs/checkpoint-3500/special_tokens_map.json
+The following columns in the evaluation set don't have a corresponding argument in `DebertaV2ForSequenceClassification.forward` and have been ignored: input. If input are not expected by `DebertaV2ForSequenceClassification.forward`,  you can safely ignore this message.
+***** Running Evaluation *****
+  Num examples = 972
+  Batch size = 8
+
+
+Training completed. Do not forget to share your model on huggingface.co/models =)
+
+
+</pre>
+</div>
+</div>
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>At the end of all this, we have a Pearson's score of 0.82 on our validation set
+which doesn't seem to be as good as our image classifier. I'm not sure how I
+would go about comparing these two different metrics. I imagine I'd want to
+ensure that both my metrics were identical to make a like-for-like comparison.</p>
+<p>My model is available on the Huggingface Hub
+<a href="https://huggingface.co/strickvl/nlp-redaction-classifier">here</a>.</p>
+<h2 id="What-did-I-learn?">
+<a class="anchor" href="#What-did-I-learn?" aria-hidden="true"><span class="octicon octicon-link"></span></a>What did I learn?<a class="anchor-link" href="#What-did-I-learn?"> </a>
+</h2>
+<ul>
+<li>Training NLP models feels like a bit of a different world from that of
+computer vision. There are different constraints in the process that I wasn't
+previously aware of and working with the <code>transformers</code> library exposed me to
+a bunch of new errors and hoops I had to jump through.</li>
+<li>It seems that the RAM needed on the GPU is directly correlated with the length
+of the text documents. Mine were on the long-ish end of the scale
+(particularly when compared with tweets which was what Jeremy was training on
+in his notebook). I wonder how people solve this problem, since mine by were
+by no means incredibly long.</li>
+<li>NLP models take longer to train than computer vision models; at least, the
+transformer-based models that I was working with.</li>
+<li>It's hard to compare two models together that don't share the same metric or
+loss function.</li>
+<li>There are MANY fiddly knobs to twist with NLP, particularly around the
+pre-processing of text samples, tokenisation strategies and so on. I wonder
+how much of those will be abstracted away from the high-level fastai
+abstraction when the library integrates with <code>transformers</code> in the coming
+months.</li>
+<li>The end-to-end process is <em>broadly</em> the same, however, and it was good to have
+the foundation that we've been building up over the previous weeks in the
+course.</li>
+</ul>
+<p>The next model I train hopefully will not be relating to redactions, I promise!</p>
+<p>UPDATE: I read a bit in the new O'Reilly book by the <code>transformers</code> team,
+<a href="https://transformersbook.com"><em>Natural Language Processing with Transformers</em></a>,
+which seems to address the issue of the same text size:</p>
+<blockquote>
+<p>"Transformer models have a maximum input sequence length that is referred to
+as the <em>maximum context size</em>. For applications using DistilBERT, the maximum
+context size is 512 tokens, which amounts to a few paragraphs of text. [...]
+Texts that are longer than a model's context size need to be truncated, which
+can lead to a loss in performance if the truncated text contains crucial
+information." (pages 28-29 of the paperback edition)</p>
+</blockquote>
+<p>The book suggests plotting out the number of tokens to get a sense of the
+distribution of the data by size:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">df</span><span class="p">[</span><span class="s2">"Tokens per document"</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">"input"</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span>
+<span class="n">df</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span>
+    <span class="s2">"Tokens per document"</span><span class="p">,</span>
+    <span class="n">by</span><span class="o">=</span><span class="s2">"labels"</span><span class="p">,</span>
+    <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">showfliers</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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">
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Here we can see that we have a fairly wide distribution, with quite a few texts
+going all the way up to 800 tokens in length, so that is probably responsible
+for the large amounts of RAM needed, but perhaps the truncation of texts is also
+harming our performance.</p>
+<p>When I visit <a href="https://huggingface.co/microsoft/deberta-v3-small">the <code>deberta-v3-small</code> model
+card</a> on Huggingface, I also
+see reference to a maximum sequence length of 256 which would indeed harm my
+model and its ability to learn, I reckon.</p>
+
+</div>
+</div>
+</div>
+&lt;/div&gt;
+ 
+
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="strickvl/ml-blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/fastai/nlp/redactionmodel/computervision/huggingface/2022/05/21/nlp-redaction-classifier.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>A place to share my technical learnings.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
