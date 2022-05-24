@@ -4,9 +4,9 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
-<title>More Data, More Problems: Using DVC to handle data versioning for a computer vision problem requiring continuous training | mlops.systems</title>
+<title>More Data, More Problems: Using DVC to handle data versioning for a computer vision problem | mlops.systems</title>
 <meta name="generator" content="Jekyll v4.1.1" />
-<meta property="og:title" content="More Data, More Problems: Using DVC to handle data versioning for a computer vision problem requiring continuous training" />
+<meta property="og:title" content="More Data, More Problems: Using DVC to handle data versioning for a computer vision problem" />
 <meta name="author" content="Alex Strick van Linschoten" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="I show you why you probably want to be versioning your data alongside your code. I introduce the basic functionality of DVC, the industry-standard tool for data versioning. I also explain specifically how I’m using DVC for my computer vision project." />
@@ -18,7 +18,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2022-05-24T00:00:00-05:00" />
 <script type="application/ld+json">
-{"datePublished":"2022-05-24T00:00:00-05:00","url":"https://mlops.systems/tools/redactionmodel/computervision/mlops/2022/05/24/data-versioning-dvc.html","@type":"BlogPosting","dateModified":"2022-05-24T00:00:00-05:00","image":"https://mlops.systems/images/dvc/dvclogo.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://mlops.systems/tools/redactionmodel/computervision/mlops/2022/05/24/data-versioning-dvc.html"},"author":{"@type":"Person","name":"Alex Strick van Linschoten"},"headline":"More Data, More Problems: Using DVC to handle data versioning for a computer vision problem requiring continuous training","description":"I show you why you probably want to be versioning your data alongside your code. I introduce the basic functionality of DVC, the industry-standard tool for data versioning. I also explain specifically how I’m using DVC for my computer vision project.","@context":"https://schema.org"}</script>
+{"datePublished":"2022-05-24T00:00:00-05:00","url":"https://mlops.systems/tools/redactionmodel/computervision/mlops/2022/05/24/data-versioning-dvc.html","@type":"BlogPosting","dateModified":"2022-05-24T00:00:00-05:00","image":"https://mlops.systems/images/dvc/dvclogo.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://mlops.systems/tools/redactionmodel/computervision/mlops/2022/05/24/data-versioning-dvc.html"},"author":{"@type":"Person","name":"Alex Strick van Linschoten"},"headline":"More Data, More Problems: Using DVC to handle data versioning for a computer vision problem","description":"I show you why you probably want to be versioning your data alongside your code. I introduce the basic functionality of DVC, the industry-standard tool for data versioning. I also explain specifically how I’m using DVC for my computer vision project.","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://mlops.systems/feed.xml" title="mlops.systems" /><!-- the google_analytics_id gets auto inserted from the config file -->
 
@@ -84,7 +84,7 @@ window.onload = wrap_img;
         <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">More Data, More Problems: Using DVC to handle data versioning for a computer vision problem requiring continuous training</h1><p class="page-description">I show you why you probably want to be versioning your data alongside your code. I introduce the basic functionality of DVC, the industry-standard tool for data versioning. I also explain specifically how I'm using DVC for my computer vision project.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-05-24T00:00:00-05:00" itemprop="datePublished">
+    <h1 class="post-title p-name" itemprop="name headline">More Data, More Problems: Using DVC to handle data versioning for a computer vision problem</h1><p class="page-description">I show you why you probably want to be versioning your data alongside your code. I introduce the basic functionality of DVC, the industry-standard tool for data versioning. I also explain specifically how I'm using DVC for my computer vision project.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-05-24T00:00:00-05:00" itemprop="datePublished">
         May 24, 2022
       </time>• 
           <span itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -287,6 +287,8 @@ window.onload = wrap_img;
 </ul>
 
 <p>At this point you should be fully transitioned over. As I mentioned above, there are a ton of weird edge cases and quirks to this process and you probably shouldn’t follow this list blindly. I’m mainly writing this up for my own records as much as anything else, so perhaps it’s helpful for someone else seeking to transition but maybe it should be taken less as a direct list of instructions than an inspiration or general template. (I wish DVC would provide some official-ish guidance on this process through their documentation. I imagine that it’s a fairly common path for someone to outgrow <code class="language-plaintext highlighter-rouge">git-lfs</code> and want to get going with DVC but currently there are no instructions for how to think this through.)</p>
+
+<p>UPDATE: <em>I originally made reference to ‘continuous training’ in the title of this blogpost but I didn’t actually get into this specific use case in what I covered, so I took that out of the title and we’ll save the specifics for a subsequent post!</em></p>
 
   </div><!-- from https://github.com/utterance/utterances -->
 <script src="https://utteranc.es/client.js"
