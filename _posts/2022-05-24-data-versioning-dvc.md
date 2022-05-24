@@ -42,7 +42,7 @@ In particular, being able to experiment with data in a way that you can always r
 
 One other thing: DVC is built on top of `git` and it follows many of the mental models you might have about how versioning works. In this way, DVC luckily is smart about how it allows you to make incremental changes to your data. When it calculates the `diff` of your dataset before and after, it really is able to do some atomic updates and logging of what changed rather than just storing all the files multiple times over. This helps prevent you building up a really huge data cache and it helps the whole process be efficient.
 
-{% include info.html text="I've mentioned this for other tools like Evidently before so I should also note that the DVC online community (https://dvc.org/community) is a pretty friendly and helpful place to hang out and learn about data versioning or to troubleshoot your problems. Nobody will tell you to RTFM here and their community events are generally beginner-friendly in my experience. This makes a big difference so they should be commended for the efforts they take to foster this kind community atmosphere." %}
+{% include info.html text="I've mentioned this for other tools like Evidently before so I should also note that the DVC online community (https://dvc.org/community) is a pretty friendly and helpful place to hang out and learn about data versioning or to troubleshoot your problems. Nobody will tell you to RTFM here and their community events are generally beginner-friendly in my experience. This makes a big difference so they should be commended for the efforts they take to foster this kind community atmosphere. ❤️" %}
 
 ## 🚀 How to get started with DVC
 
