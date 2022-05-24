@@ -5,7 +5,7 @@ description: "I show you why you probably want to be versioning your data alongs
 categories: [tools, redactionmodel, computervision, mlops]
 comments: true
 author: Alex Strick van Linschoten
-title: "More Data, More Problems: Using DVC to handle data versioning for a computer vision problem requiring continuous training"
+title: "More Data, More Problems: Using DVC to handle data versioning for a computer vision problem"
 image: images/dvc/dvclogo.png
 ---
 
@@ -130,3 +130,5 @@ while read line; do git rm --cached "$line"; done < files.txt
 - `dvc push` to get your files synced with your remote storage
 
 At this point you should be fully transitioned over. As I mentioned above, there are a ton of weird edge cases and quirks to this process and you probably shouldn't follow this list blindly. I'm mainly writing this up for my own records as much as anything else, so perhaps it's helpful for someone else seeking to transition but maybe it should be taken less as a direct list of instructions than an inspiration or general template. (I wish DVC would provide some official-ish guidance on this process through their documentation. I imagine that it's a fairly common path for someone to outgrow `git-lfs` and want to get going with DVC but currently there are no instructions for how to think this through.)
+
+UPDATE: *I originally made reference to 'continuous training' in the title of this blogpost but I didn't actually get into this specific use case in what I covered, so I took that out of the title and we'll save the specifics for a subsequent post!*
