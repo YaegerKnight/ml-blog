@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>More Data, More Problems: Using DVC to handle data versioning for a computer vision problem requiring continuous training | mlops.systems</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="More Data, More Problems: Using DVC to handle data versioning for a computer vision problem requiring continuous training" />
+<meta name="author" content="Alex Strick van Linschoten" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="I show you why you probably want to be versioning your data alongside your code. I introduce the basic functionality of DVC, the industry-standard tool for data versioning. I also explain specifically how I’m using DVC for my computer vision project." />
+<meta property="og:description" content="I show you why you probably want to be versioning your data alongside your code. I introduce the basic functionality of DVC, the industry-standard tool for data versioning. I also explain specifically how I’m using DVC for my computer vision project." />
+<link rel="canonical" href="https://mlops.systems/tools/redactionmodel/computervision/mlops/2022/05/24/data-versioning-dvc.html" />
+<meta property="og:url" content="https://mlops.systems/tools/redactionmodel/computervision/mlops/2022/05/24/data-versioning-dvc.html" />
+<meta property="og:site_name" content="mlops.systems" />
+<meta property="og:image" content="https://mlops.systems/images/dvc/dvclogo.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-05-24T00:00:00-05:00" />
+<script type="application/ld+json">
+{"datePublished":"2022-05-24T00:00:00-05:00","url":"https://mlops.systems/tools/redactionmodel/computervision/mlops/2022/05/24/data-versioning-dvc.html","@type":"BlogPosting","dateModified":"2022-05-24T00:00:00-05:00","image":"https://mlops.systems/images/dvc/dvclogo.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://mlops.systems/tools/redactionmodel/computervision/mlops/2022/05/24/data-versioning-dvc.html"},"author":{"@type":"Person","name":"Alex Strick van Linschoten"},"headline":"More Data, More Problems: Using DVC to handle data versioning for a computer vision problem requiring continuous training","description":"I show you why you probably want to be versioning your data alongside your code. I introduce the basic functionality of DVC, the industry-standard tool for data versioning. I also explain specifically how I’m using DVC for my computer vision project.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://mlops.systems/feed.xml" title="mlops.systems" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script
+  defer
+  data-domain="mlops.systems"
+  src="https://plausible.io/js/plausible.js"
+></script>
+
+
+<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">mlops.systems</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About Me</a><a class="page-link" href="/search/">Search</a><a class="page-link" href="/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">More Data, More Problems: Using DVC to handle data versioning for a computer vision problem requiring continuous training</h1><p class="page-description">I show you why you probably want to be versioning your data alongside your code. I introduce the basic functionality of DVC, the industry-standard tool for data versioning. I also explain specifically how I'm using DVC for my computer vision project.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-05-24T00:00:00-05:00" itemprop="datePublished">
+        May 24, 2022
+      </time>• 
+          <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+            <span class="p-author h-card" itemprop="name">Alex Strick van Linschoten</span></span>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      12 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/categories/#tools">tools</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#redactionmodel">redactionmodel</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#computervision">computervision</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#mlops">mlops</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h2"><a href="#-tldr-data-versioning-for-computer-vision">🚦 TL;DR: Data Versioning for Computer Vision</a></li>
+<li class="toc-entry toc-h2"><a href="#-why-do-we-need-data-versioning-isnt-git-enough">🤔 Why do we need data versioning? Isn’t git enough?</a></li>
+<li class="toc-entry toc-h2"><a href="#-dvc-use-cases">👩‍💻 DVC Use Cases</a></li>
+<li class="toc-entry toc-h2"><a href="#-how-to-get-started-with-dvc">🚀 How to get started with DVC</a></li>
+<li class="toc-entry toc-h2"><a href="#-when-to-use-dvc">🛠 When to use DVC</a></li>
+<li class="toc-entry toc-h2"><a href="#-how-im-using-dvc-in-my-redaction-project">📄 How I’m using DVC in my redaction project</a></li>
+<li class="toc-entry toc-h2"><a href="#-appendix-how-to-switch-from-git-lfs-to-dvc">🏃 Appendix: How to switch from git-lfs to DVC</a></li>
+</ul><p><em>(This is part of a series of blog posts documenting my work to train a model that detects redactions in documents. To read other posts, check out <a href="https://mlops.systems/categories/#redactionmodel">the <code class="language-plaintext highlighter-rouge">redactionmodel</code> taglist</a>.)</em></p>
+
+<p>If you’ve been following along as I train an object detection model to detect redactions, you’ll know that there have been a few iterations in how I go about doing this. For the most part, though, the dataset has remained relatively static. I downloaded a huge tranche of publicly-released government documents right at the beginning and aside from <a href="https://mlops.systems/tools/redactionmodel/computervision/2022/04/06/synthetic-data-results.html">my experiments</a> in <a href="https://mlops.systems/redactionmodel/computervision/python/tools/2022/02/10/synthetic-image-data.html">synthetic data creation</a> I haven’t really been adding to this data.</p>
+
+<p>When it comes to turning this model into something that can work <em>in production</em>, it won’t be enough to have a big bucket of image files that I train on. I’ll need to have a bit more control and fine-grained segmentation of the ways this data is being used. In short, if I want to be able to reproduce my workflows then I need some kind of data versioning.</p>
+
+<h2 id="-tldr-data-versioning-for-computer-vision">
+<a class="anchor" href="#-tldr-data-versioning-for-computer-vision" aria-hidden="true"><span class="octicon octicon-link"></span></a>🚦 TL;DR: Data Versioning for Computer Vision</h2>
+
+<ul>
+  <li>⛽️ We version our data because it is the fuel for our model development and experimentation process.</li>
+  <li>💻 Data versioning tools like DVC allow you to apply the same mental model you have for <code class="language-plaintext highlighter-rouge">git</code> to your data.</li>
+  <li>⋔ The ability to ‘branch’ off your data gives you the flexibility to experiment just as the same is true for branching off your code to try out some new behaviour.</li>
+  <li>
+<a href="https://dvc.org/">DVC</a> is probably the leading tool that allows you to version your data and flexibly access all the previous ‘commits’ and checkpoints you make along the way.</li>
+</ul>
+
+<h2 id="-why-do-we-need-data-versioning-isnt-git-enough">
+<a class="anchor" href="#-why-do-we-need-data-versioning-isnt-git-enough" aria-hidden="true"><span class="octicon octicon-link"></span></a>🤔 Why do we need data versioning? Isn’t <code class="language-plaintext highlighter-rouge">git</code> enough?</h2>
+
+<p>If the lifeblood of traditional software engineering is code then the equivalent for machine learning is data. We solve the problem of checkpointing what our code looked like at a particular moment with <code class="language-plaintext highlighter-rouge">git</code> and online hubs like Github. Until recently there weren’t many equivalent options for data. We’re trying to solve the problem that often occurs if you’re asked to reproduce the data that was used to train a particular iteration of a model from some point in the past. Without some kind of data version control this is more or less impossible, particularly if your data is constantly changing.</p>
+
+<p>Even in my case for this redaction project, I wasn’t ingesting new data all the time but I <em>was</em> removing bad annotations or updating those annotations as I conducted error analysis or <a href="https://mlops.systems/redactionmodel/computervision/tools/debugging/jupyter/2022/03/12/fiftyone-computervision.html">used tools like FiftyOne</a> to understand why my model wasn’t performing as well as I’d have liked.</p>
+
+<p>Luckily there’s a pretty great tool in this space that seems to be more or less unchallenged for what it does in the data versioning domain: <a href="https://dvc.org">Data Version Control</a> or <a href="https://dvc.org">DVC</a>.</p>
+
+<h2 id="-dvc-use-cases">
+<a class="anchor" href="#-dvc-use-cases" aria-hidden="true"><span class="octicon octicon-link"></span></a>👩‍💻 DVC Use Cases</h2>
+
+<p>DVC does many things, but for our purposes at this moment its core value is that it helps us version our data. It also handles the case where we have large files or a dataset that changes a lot and where we might end up having problems with storing all the versions of this data.</p>
+
+<p>The core behaviour we want to use with a data versioning tool is to access our data at one particular moment. Just like you incrementally annotate your code updates using <code class="language-plaintext highlighter-rouge">git</code>, with sometimes atomic progressions as you do your work, so it is with DVC that you can checkpoint your data as you make changes.</p>
+
+<p>At the beginning this was a slight mental adjustment for me. When working on a project it is now second nature to regularly make <code class="language-plaintext highlighter-rouge">git</code> commits along the way, but I wasn’t in the habit of making regular data commits as a second step. In the long-run, this requires a bit of a mental shift but this is exactly what will enable the benefits that using a tool like DVC brings.</p>
+
+<p>In particular, being able to experiment with data in a way that you can always roll-back from feels pretty liberating once you’ve covered your back with DVC. Just as you can use create <code class="language-plaintext highlighter-rouge">git</code> branches for your code, so you can create branches for your versioned data. <a href="https://dvc.org/doc/command-reference/checkout">Checking out</a> the precise data used for some zany experiment you did is pretty painless. If you realise that the experiment is a dead-end and it’s not helping you move forward, just rewind and reset your data back to a useable state from before you had that crazy idea to create a million synthetic images :)</p>
+
+<p>One other thing: DVC is built on top of <code class="language-plaintext highlighter-rouge">git</code> and it follows many of the mental models you might have about how versioning works. In this way, DVC luckily is smart about how it allows you to make incremental changes to your data. When it calculates the <code class="language-plaintext highlighter-rouge">diff</code> of your dataset before and after, it really is able to do some atomic updates and logging of what changed rather than just storing all the files multiple times over. This helps prevent you building up a really huge data cache and it helps the whole process be efficient.</p>
+
+<div class="Toast">
+   <span class="Toast-icon"><svg class="octicon octicon-info octicon octicon-info octicon octicon-info octicon octicon-info" viewbox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8zm6.5-.25A.75.75 0 017.25 7h1a.75.75 0 01.75.75v2.75h.25a.75.75 0 010 1.5h-2a.75.75 0 010-1.5h.25v-2h-.25a.75.75 0 01-.75-.75zM8 6a1 1 0 100-2 1 1 0 000 2z"></path></svg></span>
+   <span class="Toast-content">I've mentioned this for other tools like [Evidently](https://evidentlyai.com) before so I should also note that the [DVC online community](https://dvc.org/community) is a pretty friendly and helpful place to hang out and learn about data versioning or to troubleshoot your problems. Nobody will tell you to RTFM here and their community events are generally beginner-friendly in my experience. This makes a big difference so they should be commended for the efforts they take to foster this kind community atmosphere.</span>
+</div>
+
+<h2 id="-how-to-get-started-with-dvc">
+<a class="anchor" href="#-how-to-get-started-with-dvc" aria-hidden="true"><span class="octicon octicon-link"></span></a>🚀 How to get started with DVC</h2>
+
+<p>The basics are mostly similar to how you’d use a tool like <code class="language-plaintext highlighter-rouge">git</code>:</p>
+
+<ul>
+  <li>You <a href="https://dvc.org/doc/command-reference/init"><code class="language-plaintext highlighter-rouge">init</code></a> your repository. This add some DVC superpowers on top of what you already have with <code class="language-plaintext highlighter-rouge">git</code>.</li>
+  <li>You <a href="https://dvc.org/doc/command-reference/add">specify which files</a> you want to have DVC manage and track. It would make a lot of sense, for example, to have DVC handle tracking your models, your image files and your data annotations (if those exist as separate files).</li>
+  <li>You can optionally also <a href="https://dvc.org/doc/command-reference/remote">specify a <code class="language-plaintext highlighter-rouge">remote</code> location</a> where you want these files to be stored. (DVC supports several types of remote storage: local file system, SSH, Amazon S3, Google Cloud Storage, HTTP, HDFS, among others.)</li>
+</ul>
+
+<p>(To get a taste of the full workflow when using DVC for data tracking I’d recommend something like the basic tutorial they have <a href="https://dvc.org/doc/use-cases/versioning-data-and-model-files/tutorial">here</a>. They also <a href="https://dvc.org/blog/end-to-end-computer-vision-api-part-1-data-versioning-and-ml-pipelines">recently added a three-part tutorial</a> specific to computer vision that you might want to check out.)</p>
+
+<p>If you want to use DVC programmatically using their Python API, you can get some information on this <a href="https://dvc.org/doc/api-reference">in their docs here</a>. Unfortunately, these docs are incomplete and you’ll have to experiment a bit if you want to do anything beyond the simple functionality they themselves list. I’m told it behaves very similarly to how <a href="https://gitpython.readthedocs.io/en/stable/intro.html">a tool like GitPython</a> works, where you can just use the equivalent <code class="language-plaintext highlighter-rouge">add()</code> or <code class="language-plaintext highlighter-rouge">checkout()</code> function call that corresponds to a DVC CLI command, but given the lack of documentation it’s a bit harder to get a full sense of what is possible.</p>
+
+<div class="Toast Toast--warning googoo">
+   <span class="Toast-icon"><svg class="octicon octicon-alert" viewbox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M8.22 1.754a.25.25 0 00-.44 0L1.698 13.132a.25.25 0 00.22.368h12.164a.25.25 0 00.22-.368L8.22 1.754zm-1.763-.707c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0114.082 15H1.918a1.75 1.75 0 01-1.543-2.575L6.457 1.047zM9 11a1 1 0 11-2 0 1 1 0 012 0zm-.25-5.25a.75.75 0 00-1.5 0v2.5a.75.75 0 001.5 0v-2.5z"></path></svg></span>
+   <span class="Toast-content">DVC includes a lot of extra functionality around experiment tracking and pipelining of your code. You can safely ignore all that and just use DVC for data versioning. No shame in that :)</span>
+</div>
+
+<h2 id="-when-to-use-dvc">
+<a class="anchor" href="#-when-to-use-dvc" aria-hidden="true"><span class="octicon octicon-link"></span></a>🛠 When to use DVC</h2>
+
+<p>It probably is a good practice to use something like DVC from the start of most projects. If you know you’re never going to need to update the data you use, or if you will only ever generate one model, then maybe you have no need for data versioning. But realistically, when are you going to do that? Generally speaking you’ll be iterating a lot and you’ll be trying things out, so perhaps just start using DVC at the start of any new project: a <code class="language-plaintext highlighter-rouge">git init</code> can just as easily be followed by a <code class="language-plaintext highlighter-rouge">dvc init</code>…</p>
+
+<p>DVC will thrive in long-lived projects where you go down certain rabbit-holes, trying out different approaches and techniques. If you have a decent amount of data — and you probably do if you’re bringing deep learning to the table — then you can leverage how DVC makes it easy to store your data in the remote infrastructure of your choice with <a href="https://dvc.org/doc/command-reference/remote"><code class="language-plaintext highlighter-rouge">dvc remote</code></a>.</p>
+
+<h2 id="-how-im-using-dvc-in-my-redaction-project">
+<a class="anchor" href="#-how-im-using-dvc-in-my-redaction-project" aria-hidden="true"><span class="octicon octicon-link"></span></a>📄 How I’m using DVC in my redaction project</h2>
+
+<p>For my purposes, the things I’m tracking with DVC include:</p>
+
+<ul>
+  <li>the models I train</li>
+  <li>the PDF documents I downloaded from public sources that form the basis of the data in this project</li>
+  <li>the images that I extracted from the PDF documents</li>
+  <li>the annotations I make on the images using <a href="https://cocodataset.org/">the standard COCO Dataset format</a>.</li>
+</ul>
+
+<p>This covers the core data that I expect to be working with for this project. I keep all this data synced to a remote Amazon S3 bucket which allows me to easily get set up on a new remote machine if needed.</p>
+
+<p>I’ll next be writing about how to move towards a ‘production-ready’ system in the coming weeks, but one thing I’ll hope to be adding to the current way I do things is to add some kind of <a href="https://github.com/PAIR-code/datacardsplaybook">‘data cards’</a>. I think a combination of manual comments and annotations alongside some auto-generated data profiles would be a useful thing to get a sense of for every checkpoint we make, particularly as the data grows and is augmented.</p>
+
+<p>Let me know if you’re using DVC to version your data for computer vision projects! I’m curious if there are any tricks I’m missing out…</p>
+
+<h2 id="-appendix-how-to-switch-from-git-lfs-to-dvc">
+<a class="anchor" href="#-appendix-how-to-switch-from-git-lfs-to-dvc" aria-hidden="true"><span class="octicon octicon-link"></span></a>🏃 Appendix: How to switch from <code class="language-plaintext highlighter-rouge">git-lfs</code> to DVC</h2>
+
+<p>When I first started this project, <a href="https://git-lfs.github.com"><code class="language-plaintext highlighter-rouge">git-lfs</code></a> or Git Large File Storage seemed the best option that didn’t constrain my choices. It allowed me to store any large files I had inside my repository and allowed for some sort of versioning. Over time this ended up being less robust, especially in the context of an ML workflow, so I decided to switch to using DVC backed by an Amazon S3 bucket.</p>
+
+<p>I didn’t find any useful information on the DVC website or forums on how to make this switch so I’m including my notes on how I switched over myself.</p>
+
+<div class="Toast Toast--warning googoo">
+   <span class="Toast-icon"><svg class="octicon octicon-alert octicon octicon-alert" viewbox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M8.22 1.754a.25.25 0 00-.44 0L1.698 13.132a.25.25 0 00.22.368h12.164a.25.25 0 00.22-.368L8.22 1.754zm-1.763-.707c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0114.082 15H1.918a1.75 1.75 0 01-1.543-2.575L6.457 1.047zM9 11a1 1 0 11-2 0 1 1 0 012 0zm-.25-5.25a.75.75 0 00-1.5 0v2.5a.75.75 0 001.5 0v-2.5z"></path></svg></span>
+   <span class="Toast-content">Lots of caution is advised when doing this for your own project or work. I hit some major roadblocks along the way while doing this owing to some quirks of how I'd set 'git-lfs' up in the beginning. Please take all necessary backups and snapshots of your data in case something goes wrong along the way!</span>
+</div>
+
+<p>Some resources I consulted to understand how to do this:</p>
+
+<ul>
+  <li><a href="https://stackoverflow.com/questions/35011366/move-git-lfs-tracked-files-under-regular-git/54119191#54119191">This Stackoverflow thread</a></li>
+  <li>
+<a href="https://github.com/git-lfs/git-lfs/issues/3026">A Github issue</a> on the same topic</li>
+  <li>
+<a href="https://gist.github.com/everttrollip/198ed9a09bba45d2663ccac99e662201">A super useful Gist</a> I reached via the previous Github issue that ended up guiding me most of the way</li>
+</ul>
+
+<p>This is what I did, step by step:</p>
+
+<ul>
+  <li>Commit and push everything to Git / Github / <code class="language-plaintext highlighter-rouge">git-lfs</code>
+</li>
+  <li>Create a branch, something like <code class="language-plaintext highlighter-rouge">fix/remove-lfs</code>
+</li>
+  <li>Remove the hooks using <code class="language-plaintext highlighter-rouge">git las uninstall</code>
+</li>
+  <li>Go into the <code class="language-plaintext highlighter-rouge">.gitattributes</code> file and delete whatever tracking you don’t want <code class="language-plaintext highlighter-rouge">git-lfs</code> to handle from now on. For me, this involved removing lines referring to <code class="language-plaintext highlighter-rouge">.pth</code> (model) files and <code class="language-plaintext highlighter-rouge">.jpg</code> (image) files.</li>
+  <li>Get a list of all the files that <code class="language-plaintext highlighter-rouge">git-lfs</code> currently is storing using the following command: <code class="language-plaintext highlighter-rouge">git lfs ls-files &gt; files.txt</code>
+</li>
+  <li>Modify the file to remove the beginnings of each line that we don’t need. At the end we want our <code class="language-plaintext highlighter-rouge">files.txt</code> to contain just a series of paths to our files. I did it with a simple Python script:</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">"filenames.txt"</span><span class="p">,</span> <span class="s">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="s">""</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">"files.txt"</span><span class="p">,</span> <span class="s">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f2</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f2</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">"filenames.txt"</span><span class="p">,</span> <span class="s">"a"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">" "</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</code></pre></div></div>
+
+<ul>
+  <li>Run <code class="language-plaintext highlighter-rouge">run git rm --cached</code> for each file that <code class="language-plaintext highlighter-rouge">git-lfs</code> is storing. I did this with a simple bash command that uses the file I’d created in the previous step:</li>
+</ul>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">while </span><span class="nb">read </span>line<span class="p">;</span> <span class="k">do </span>git <span class="nb">rm</span> <span class="nt">--cached</span> <span class="s2">"</span><span class="nv">$line</span><span class="s2">"</span><span class="p">;</span> <span class="k">done</span> &lt; files.txt
+</code></pre></div></div>
+
+<ul>
+  <li>Initialise the DVC repository with <code class="language-plaintext highlighter-rouge">dvc init</code>
+</li>
+  <li>Add whatever data sources you want tracked (<code class="language-plaintext highlighter-rouge">dvc add FOLDERNAME</code>)</li>
+  <li>Allow for autostaging with DVC with the <code class="language-plaintext highlighter-rouge">dvc config core.autostage true</code> command</li>
+  <li>Commit everything</li>
+  <li>Check that no <code class="language-plaintext highlighter-rouge">git-lfs</code> files are left with the <code class="language-plaintext highlighter-rouge">git lfs ls-files</code> command. Whatever you uncached in previous steps should not show up any more.</li>
+  <li>Remove any lfs with <code class="language-plaintext highlighter-rouge">rm -rf .git/lfs</code>
+</li>
+  <li>Merge your branch into <code class="language-plaintext highlighter-rouge">main</code>
+    <ul>
+      <li>(if you’re using <code class="language-plaintext highlighter-rouge">git-lfs</code> as a team, now is probably the time when other collaborators can uninstall git-lfs as specified above)</li>
+    </ul>
+  </li>
+  <li>If needed, add your DVC remote storage with <code class="language-plaintext highlighter-rouge">dvc remote add …</code> (<a href="https://dvc.org/doc/command-reference/remote">consult the docs</a> for exactly how to set this up for your specific needs)</li>
+  <li>
+<code class="language-plaintext highlighter-rouge">dvc push</code> to get your files synced with your remote storage</li>
+</ul>
+
+<p>At this point you should be fully transitioned over. As I mentioned above, there are a ton of weird edge cases and quirks to this process and you probably shouldn’t follow this list blindly. I’m mainly writing this up for my own records as much as anything else, so perhaps it’s helpful for someone else seeking to transition but maybe it should be taken less as a direct list of instructions than an inspiration or general template. (I wish DVC would provide some official-ish guidance on this process through their documentation. I imagine that it’s a fairly common path for someone to outgrow <code class="language-plaintext highlighter-rouge">git-lfs</code> and want to get going with DVC but currently there are no instructions for how to think this through.)</p>
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="strickvl/ml-blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/tools/redactionmodel/computervision/mlops/2022/05/24/data-versioning-dvc.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>A place to share my technical learnings.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
