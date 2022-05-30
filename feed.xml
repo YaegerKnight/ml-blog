@@ -1,4 +1,195 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://mlops.systems/feed.xml" rel="self" type="application/atom+xml" /><link href="https://mlops.systems/" rel="alternate" type="text/html" /><updated>2022-05-24T02:18:17-05:00</updated><id>https://mlops.systems/feed.xml</id><title type="html">mlops.systems</title><subtitle>A place to share my technical learnings.</subtitle><entry><title type="html">More Data, More Problems: Using DVC to handle data versioning for a computer vision problem</title><link href="https://mlops.systems/tools/redactionmodel/computervision/mlops/2022/05/24/data-versioning-dvc.html" rel="alternate" type="text/html" title="More Data, More Problems: Using DVC to handle data versioning for a computer vision problem" /><published>2022-05-24T00:00:00-05:00</published><updated>2022-05-24T00:00:00-05:00</updated><id>https://mlops.systems/tools/redactionmodel/computervision/mlops/2022/05/24/data-versioning-dvc</id><content type="html" xml:base="https://mlops.systems/tools/redactionmodel/computervision/mlops/2022/05/24/data-versioning-dvc.html">&lt;p&gt;&lt;em&gt;(This is part of a series of blog posts documenting my work to train a model that detects redactions in documents. To read other posts, check out &lt;a href=&quot;https://mlops.systems/categories/#redactionmodel&quot;&gt;the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;redactionmodel&lt;/code&gt; taglist&lt;/a&gt;.)&lt;/em&gt;&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://mlops.systems/feed.xml" rel="self" type="application/atom+xml" /><link href="https://mlops.systems/" rel="alternate" type="text/html" /><updated>2022-05-30T14:16:40-05:00</updated><id>https://mlops.systems/feed.xml</id><title type="html">mlops.systems</title><subtitle>A place to share my technical learnings.</subtitle><entry><title type="html">It takes a tribe: how I’m thinking about putting my object detection model into production</title><link href="https://mlops.systems/tools/redactionmodel/computervision/mlops/2022/05/30/redaction-production-introduction.html" rel="alternate" type="text/html" title="It takes a tribe: how I’m thinking about putting my object detection model into production" /><published>2022-05-30T00:00:00-05:00</published><updated>2022-05-30T00:00:00-05:00</updated><id>https://mlops.systems/tools/redactionmodel/computervision/mlops/2022/05/30/redaction-production-introduction</id><content type="html" xml:base="https://mlops.systems/tools/redactionmodel/computervision/mlops/2022/05/30/redaction-production-introduction.html">&lt;p&gt;&lt;em&gt;(This is part of a series of blog posts documenting my work to train a model that detects redactions in documents. To read other posts, check out &lt;a href=&quot;https://mlops.systems/categories/#redactionmodel&quot;&gt;the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;redactionmodel&lt;/code&gt; taglist&lt;/a&gt;.)&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;So we’ve trained our model… now what? Are we done?&lt;/p&gt;
+
+&lt;p&gt;If we’re just exercising our curiosity or have a tight focus for our work, then we might well be done with our work. Our responsibility within a larger team might only be for this specific step of training the model, for example. For many cases, however, we’re going to want to do something with our model, perhaps making it available to others via some web interface or an online API.&lt;/p&gt;
+
+&lt;p&gt;The next blog posts in this series will focus on the challenges and practicalities of getting a model ‘in production’. I’ll sidestep the nuances of exactly what we mean by ‘in production’ for the moment, but suffice it to say that the end goal is to have a way to not only make our model available to other consumers but also to deal with re-training and/or re-deploying new models to take the place of older or stale models. There is a whole spectrum of variety in this context that goes by the name “MLOps”. This blog post will try to provide a high level overview of some of the basic elements relevant to getting my redaction model into production.&lt;/p&gt;
+
+&lt;h2 id=&quot;-tldr-what-will-you-learn&quot;&gt;🚦 TL;DR: What will you learn?&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;🤖 Deploying a model and automating everything on the way requires a decent number of steps and tools to do it properly.&lt;/li&gt;
+  &lt;li&gt;👀 I take you through the core steps you need to think about when working with a continuously deployed object detection model.&lt;/li&gt;
+  &lt;li&gt;💪 I end by outlining the specific pieces I will need to build as I get my own model out into the world and ‘in production’.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;-what-is-in-production-for-the-redaction-model&quot;&gt;🚀 What is ‘in production’ for the redaction model?&lt;/h2&gt;
+
+&lt;p&gt;“Production” relates heavily to the use case. An image classification model used across the United States to identify dents on rental cars is going to have a very different profile to a privately hosted language model being used as part of an internal company chatbot interface. In the case of our redaction model, there are two main scenarios that I’m interested in supporting:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;an online API which can power other services building on top of the functionality the model enables, albeit document-by-document. A user could upload a specific document and they’d receive specific predictions and results for just that document.&lt;/li&gt;
+  &lt;li&gt;an offline-first model which handles large volumes of input data and that does not require internet connectivity. For example, legal teams trying to get a sense of what kinds of documents are redacted as part of a case (and to what extent) could run an extended inference process over an entire set of documents.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;These two scenarios have different requirements. Of the two, the online version is perhaps slightly more complex given the more complex serving needs and potential guarantees around speed of execution and so on. The second use offline / on-prem scenario has its own challenges around making sure that inference is fast enough to be able to work over massive document collections, but I’m not sure I’d consider that an MLOps challenge so I will mostly be focusing on the online deployment in this series.&lt;/p&gt;
+
+&lt;h2 id=&quot;️-handling-failure-and-success&quot;&gt;⚖️ Handling failure and success&lt;/h2&gt;
+
+&lt;p&gt;One way to think about what’s required to get a model in production is to think of the answers to the following two questions:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;what could go wrong with my deployed online model?&lt;/li&gt;
+  &lt;li&gt;what are the possible consequences if everything went really &lt;em&gt;well&lt;/em&gt;?&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;In terms of the redaction model, there are lots of potential complications:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;our model could be slow and therefore users wouldn’t want to  hang around for inference to take place&lt;/li&gt;
+  &lt;li&gt;the data on which our model was originally trained could start to show its age and so maybe our model wouldn’t perform as well on newer documents being released (perhaps with a different style or method of redaction)&lt;/li&gt;
+  &lt;li&gt;some software bug or managed infrastructure outage could bring our hosting down and we’d have to redeploy everything&lt;/li&gt;
+  &lt;li&gt;there could be a legal or ethical challenge to our deployed model, and we’d perhaps be required to show the exact process used that resulted in a particular model&lt;/li&gt;
+  &lt;li&gt;maybe the way we choose to make our model available is expensive and/or unreliable&lt;/li&gt;
+  &lt;li&gt;and so on…&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;If things went really well, we have a different set of problems: perhaps a million people would be interested in using the service at the same time. This scalability problem could bring down the model inference service completely. Or perhaps the model would be adopted for use in a legal setting and people would start to trust its predictions blindly without taking into account the fact that its performance was starting to decline the further away we got from when it was originally trained. Maybe some legal institution would start using it to make decisions making assumptions about the accuracy of the model’s predictions, or maybe even the various government departments responsible for &lt;em&gt;creating&lt;/em&gt; and &lt;em&gt;applying&lt;/em&gt; the redactions in the first place would use it as a way of more efficiently or voluminously adding redactions, an unintended consequence that could potentially be harmful.&lt;/p&gt;
+
+&lt;p&gt;All the above scenarios and more are some of the reasons why MLOps exists. We care about having repeatable and robust processes for getting our models out in the world because the use cases are themselves often complex. We also care that our models are actually a net positive when released into the world rather than just some process that happens after model training is completed from which we’re completely disconnected.&lt;/p&gt;
+
+&lt;h2 id=&quot;-basic-mlops-building-blocks&quot;&gt;🧱 Basic MLOps building blocks&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/production-introduction/mlops-landscape.png&quot; alt=&quot;&quot; title=&quot;A somewhat notorious image offering an the overview of some of the MLOps tooling available to users.&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;These are some of the tools available to those trying to put their models into production. This &lt;a href=&quot;https://landscape.lfai.foundation&quot;&gt;‘landscape’&lt;/a&gt; showcases both the explosion of options for various parts of the full lifecycle as well as the way that this space hasn’t yet settled on a set of best-in-class tools. For my redaction project, there are a few basics that will seek to have in place in order to meet the needs of the use case(s):&lt;/p&gt;
+
+&lt;h3 id=&quot;-code-standardisation&quot;&gt;⎂ Code standardisation&lt;/h3&gt;
+
+&lt;p&gt;Perhaps not even worth mentioning, but having some standards around how the code looks and having processes to enforce this is important. Using &lt;a href=&quot;https://pre-commit.com&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pre-commit&lt;/code&gt;&lt;/a&gt; alongside tools like &lt;a href=&quot;https://black.readthedocs.io&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;black&lt;/code&gt;&lt;/a&gt;, &lt;a href=&quot;https://pycqa.github.io/isort/&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;isort&lt;/code&gt;&lt;/a&gt;, &lt;a href=&quot;https://github.com/terrencepreilly/darglint&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;darglint&lt;/code&gt;&lt;/a&gt;, &lt;a href=&quot;http://www.pydocstyle.org&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pydocstyle&lt;/code&gt;&lt;/a&gt; and so on will take you a long way in this direction.&lt;/p&gt;
+
+&lt;p&gt;This would be especially important if I were working as part of a team. These tools would ensure some kinds of standards and baseline uniformity within the codebase. In my case, I’m doing everything on my own so it matters less, but these tools all help me collaborate with my future self, several months from now, perhaps when I need to fix some bug or add a new feature. Having code that reads clearly and cleanly goes a long way to getting started on that work.&lt;/p&gt;
+
+&lt;h3 id=&quot;-code-versioning&quot;&gt;📸 Code Versioning&lt;/h3&gt;
+
+&lt;p&gt;Versioning your code with a tool like &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;git&lt;/code&gt; is also another basic requirement of any process involving software. I’d almost say this barely requires mentioning, but I know that the use of regular atomic git commits is by no means standard practice in the world of data science so it bears restating here.&lt;/p&gt;
+
+&lt;p&gt;We version our code because we want to be able to go back to earlier points in our code’s history. If we wanted to see the difference between the code used to train our model today and the code used last week, we’d require a tool like &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;git&lt;/code&gt; to help us with that. (Code versioning tools also help tremendously when collaborating with a larger team or to an open-source community project.)&lt;/p&gt;
+
+&lt;p&gt;There are various options for what tool to use but the vast majority of people use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;git&lt;/code&gt; for this as of 2022.&lt;/p&gt;
+
+&lt;h3 id=&quot;-data-model-and-artifact-versioning&quot;&gt;🧳 Data, Model and Artifact Versioning&lt;/h3&gt;
+
+&lt;p&gt;Last week I wrote about &lt;a href=&quot;https://dvc.org/&quot;&gt;DVC&lt;/a&gt; and the ways it can be used as a lightweight way to add data versioning to a project. Since data is as important to a model as the code used to train it, we want ways to step backwards and forwards with our data. This will not only enable us to debug and retrain older models but it will help in general with managing our assets such that we don’t just have a sprawling series of folders with names like &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;training_data_FINAL_july_2021&lt;/code&gt; or &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;validation_data_minus_synthetic_FINAL_FINAL_march_2020&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Not only does this make sense from the perspective of productivity, but for sensitive or popular ML applications there are &lt;a href=&quot;https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai&quot;&gt;increasing legal requirements&lt;/a&gt; around this kind of flexibility to introspect how you trained your models.&lt;/p&gt;
+
+&lt;p&gt;DVC is commonly used for this kind of use case, but there are other alternatives such as &lt;a href=&quot;https://www.pachyderm.com&quot;&gt;Pachyderm&lt;/a&gt; or &lt;a href=&quot;https://lakefs.io&quot;&gt;LakeFS&lt;/a&gt; that might be worth considering if you have larger amounts of data.&lt;/p&gt;
+
+&lt;h3 id=&quot;-testing&quot;&gt;🧪 Testing&lt;/h3&gt;
+
+&lt;p&gt;This testing is primarily around ensuring that the code does what you think it’s doing, but we also care about preventing regressions in one part of the codebase when you change something somewhere else.&lt;/p&gt;
+
+&lt;p&gt;There isn’t much in the way of rocket science to testing, but it is a whole world unto its own. For my project, there is a decent amount of code that handles somewhat complicated conversions between different kinds of image formats, multiple competing ideas for how bounding boxes or &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;BBox&lt;/code&gt;es should be handled as data structures and so on. Having a way to be sure that my code is actually doing what I intended is a surefire way to letting me sleep better at night if I intend my model to be used by others.&lt;/p&gt;
+
+&lt;h3 id=&quot;-data-validation&quot;&gt;👁 Data Validation&lt;/h3&gt;
+
+&lt;p&gt;Just like our code needs to have some kinds of checks and balances, so does the lifeblood of our project: our data. I recently finished &lt;a href=&quot;https://mlops.systems/categories/#datavalidation&quot;&gt;a three-part series&lt;/a&gt; on data validation in the context of this project, and both &lt;a href=&quot;https://greatexpectations.io&quot;&gt;Great Expectations&lt;/a&gt; and &lt;a href=&quot;https://evidentlyai.com&quot;&gt;Evidently&lt;/a&gt; are excellent options worth considering, depending on your exact requirements.&lt;/p&gt;
+
+&lt;h3 id=&quot;-experiment-tracking&quot;&gt;📝 Experiment Tracking&lt;/h3&gt;
+
+&lt;div class=&quot;jekyll-twitter-plugin&quot;&gt;&lt;blockquote class=&quot;twitter-tweet&quot;&gt;&lt;p lang=&quot;en&quot; dir=&quot;ltr&quot;&gt;Something that old boring process literature talk about (Toyota, The Goal etc) that applies to software engineering 10000000% is that minimizing the size of the feedback loop is much more important for productivity than minimizing idleness&lt;/p&gt;&amp;mdash; Erik Bernhardsson (@bernhardsson) &lt;a href=&quot;https://twitter.com/bernhardsson/status/1526635195243409408?ref_src=twsrc%5Etfw&quot;&gt;May 17, 2022&lt;/a&gt;&lt;/blockquote&gt;
+&lt;script async=&quot;&quot; src=&quot;https://platform.twitter.com/widgets.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;
+&lt;/div&gt;
+
+&lt;p&gt;When starting a project from scratch, you want to iterate quickly, trying out lots of training options or combinations of features and/or data. Not only do you want to be able to replicate the precise combination of data and code used to train a particular model, but you also want to be able to compare these various efforts with one another.&lt;/p&gt;
+
+&lt;p&gt;Experiment trackers like &lt;a href=&quot;https://wandb.ai&quot;&gt;Weights &amp;amp; Biases&lt;/a&gt;, &lt;a href=&quot;https://mlflow.org&quot;&gt;MLflow&lt;/a&gt;, &lt;a href=&quot;https://www.tensorflow.org/tensorboard/&quot;&gt;Tensorboard&lt;/a&gt; and &lt;a href=&quot;https://neptune.ai&quot;&gt;Neptune&lt;/a&gt; enable you to compare the results of your models as well as practically any combination of the hyperparameters used to train them. I’ve &lt;a href=&quot;https://mlops.systems/redactionmodel/computervision/tools/2022/03/03/model-improvements.html&quot;&gt;used&lt;/a&gt; &lt;a href=&quot;https://mlops.systems/tools/redactionmodel/computervision/2022/04/06/synthetic-data-results.html&quot;&gt;charts&lt;/a&gt; from my own (Weights &amp;amp; Biases-powered) experiment tracker to showcase the different results obtained as part of my process. Not only is it useful for outward-facing engagement with users, stakeholders or other third-parties, but it can be useful to step back from your experiments and evaluate where your model is performing well and how you might improve it.&lt;/p&gt;
+
+&lt;h3 id=&quot;-monitoring&quot;&gt;📺 Monitoring&lt;/h3&gt;
+
+&lt;p&gt;There’s a lot of potential complexity packed into the simple term ‘monitoring’. (I’d recommend you check out Shreya Shankar’s &lt;a href=&quot;https://www.shreya-shankar.com/tags/machine-learning/&quot;&gt;four-part series on monitoring&lt;/a&gt; if you’re curious to learn more.) For our purposes, this will mainly involve making sure our model doesn’t drift or become stale. We’ll need to make sure that the data used to periodically (re)train or fine-tune our model is somewhat within the original parameters of the original training data. We’ll also want to be monitoring the kinds of predictions that our deployed model is making to make sure that they’re more or less within the reasonable ranges of values that we’d expect. If we start to regularly diverge from these kinds of boundary values it probably should prompt an examination of what’s going on and why we’re overstepping. This is an essential part of what it means to robustly deploy a model in production; you need to know when things are going wrong.&lt;/p&gt;
+
+&lt;h3 id=&quot;-automated-model-deployment&quot;&gt;🏁 Automated Model Deployment&lt;/h3&gt;
+
+&lt;p&gt;Automation is a big part of what people generally consider to be ‘mature’ MLOps practices. It is useful to have an automated way to take your model from when training is complete to having it deployed and user-facing. Perhaps you know you need to retrain or fine-tune your model once a week because the data context is continually changing. Perhaps (or likely!) you have rigorous monitoring processes and in the event of a failure or series of non-sensical / out-of-bounds predictions you want a way to revert the model used in production to something more stable.&lt;/p&gt;
+
+&lt;p&gt;This is where the process of putting a model in production resembles the processes and values of DevOps most closely. For my redaction model, I’ll want to have a way to handle the two cases mentioned above as a starting point along with more complex versions of those cases. I’ll also want to automate the process of converting my IceVision VFNet model into something that can be used in the offline ‘on-prem’ use case I described at the beginning of this post.&lt;/p&gt;
+
+&lt;h3 id=&quot;-dag-cards-model-cards-data-cards-all-the-cards&quot;&gt;🃏 DAG Cards, Model Cards, Data Cards, All the Cards&lt;/h3&gt;
+
+&lt;p&gt;The basic idea is that you write some notes on the context surrounding your data, or your model or the pipelines you’re using as part of your overall workflow. Your processes and artifacts will likely change with the project, and I know from bitter experience that it’s easy to forget the reasoning behind why you chose to do one thing or another. So you write notes to describe what you were thinking when you created or modified this or that asset. You describe the decisions you made and what tradeoffs and downstream effects this might have. Not only is this a good practice that benefits FutureYou™️ and your project, but anything developed in the open will maybe have users or contributors and they’ll also benefit from these notes.&lt;/p&gt;
+
+&lt;p&gt;This is the only part of my ‘requirements’ that is (at least currently) &lt;a href=&quot;https://towardsdatascience.com/dag-card-is-the-new-model-card-70754847a111&quot;&gt;a bit more of a ‘fad’&lt;/a&gt; and I wouldn’t say was commonly found. Even five years from now, I imagine that we’ll have more sophisticated or standardised ways of achieving what cards bring, but for now they resonate strongly with some processes I used when working as a historian, archivist and researcher in &lt;a href=&quot;https://foreignpolicy.com/2009/10/16/see-you-soon-if-were-still-alive/&quot;&gt;my previous life&lt;/a&gt;. Some tools like the Huggingface Model Hub offer this &lt;a href=&quot;https://huggingface.co/docs/hub/model-repos#what-are-model-cards-and-why-are-they-useful&quot;&gt;as a built-in standard&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;-mlops-maturity-models&quot;&gt;👴 MLOps Maturity Models&lt;/h2&gt;
+
+&lt;p&gt;The pieces I described above relate to my particular use case. Different project will require different levels of automation, or even potentially other additional stages or toolkits. There is a vast spectrum of options and decisions to be made and now is probably a good time to mention that various players have tried to define what it means to do the whole ‘putting a model into production and keeping it healthy’ thing in a good way. These “MLOps Maturity Models” are not completely without value, but remember that what works for Google may not be (or &lt;a href=&quot;https://blog.bradfieldcs.com/you-are-not-google-84912cf44afb&quot;&gt;is probably not&lt;/a&gt;) applicable to you as an individual working on a small side-project. I wrote &lt;a href=&quot;https://blog.zenml.io/mlops-maturity-models/&quot;&gt;an overview of the two most commonly cited maturity models&lt;/a&gt; (from Microsoft and Google) over on the ZenML blog and I encourage you to give that a read if you want to learn more.&lt;/p&gt;
+
+&lt;p&gt;But what does this all mean for my project? What specifically will it all look like and how am I implementing it? I’ll get into some of the details in the coming weeks, but for now let me just outline my two main workflows.&lt;/p&gt;
+
+&lt;h2 id=&quot;️-redaction-project-workflow-1-annotation&quot;&gt;✍️ Redaction Project Workflow #1: Annotation&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/production-introduction/annotation-pipeline.png&quot; alt=&quot;&quot; title=&quot;The two parts of my annotation workflow.&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;There are two main pieces to this pipeline that happens before we train our model. My model is still thirsty for annotations and data, so from the very beginning I want to integrate the annotation process in as part of how I set up the workflows. This way, I make it as easy as possible to annotate data and use that data for subsequent training or fine-tuning.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Ingestion / Import&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Here I will check a series of pre-defined URLs to see if there are any new PDF files available for download. If new files are available (and we’ve confirmed that we haven’t already downloaded them, I can download those files. Those PDFs then get converted into image files and the metadata for each image gets saved centrally so we have that to hand when annotating the files. This point is a good one to save a checkpoint version of our data using DVC.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Annotation&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;We only want to annotate images that haven’t been annotated, so that check is the first to be performed before spinning up Prodigy to randomly select pages from the PDFs (now in the format of image files) to be annotated. 10% of the images that are annotated get saved in a separate ‘test data’ location. This test data is &lt;em&gt;never&lt;/em&gt; used in training and is simply held out for a more realistic final validation of the project. We version the annotations file whenever we are done annotating for the day.&lt;/p&gt;
+
+&lt;h2 id=&quot;-redaction-project-workflow-2-continuous-training-continuous-deployment&quot;&gt;🐙 Redaction Project Workflow #2: Continuous Training, Continuous Deployment&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/production-introduction/continuous-training-pipeline.png&quot; alt=&quot;&quot; title=&quot;The core parts of the continuous training and deployment pipeline.&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;This longer pipeline contains the core value and most compute-intensive processes like training. We take the data from the raw state as annotations and go all the way to deployment.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Annotation Checker&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;We first check to see if there are any new annotations available since we last ran the pipeline. We will probably need some kind of threshold number of annotations which will make it worth our while to trigger the retraining process.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Data Validation&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;We’ll use Great Expectations to validate the incoming new annotation data.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Synthetic Data Generation&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;If / as we hit certain thresholds, we might want to generate more synthetic data and add it to the dataset.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Training&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;We train or fine-tune the model for a certain number of epochs. We log our experiment metadata with Weights &amp;amp; Biases.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Deployment Trigger / Decision&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;At this point we need to decide whether to deploy the model or not, based on some evaluation criteria. Our decision will determine the path of the rest of the workflow.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Deployment&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;We take the trained model and make it available for online inference. We save a version of the model using DVC, and we also package it up for use in on-prem / offline settings.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Inference &amp;amp; Monitoring&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;This step is crucial. We monitor the performance of our deployed model along with the predictions it is making. We want to be able to catch any cases where we notice the predictions to start to drift, or be aware of sluggish response times from our server and so on.&lt;/p&gt;
+
+&lt;h2 id=&quot;final-thoughts&quot;&gt;Final Thoughts&lt;/h2&gt;
+
+&lt;p&gt;Nice work on making it all the way to the end! We took a long tour through the various considerations you need to bear in mind when deploying a model, and finished off with a preview of the kinds of things I’ll be building over the coming weeks to actually put my own object detection model in production.&lt;/p&gt;
+
+&lt;p&gt;If you have parts of this that you’d like me to cover in more detail, or questions based on what you read here today, please leave a comment below!&lt;/p&gt;</content><author><name>Alex Strick van Linschoten</name></author><category term="tools" /><category term="redactionmodel" /><category term="computervision" /><category term="mlops" /><summary type="html">(This is part of a series of blog posts documenting my work to train a model that detects redactions in documents. To read other posts, check out the redactionmodel taglist.)</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://mlops.systems/images/production-introduction/mlops-landscape-tiny.png" /><media:content medium="image" url="https://mlops.systems/images/production-introduction/mlops-landscape-tiny.png" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">More Data, More Problems: Using DVC to handle data versioning for a computer vision problem</title><link href="https://mlops.systems/tools/redactionmodel/computervision/mlops/2022/05/24/data-versioning-dvc.html" rel="alternate" type="text/html" title="More Data, More Problems: Using DVC to handle data versioning for a computer vision problem" /><published>2022-05-24T00:00:00-05:00</published><updated>2022-05-24T00:00:00-05:00</updated><id>https://mlops.systems/tools/redactionmodel/computervision/mlops/2022/05/24/data-versioning-dvc</id><content type="html" xml:base="https://mlops.systems/tools/redactionmodel/computervision/mlops/2022/05/24/data-versioning-dvc.html">&lt;p&gt;&lt;em&gt;(This is part of a series of blog posts documenting my work to train a model that detects redactions in documents. To read other posts, check out &lt;a href=&quot;https://mlops.systems/categories/#redactionmodel&quot;&gt;the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;redactionmodel&lt;/code&gt; taglist&lt;/a&gt;.)&lt;/em&gt;&lt;/p&gt;
 
 &lt;p&gt;If you’ve been following along as I train an object detection model to detect redactions, you’ll know that there have been a few iterations in how I go about doing this. For the most part, though, the dataset has remained relatively static. I downloaded a huge tranche of publicly-released government documents right at the beginning and aside from &lt;a href=&quot;https://mlops.systems/tools/redactionmodel/computervision/2022/04/06/synthetic-data-results.html&quot;&gt;my experiments&lt;/a&gt; in &lt;a href=&quot;https://mlops.systems/redactionmodel/computervision/python/tools/2022/02/10/synthetic-image-data.html&quot;&gt;synthetic data creation&lt;/a&gt; I haven’t really been adding to this data.&lt;/p&gt;
 
@@ -11367,4 +11558,4 @@ pyenv deactivate env-name
 &lt;/div&gt;
     
 
-&lt;/div&gt;</content><author><name>Alex Strick van Linschoten</name></author><category term="fastai" /><category term="jupyter" /><category term="computervision" /><summary type="html"></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://mlops.systems/images/cat_prediction.png" /><media:content medium="image" url="https://mlops.systems/images/cat_prediction.png" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Managing Python Environments with pyenv and pipenv</title><link href="https://mlops.systems/python/2021/09/10/python-environments.html" rel="alternate" type="text/html" title="Managing Python Environments with pyenv and pipenv" /><published>2021-09-10T00:00:00-05:00</published><updated>2021-09-10T00:00:00-05:00</updated><id>https://mlops.systems/python/2021/09/10/python-environments</id><content type="html" xml:base="https://mlops.systems/python/2021/09/10/python-environments.html">&lt;p&gt;It’s hardly news that that managing multiple versions of Python in a development environment is hard. Adding in dependency management on top of that makes everything harder.&lt;/p&gt;</content><author><name>Alex Strick van Linschoten</name></author><category term="python" /><summary type="html">It’s hardly news that that managing multiple versions of Python in a development environment is hard. Adding in dependency management on top of that makes everything harder.</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://mlops.systems/images/pyenv_terminal_output.png" /><media:content medium="image" url="https://mlops.systems/images/pyenv_terminal_output.png" xmlns:media="http://search.yahoo.com/mrss/" /></entry></feed>
+&lt;/div&gt;</content><author><name>Alex Strick van Linschoten</name></author><category term="fastai" /><category term="jupyter" /><category term="computervision" /><summary type="html"></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://mlops.systems/images/cat_prediction.png" /><media:content medium="image" url="https://mlops.systems/images/cat_prediction.png" xmlns:media="http://search.yahoo.com/mrss/" /></entry></feed>
