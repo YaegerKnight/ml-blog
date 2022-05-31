@@ -11,14 +11,14 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="There are many pieces involved when deploying a model. This post covers the ones that relate to my object detection model and I explain how I’m going to put together the pipelines that will drive a continuous training loop once it’s all up." />
 <meta property="og:description" content="There are many pieces involved when deploying a model. This post covers the ones that relate to my object detection model and I explain how I’m going to put together the pipelines that will drive a continuous training loop once it’s all up." />
-<link rel="canonical" href="https://mlops.systems/tools/redactionmodel/computervision/mlops/2022/05/30/redaction-production-introduction.html" />
-<meta property="og:url" content="https://mlops.systems/tools/redactionmodel/computervision/mlops/2022/05/30/redaction-production-introduction.html" />
+<link rel="canonical" href="https://mlops.systems/tools/redactionmodel/computervision/mlops/2022/05/31/redaction-production-introduction.html" />
+<meta property="og:url" content="https://mlops.systems/tools/redactionmodel/computervision/mlops/2022/05/31/redaction-production-introduction.html" />
 <meta property="og:site_name" content="mlops.systems" />
-<meta property="og:image" content="https://mlops.systems/images/production-introduction/mlops-landscape-tiny.png" />
+<meta property="og:image" content="https://mlops.systems/images/production-introduction/blemish-pipelines.png" />
 <meta property="og:type" content="article" />
-<meta property="article:published_time" content="2022-05-30T00:00:00-05:00" />
+<meta property="article:published_time" content="2022-05-31T00:00:00-05:00" />
 <script type="application/ld+json">
-{"datePublished":"2022-05-30T00:00:00-05:00","url":"https://mlops.systems/tools/redactionmodel/computervision/mlops/2022/05/30/redaction-production-introduction.html","@type":"BlogPosting","dateModified":"2022-05-30T00:00:00-05:00","image":"https://mlops.systems/images/production-introduction/mlops-landscape-tiny.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://mlops.systems/tools/redactionmodel/computervision/mlops/2022/05/30/redaction-production-introduction.html"},"author":{"@type":"Person","name":"Alex Strick van Linschoten"},"headline":"It takes a tribe: how I’m thinking about putting my object detection model into production","description":"There are many pieces involved when deploying a model. This post covers the ones that relate to my object detection model and I explain how I’m going to put together the pipelines that will drive a continuous training loop once it’s all up.","@context":"https://schema.org"}</script>
+{"datePublished":"2022-05-31T00:00:00-05:00","url":"https://mlops.systems/tools/redactionmodel/computervision/mlops/2022/05/31/redaction-production-introduction.html","@type":"BlogPosting","dateModified":"2022-05-31T00:00:00-05:00","image":"https://mlops.systems/images/production-introduction/blemish-pipelines.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://mlops.systems/tools/redactionmodel/computervision/mlops/2022/05/31/redaction-production-introduction.html"},"author":{"@type":"Person","name":"Alex Strick van Linschoten"},"headline":"It takes a tribe: how I’m thinking about putting my object detection model into production","description":"There are many pieces involved when deploying a model. This post covers the ones that relate to my object detection model and I explain how I’m going to put together the pipelines that will drive a continuous training loop once it’s all up.","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://mlops.systems/feed.xml" title="mlops.systems" /><!-- the google_analytics_id gets auto inserted from the config file -->
 
@@ -84,8 +84,8 @@ window.onload = wrap_img;
         <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">It takes a tribe: how I&#39;m thinking about putting my object detection model into production</h1><p class="page-description">There are many pieces involved when deploying a model. This post covers the ones that relate to my object detection model and I explain how I'm going to put together the pipelines that will drive a continuous training loop once it's all up.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-05-30T00:00:00-05:00" itemprop="datePublished">
-        May 30, 2022
+    <h1 class="post-title p-name" itemprop="name headline">It takes a tribe: how I&#39;m thinking about putting my object detection model into production</h1><p class="page-description">There are many pieces involved when deploying a model. This post covers the ones that relate to my object detection model and I explain how I'm going to put together the pipelines that will drive a continuous training loop once it's all up.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-05-31T00:00:00-05:00" itemprop="datePublished">
+        May 31, 2022
       </time>• 
           <span itemprop="author" itemscope itemtype="http://schema.org/Person">
             <span class="p-author h-card" itemprop="name">Alex Strick van Linschoten</span></span>
@@ -145,6 +145,8 @@ window.onload = wrap_img;
 <p>If we’re just exercising our curiosity or have a tight focus for our work, then we might well be done with our work. Our responsibility within a larger team might only be for this specific step of training the model, for example. For many cases, however, we’re going to want to do something with our model, perhaps making it available to others via some web interface or an online API.</p>
 
 <p>The next blog posts in this series will focus on the challenges and practicalities of getting a model ‘in production’. I’ll sidestep the nuances of exactly what we mean by ‘in production’ for the moment, but suffice it to say that the end goal is to have a way to not only make our model available to other consumers but also to deal with re-training and/or re-deploying new models to take the place of older or stale models. There is a whole spectrum of variety in this context that goes by the name “MLOps”. This blog post will try to provide a high level overview of some of the basic elements relevant to getting my redaction model into production.</p>
+
+<p><img src="/images/production-introduction/blemish-pipelines.png" alt="" title="Keep reading to learn more about the different parts of my object detection workflows."></p>
 
 <h2 id="-tldr-what-will-you-learn">
 <a class="anchor" href="#-tldr-what-will-you-learn" aria-hidden="true"><span class="octicon octicon-link"></span></a>🚦 TL;DR: What will you learn?</h2>
@@ -359,7 +361,7 @@ window.onload = wrap_img;
         theme="github-light"
         crossorigin="anonymous"
         async>
-</script><a class="u-url" href="/tools/redactionmodel/computervision/mlops/2022/05/30/redaction-production-introduction.html" hidden></a>
+</script><a class="u-url" href="/tools/redactionmodel/computervision/mlops/2022/05/31/redaction-production-introduction.html" hidden></a>
 </article>
       </div>
     </main><footer class="site-footer h-card">
