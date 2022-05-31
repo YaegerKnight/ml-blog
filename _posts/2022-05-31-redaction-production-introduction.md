@@ -6,7 +6,7 @@ categories: [tools, redactionmodel, computervision, mlops]
 comments: true
 author: Alex Strick van Linschoten
 title: "It takes a tribe: how I'm thinking about putting my object detection model into production"
-image: images/production-introduction/mlops-landscape-tiny.png
+image: images/production-introduction/blemish-pipelines.png
 ---
 
 _(This is part of a series of blog posts documenting my work to train a model that detects redactions in documents. To read other posts, check out [the `redactionmodel` taglist](https://mlops.systems/categories/#redactionmodel).)_
@@ -16,6 +16,8 @@ So we've trained our model… now what? Are we done?
 If we're just exercising our curiosity or have a tight focus for our work, then we might well be done with our work. Our responsibility within a larger team might only be for this specific step of training the model, for example. For many cases, however, we're going to want to do something with our model, perhaps making it available to others via some web interface or an online API.
 
 The next blog posts in this series will focus on the challenges and practicalities of getting a model 'in production'. I'll sidestep the nuances of exactly what we mean by 'in production' for the moment, but suffice it to say that the end goal is to have a way to not only make our model available to other consumers but also to deal with re-training and/or re-deploying new models to take the place of older or stale models. There is a whole spectrum of variety in this context that goes by the name "MLOps". This blog post will try to provide a high level overview of some of the basic elements relevant to getting my redaction model into production.
+
+![]({{ site.baseurl }}/images/production-introduction/blemish-pipelines.png "Keep reading to learn more about the different parts of my object detection workflows.")
 
 ## 🚦 TL;DR: What will you learn?
 
