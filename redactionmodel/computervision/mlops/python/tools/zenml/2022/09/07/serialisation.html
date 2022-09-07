@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Storing Bytes: what data serialisation is and why you need it for machine learning | mlops.systems</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Storing Bytes: what data serialisation is and why you need it for machine learning" />
+<meta name="author" content="Alex Strick van Linschoten" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="I explain the basics around data serialisation and deserialisation, why it’s a commonly-encountered topic, and showcase where I had to implement some custom logic to serialise custom Python objects used in a computer vision project." />
+<meta property="og:description" content="I explain the basics around data serialisation and deserialisation, why it’s a commonly-encountered topic, and showcase where I had to implement some custom logic to serialise custom Python objects used in a computer vision project." />
+<link rel="canonical" href="https://mlops.systems/redactionmodel/computervision/mlops/python/tools/zenml/2022/09/07/serialisation.html" />
+<meta property="og:url" content="https://mlops.systems/redactionmodel/computervision/mlops/python/tools/zenml/2022/09/07/serialisation.html" />
+<meta property="og:site_name" content="mlops.systems" />
+<meta property="og:image" content="https://mlops.systems/images/serialisation/fabio-oyXis2kALVg-unsplash.jpg" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-09-07T00:00:00-05:00" />
+<script type="application/ld+json">
+{"datePublished":"2022-09-07T00:00:00-05:00","url":"https://mlops.systems/redactionmodel/computervision/mlops/python/tools/zenml/2022/09/07/serialisation.html","@type":"BlogPosting","dateModified":"2022-09-07T00:00:00-05:00","image":"https://mlops.systems/images/serialisation/fabio-oyXis2kALVg-unsplash.jpg","mainEntityOfPage":{"@type":"WebPage","@id":"https://mlops.systems/redactionmodel/computervision/mlops/python/tools/zenml/2022/09/07/serialisation.html"},"author":{"@type":"Person","name":"Alex Strick van Linschoten"},"headline":"Storing Bytes: what data serialisation is and why you need it for machine learning","description":"I explain the basics around data serialisation and deserialisation, why it’s a commonly-encountered topic, and showcase where I had to implement some custom logic to serialise custom Python objects used in a computer vision project.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://mlops.systems/feed.xml" title="mlops.systems" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script
+  defer
+  data-domain="mlops.systems"
+  src="https://plausible.io/js/plausible.js"
+></script>
+
+
+<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">mlops.systems</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About Me</a><a class="page-link" href="/search/">Search</a><a class="page-link" href="/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Storing Bytes: what data serialisation is and why you need it for machine learning</h1><p class="page-description">I explain the basics around data serialisation and deserialisation, why it's a commonly-encountered topic, and showcase where I had to implement some custom logic to serialise custom Python objects used in a computer vision project.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-09-07T00:00:00-05:00" itemprop="datePublished">
+        Sep 7, 2022
+      </time>• 
+          <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+            <span class="p-author h-card" itemprop="name">Alex Strick van Linschoten</span></span>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      13 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/categories/#redactionmodel">redactionmodel</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#computervision">computervision</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#mlops">mlops</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#python">python</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#tools">tools</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#zenml">zenml</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h2"><a href="#-the-basics">🔢 The Basics</a></li>
+<li class="toc-entry toc-h2"><a href="#-common-ways-to-serialise-data-in-python">🍏 Common ways to serialise data in Python</a></li>
+<li class="toc-entry toc-h2"><a href="#-serialisation-and-deserialisation-in-machine-learning">🔐 Serialisation and deserialisation in Machine Learning</a></li>
+<li class="toc-entry toc-h2"><a href="#-a-basic-custom-materializer">🛠 A basic custom materializer</a></li>
+<li class="toc-entry toc-h2"><a href="#️-materialisation-in-practice-icevision-and-custom-objects">🕵️ Materialisation in practice: IceVision and Custom Objects</a></li>
+<li class="toc-entry toc-h2"><a href="#-serialisation-is-for-everyone">🥳 Serialisation is for Everyone!</a></li>
+</ul><p><em>(This is part of a series of blog posts documenting my work to train a model that detects redactions in documents. To read other posts, check out <a href="https://mlops.systems/categories/#redactionmodel">the <code class="language-plaintext highlighter-rouge">redactionmodel</code> taglist</a>.)</em></p>
+
+<p>Serialisation and deserialisation. I ran headfirst into these two words on my first day in my new job. From the way my colleagues discussed them, it seemed like this was something I should have learned from a computer science degree; foundational concepts with practical applications throughout most places that computers touched.</p>
+
+<p>A few months in, I’ve come to appreciate a little more about what the underlying concept is about as well as some of the reasons why it remains both relevant and something that pops up regularly. I’ll begin by setting out some of this context before showing an example of where I encountered it recently in my own project. By the end, you’ll understand why this is such an important (and practical) concept and why you’ll encounter it a lot while doing machine learning.</p>
+
+<h2 id="-the-basics">
+<a class="anchor" href="#-the-basics" aria-hidden="true"><span class="octicon octicon-link"></span></a>🔢 The Basics</h2>
+
+<p>In the common definition, serialisation is the process by which you convert something into a sequence of bytes, and deserialisation is when you convert the other way (i.e. <em>from</em> bytes). In some domains it is also known as marshalling or pickling.</p>
+
+<p>This commonly is encountered when you need to store some data on disk (i.e. <em>not</em> or no longer in memory). Perhaps you need some kind of permanent storage of that data, or you need to make the data available to another process. The process through which you transform the data (from something that is comprehensible to whatever environment or language you’re working on) is serialisation.</p>
+
+<p>To give another example, in a language like Python we often think in and deal through a series of ‘objects’: think dictionaries or even classes in an OOP context. In order to save this to disk, we have to convert it to some other format that firstly is in some format that is stable when saved as a file. We might want to send that data across the network, or have it opened by a different process or a programme running in a different language. Serialisation is the process by which something context and perhaps language-specific gets transformed into this universal substrate (i.e. a sequence of bytes).</p>
+
+<h2 id="-common-ways-to-serialise-data-in-python">
+<a class="anchor" href="#-common-ways-to-serialise-data-in-python" aria-hidden="true"><span class="octicon octicon-link"></span></a>🍏 Common ways to serialise data in Python</h2>
+
+<p>In the past, <code class="language-plaintext highlighter-rouge">pickle</code> was a commonly-used way of making this conversion. It has a lot of shortcomings, two of which sit at the top of the list:</p>
+
+<ul>
+  <li>there isn’t (as far as I’m aware) much interoperability for objects that are serialised with <code class="language-plaintext highlighter-rouge">pickle</code>. If you want to load an object that has been ‘pickled’, the entity doing the ‘unpickling’ will have to be running the exact same version of Python as the one that did the pickling. (If I’m not mistaken, there might even be some cross platform interoperability issues as well.)</li>
+  <li>security concerns are serious when it comes to <code class="language-plaintext highlighter-rouge">pickle</code>: when you <code class="language-plaintext highlighter-rouge">load(...)</code> some pickled object, this will run whatever code is inside with the assumption that it is ‘trusted’. As such, it is unsuitable for use with untrusted data and generally people tend to turn their nose at <code class="language-plaintext highlighter-rouge">pickle</code>. (If you <em>do</em> have to interact with some pickled data, <a href="https://docs.python.org/3/library/pickletools.html"><code class="language-plaintext highlighter-rouge">pickletools</code></a> is a handy tool that allows you to inspect and interact with the file <strong>without</strong> running the arbitrary code packaged inside. While we’re at the library recommendations, it’s also worth checking out <a href="https://github.com/trailofbits/fickling"><code class="language-plaintext highlighter-rouge">fickling</code></a> which overlaps in functionality somewhat.)</li>
+</ul>
+
+<p>JSON has become a commonly-used format for serialising data (or its cousin <a href="https://jsonlines.org">JSONL</a>, for too-much-to-load-into-memory-at-once data). This is a common format with many uses, but it does come with a serious shortcoming which is that it only supports certain data types. If you’re saving some custom object of your own creation, you’ll first need to convert that into a format that can be transformed into a JSON object/file. If you don’t, then your object will not be able to be rehydrated from the on-disk representation.</p>
+
+<p>Note that the Python <code class="language-plaintext highlighter-rouge">pickle</code> module serialises data into a binary format, whereas the <code class="language-plaintext highlighter-rouge">json</code> module converts it into a text format (i.e. readable and comprehensible to someone browsing files or displaying their contents with something like <code class="language-plaintext highlighter-rouge">cat</code>). Moreover, <code class="language-plaintext highlighter-rouge">pickle</code> does handle many (most?) objects and types that you can throw at it, though with all the caveats mentioned above.</p>
+
+<p>I haven’t explored it at all, but while reading a bit about this area I was consistently pointed to Google’s <a href="https://developers.google.com/protocol-buffers">Protobuf</a> format / library which is another way to serialise structured data. I am unable to properly evaluate the extent to which this is an improvement on existing protocols.</p>
+
+<h2 id="-serialisation-and-deserialisation-in-machine-learning">
+<a class="anchor" href="#-serialisation-and-deserialisation-in-machine-learning" aria-hidden="true"><span class="octicon octicon-link"></span></a>🔐 Serialisation and deserialisation in Machine Learning</h2>
+
+<p>I mentioned earlier that this concept and operation was something that I confronted more or less on my first day working in my new job. (<em>We build <a href="https://zenml.io">an open-source framework</a> that supports someone working to build and deploy machine learning models.</em>) In order to understand why this is so important, a small detour showing a basic example of a ZenML pipeline is necessary. What follows is an extremely simple example showcasing how pipelines are composed of steps, and how those are in turn run:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">zenml.steps</span> <span class="kn">import</span> <span class="n">step</span>
+<span class="kn">from</span> <span class="nn">zenml.pipelines</span> <span class="kn">import</span> <span class="n">pipeline</span>
+
+<span class="o">@</span><span class="n">step</span>
+<span class="k">def</span> <span class="nf">read_integer</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">return</span> <span class="mi">3</span>
+
+<span class="o">@</span><span class="n">pipeline</span>
+<span class="k">def</span> <span class="nf">basic_pipeline</span><span class="p">(</span><span class="n">read_integer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="n">read_integer</span><span class="p">()</span>
+
+<span class="n">basic_pipeline</span><span class="p">(</span><span class="n">read_integer</span><span class="o">=</span><span class="n">read_integer</span><span class="p">()).</span><span class="n">run</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>Pipelines are constructed out of a series of steps. The steps are defined with an <code class="language-plaintext highlighter-rouge">@step</code> decorator, and pipeline definitions are composed in a similar way. Finally, at the end we specify which steps correspond to which parts of the pipeline definition and then call the <code class="language-plaintext highlighter-rouge">run()</code> method to execute our pipeline.</p>
+
+<p>You’ll also note the presence of some type annotations as part of how we define our step and pipeline. These are required, and while they may seem simplistic and unnecessary at the moment, later on they will make things much clearer.</p>
+
+<p>Our pipeline isn’t doing much at the moment, you might think. Behind the scenes, however, ZenML is doing a lot of legwork:</p>
+
+<ul>
+  <li>storing the outputs (and inputs, though there aren’t any in this basic example) of all steps</li>
+  <li>caching those output values or objects, such that if the code doesn’t change then we should just retrieve the cached value.</li>
+  <li>validating and checking the types of values that get returned so that we can be sure our code is returning what we hope / think it should be returning.</li>
+</ul>
+
+<p>Moreover, it does all this in a way that all this intermediary state is stored on disk and versioned. If you update your pipeline steps then rerun it, ZenML will save the new outputs such that you can go back and inspect where data came from and so on.</p>
+
+<p>In order to save all these objects on disk, however, and to bring this story full-circle, ZenML serialises the data when saving the artifacts from pipeline runs, and deserialises that data when those artifacts are needed (by the cache, for example, or when you want to access a step output once your pipeline has completed its run). We call this part of the process ‘materialisation’. (There’s more <a href="https://docs.zenml.io/developer-guide/advanced-usage/materializer">in our docs on materialisation here</a>, and if you’re searching, be sure to search with a ‘z’ and not an ‘s’, coz America.)</p>
+
+<h2 id="-a-basic-custom-materializer">
+<a class="anchor" href="#-a-basic-custom-materializer" aria-hidden="true"><span class="octicon octicon-link"></span></a>🛠 A basic custom materializer</h2>
+
+<p>For most kinds of ‘normal’ Python objects, this is no problem at all. But as we saw above, if we’re going to be able to reconstruct and rehydrate an object from a static sequence of bytes, we’re going to need to do a bit more to make this happen. Within ZenML this means that if you have some special kind of object or type, you’ll need to define a ‘custom materialiser’; this is code that defines how ZenML should serialise and deserialise the objects that you want to be stored as state on disk.</p>
+
+<p>To give you a sense of what this will look like, here’s our code from above but updated a little to fit this new scenario:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Type</span>
+
+<span class="kn">from</span> <span class="nn">zenml.artifacts</span> <span class="kn">import</span> <span class="n">DataArtifact</span>
+<span class="kn">from</span> <span class="nn">zenml.io</span> <span class="kn">import</span> <span class="n">fileio</span>
+<span class="kn">from</span> <span class="nn">zenml.materializers.base_materializer</span> <span class="kn">import</span> <span class="n">BaseMaterializer</span>
+<span class="kn">from</span> <span class="nn">zenml.pipelines</span> <span class="kn">import</span> <span class="n">pipeline</span>
+<span class="kn">from</span> <span class="nn">zenml.steps</span> <span class="kn">import</span> <span class="n">step</span>
+
+<span class="k">class</span> <span class="nc">MyCustomObject</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+
+<span class="k">class</span> <span class="nc">MyCustomMaterializer</span><span class="p">(</span><span class="n">BaseMaterializer</span><span class="p">):</span>
+    <span class="n">ASSOCIATED_TYPES</span> <span class="o">=</span> <span class="p">(</span><span class="n">MyCustomObject</span><span class="p">,)</span>
+    <span class="n">ASSOCIATED_ARTIFACT_TYPES</span> <span class="o">=</span> <span class="p">(</span><span class="n">DataArtifact</span><span class="p">,)</span>
+
+    <span class="k">def</span> <span class="nf">handle_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_type</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">MyCustomObject</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">MyCustomObject</span><span class="p">:</span>
+        <span class="s">"""Read from artifact store"""</span>
+        <span class="nb">super</span><span class="p">().</span><span class="n">handle_input</span><span class="p">(</span><span class="n">data_type</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">fileio</span><span class="p">.</span><span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">artifact</span><span class="p">.</span><span class="n">uri</span><span class="p">,</span> <span class="s">"data.txt"</span><span class="p">),</span> <span class="s">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">f</span><span class="p">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">MyCustomObject</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">handle_return</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">my_obj</span><span class="p">:</span> <span class="n">MyCustomObject</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="s">"""Write to artifact store"""</span>
+        <span class="nb">super</span><span class="p">().</span><span class="n">handle_return</span><span class="p">(</span><span class="n">my_obj</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">fileio</span><span class="p">.</span><span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">artifact</span><span class="p">.</span><span class="n">uri</span><span class="p">,</span> <span class="s">"data.txt"</span><span class="p">),</span> <span class="s">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">my_obj</span><span class="p">.</span><span class="n">name</span><span class="p">)</span>
+
+<span class="o">@</span><span class="n">step</span>
+<span class="k">def</span> <span class="nf">read_custom_object</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">MyCustomObject</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">MyCustomObject</span><span class="p">(</span><span class="s">"aria"</span><span class="p">)</span>
+
+<span class="o">@</span><span class="n">pipeline</span>
+<span class="k">def</span> <span class="nf">basic_pipeline</span><span class="p">(</span><span class="n">read_custom_object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="n">read_custom_object</span><span class="p">()</span>
+
+<span class="n">basic_pipeline</span><span class="p">(</span>
+    <span class="n">read_custom_object</span><span class="o">=</span><span class="n">read_custom_object</span><span class="p">().</span><span class="n">with_return_materializers</span><span class="p">(</span>
+        <span class="n">MyCustomMaterializer</span>
+    <span class="p">)</span>
+<span class="p">).</span><span class="n">run</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>You’ll notice a new piece of code which defines the <code class="language-plaintext highlighter-rouge">MyCustomMaterializer</code> class. This is subclassed off our <code class="language-plaintext highlighter-rouge">BaseMaterializer</code> class and we just have to define two methods, one that handles how to serialise or save the data to disk, and the other that handles how to deserialise or rehydrate the objects/data from disk. We add a special <code class="language-plaintext highlighter-rouge">.with_return_materializers</code> call when we run the pipeline; this lets ZenML that when we encounter a weird type of object, it can go ahead and use our custom defined materialiser to handle it.</p>
+
+<p>I hope you’ll agree that this stuff isn’t <em>too</em> hard to grok, and while the precise steps of how you implement all this might take a bit of getting used to, it’s conceptually not too hard once you understand the foundations of what you’re doing. It took me longer than I’m proud to admit to really understand the elegance of this way of doing things, but all these little pieces add up and you can then go off and use them in your real-life projects.</p>
+
+<h2 id="️-materialisation-in-practice-icevision-and-custom-objects">
+<a class="anchor" href="#%EF%B8%8F-materialisation-in-practice-icevision-and-custom-objects" aria-hidden="true"><span class="octicon octicon-link"></span></a>🕵️ Materialisation in practice: IceVision and Custom Objects</h2>
+
+<p>Case in point: my object detection pipeline. I took a bit of a break over the summer, but now I’m back and working to get my pipeline production-ready. Defining the basic steps of my pipeline were fairly easy; I’ve already described that in <a href="https://mlops.systems/tools/redactionmodel/computervision/mlops/2022/05/31/redaction-production-introduction.html">my last blog post</a>.</p>
+
+<p>The moment I started defining my pipeline in code, I immediately hit a whole array of non-standard objects. My data loading steps returned IceVision-specific parsers custom to COCO BBoxes and my training step returned a collection of various custom objects combining code with the trained model parameters. (<em>Note: for some common use cases like training with raw PyTorch or Tensorflow etc, ZenML has defined many standard materialisers already to get you going quickly.</em>) I realised that I’d have to define custom materialisers to handle these different inputs and outputs.</p>
+
+<p>Some of this wasn’t trivial to implement. Sometimes you might get lucky and the library you work with has implemented some handy features to help with serialisation and deserialisation. From what I can tell, this seems to be the case when saving models with PyTorch, for example. But for the rest it’s often less clear what need to happen and why code works in the way it does. To save the IceVision <code class="language-plaintext highlighter-rouge">RecordCollection</code> object, for example, I had to jump through some hoops, converting several sub levels of custom objects along the way, to make sure that my objects were serialisable.</p>
+
+<p>Here’s the custom materialiser code responsible for handling those conversions and serialisation for the <code class="language-plaintext highlighter-rouge">RecordCollection</code>. (Think of <code class="language-plaintext highlighter-rouge">RecordCollection</code> just as a type of stored data, parsed and ready to use for model training.)</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pathlib</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Type</span>
+
+<span class="kn">from</span> <span class="nn">icevision.all</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">srsly</span>
+<span class="kn">from</span> <span class="nn">zenml.artifacts</span> <span class="kn">import</span> <span class="n">DataArtifact</span>
+<span class="kn">from</span> <span class="nn">zenml.io</span> <span class="kn">import</span> <span class="n">fileio</span>
+<span class="kn">from</span> <span class="nn">zenml.materializers.base_materializer</span> <span class="kn">import</span> <span class="n">BaseMaterializer</span>
+
+<span class="k">class</span> <span class="nc">COCOMaterializerParser</span><span class="p">(</span><span class="n">Parser</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">template_record</span><span class="p">,</span> <span class="n">records</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]):</span>
+        <span class="nb">super</span><span class="p">().</span><span class="n">__init__</span><span class="p">(</span><span class="n">template_record</span><span class="o">=</span><span class="bp">self</span><span class="p">.</span><span class="n">template_record</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="p">.</span><span class="n">records</span> <span class="o">=</span> <span class="n">records</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">class_map</span> <span class="o">=</span> <span class="n">ClassMap</span><span class="p">(</span><span class="n">records</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">"common"</span><span class="p">][</span><span class="s">"classes"</span><span class="p">])</span>
+        <span class="k">print</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">class_map</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="k">from</span> <span class="bp">self</span><span class="p">.</span><span class="n">records</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">records</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">record_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Hashable</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">o</span><span class="p">[</span><span class="s">"common"</span><span class="p">][</span><span class="s">"filepath"</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">template_record</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BaseRecord</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">BaseRecord</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="n">FilepathRecordComponent</span><span class="p">(),</span>
+                <span class="n">InstancesLabelsRecordComponent</span><span class="p">(),</span>
+                <span class="n">AreasRecordComponent</span><span class="p">(),</span>
+                <span class="n">IsCrowdsRecordComponent</span><span class="p">(),</span>
+                <span class="n">BBoxesRecordComponent</span><span class="p">(),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">filepath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pathlib</span><span class="p">.</span><span class="n">Path</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s">"common"</span><span class="p">][</span><span class="s">"filepath"</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">img_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ImgSize</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ImgSize</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="n">o</span><span class="p">[</span><span class="s">"common"</span><span class="p">][</span><span class="s">"width"</span><span class="p">],</span> <span class="n">height</span><span class="o">=</span><span class="n">o</span><span class="p">[</span><span class="s">"common"</span><span class="p">][</span><span class="s">"height"</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">labels_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">o</span><span class="p">[</span><span class="s">"detection"</span><span class="p">][</span><span class="s">"label_ids"</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">areas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">o</span><span class="p">[</span><span class="s">"detection"</span><span class="p">][</span><span class="s">"areas"</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">iscrowds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">bool</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">o</span><span class="p">[</span><span class="s">"detection"</span><span class="p">][</span><span class="s">"iscrowds"</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">bboxes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">BBox</span><span class="p">]:</span>
+        <span class="n">boxes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">bbox</span> <span class="ow">in</span> <span class="n">o</span><span class="p">[</span><span class="s">"detection"</span><span class="p">][</span><span class="s">"bboxes"</span><span class="p">]:</span>
+            <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">bbox</span>
+            <span class="n">new_bbox</span> <span class="o">=</span> <span class="n">BBox</span><span class="p">.</span><span class="n">from_xyxy</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+            <span class="n">boxes</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_bbox</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">boxes</span>
+
+    <span class="k">def</span> <span class="nf">parse_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">record</span><span class="p">:</span> <span class="n">BaseRecord</span><span class="p">,</span> <span class="n">is_new</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">is_new</span><span class="p">:</span>
+            <span class="n">record</span><span class="p">.</span><span class="n">set_filepath</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">filepath</span><span class="p">(</span><span class="n">o</span><span class="p">))</span>
+            <span class="n">record</span><span class="p">.</span><span class="n">set_img_size</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">img_size</span><span class="p">(</span><span class="n">o</span><span class="p">))</span>
+
+        <span class="n">record</span><span class="p">.</span><span class="n">detection</span><span class="p">.</span><span class="n">set_class_map</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">class_map</span><span class="p">)</span>
+        <span class="n">record</span><span class="p">.</span><span class="n">detection</span><span class="p">.</span><span class="n">add_areas</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">areas</span><span class="p">(</span><span class="n">o</span><span class="p">))</span>
+        <span class="n">record</span><span class="p">.</span><span class="n">detection</span><span class="p">.</span><span class="n">add_iscrowds</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">iscrowds</span><span class="p">(</span><span class="n">o</span><span class="p">))</span>
+        <span class="n">record</span><span class="p">.</span><span class="n">detection</span><span class="p">.</span><span class="n">add_bboxes</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">bboxes</span><span class="p">(</span><span class="n">o</span><span class="p">))</span>
+        <span class="n">record</span><span class="p">.</span><span class="n">detection</span><span class="p">.</span><span class="n">add_labels</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s">"detection"</span><span class="p">][</span><span class="s">"labels"</span><span class="p">])</span>
+
+
+<span class="k">def</span> <span class="nf">detection_record_collection_to_json</span><span class="p">(</span><span class="n">rcoll</span><span class="p">:</span> <span class="n">RecordCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">indexes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">rcoll</span><span class="p">.</span><span class="n">_records</span><span class="p">)</span>
+    <span class="n">records</span> <span class="o">=</span> <span class="p">[</span><span class="n">rcoll</span><span class="p">.</span><span class="n">_records</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indexes</span><span class="p">]</span>
+    <span class="n">classes</span> <span class="o">=</span> <span class="n">rcoll</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">detection</span><span class="p">.</span><span class="n">class_map</span><span class="p">.</span><span class="n">get_classes</span><span class="p">()</span>
+    <span class="n">dict_records</span> <span class="o">=</span> <span class="p">[</span><span class="n">record</span><span class="p">.</span><span class="n">as_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">records</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">dict_records</span><span class="p">:</span>
+        <span class="n">record</span><span class="p">[</span><span class="s">"common"</span><span class="p">][</span><span class="s">"filepath"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="s">"common"</span><span class="p">][</span><span class="s">"filepath"</span><span class="p">])</span>
+        <span class="n">bboxes</span> <span class="o">=</span> <span class="n">record</span><span class="p">[</span><span class="s">"detection"</span><span class="p">][</span><span class="s">"bboxes"</span><span class="p">]</span>
+        <span class="n">new_bboxes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">bbox</span> <span class="ow">in</span> <span class="n">bboxes</span><span class="p">:</span>
+            <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">bbox</span><span class="p">.</span><span class="n">xyxy</span>
+            <span class="n">new_bbox</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">]</span>
+            <span class="n">new_bboxes</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_bbox</span><span class="p">)</span>
+        <span class="n">record</span><span class="p">[</span><span class="s">"detection"</span><span class="p">][</span><span class="s">"bboxes"</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_bboxes</span>
+        <span class="n">record</span><span class="p">[</span><span class="s">"common"</span><span class="p">][</span><span class="s">"classes"</span><span class="p">]</span> <span class="o">=</span> <span class="n">classes</span>
+    <span class="k">return</span> <span class="n">srsly</span><span class="p">.</span><span class="n">json_dumps</span><span class="p">(</span><span class="n">dict_records</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">detection_json_str_to_record_collection</span><span class="p">(</span><span class="n">records</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RecordCollection</span><span class="p">:</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">srsly</span><span class="p">.</span><span class="n">json_loads</span><span class="p">(</span><span class="n">records</span><span class="p">)</span>
+    <span class="n">template_record</span> <span class="o">=</span> <span class="n">ObjectDetectionRecord</span><span class="p">()</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">COCOMaterializerParser</span><span class="p">(</span><span class="n">template_record</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+    <span class="n">parsed_records</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">parser</span><span class="p">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data_splitter</span><span class="o">=</span><span class="n">SingleSplitSplitter</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">parsed_records</span>
+
+
+<span class="k">class</span> <span class="nc">COCOBBoxRecordCollectionMaterializer</span><span class="p">(</span><span class="n">BaseMaterializer</span><span class="p">):</span>
+    <span class="n">ASSOCIATED_TYPES</span> <span class="o">=</span> <span class="p">(</span><span class="n">RecordCollection</span><span class="p">,)</span>
+    <span class="n">ASSOCIATED_ARTIFACT_TYPES</span> <span class="o">=</span> <span class="p">(</span><span class="n">DataArtifact</span><span class="p">,)</span>
+
+    <span class="k">def</span> <span class="nf">handle_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_type</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">RecordCollection</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">RecordCollection</span><span class="p">:</span>
+        <span class="s">"""Read from artifact store"""</span>
+        <span class="nb">super</span><span class="p">().</span><span class="n">handle_input</span><span class="p">(</span><span class="n">data_type</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">fileio</span><span class="p">.</span><span class="nb">open</span><span class="p">(</span>
+            <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">artifact</span><span class="p">.</span><span class="n">uri</span><span class="p">,</span> <span class="n">DEFAULT_RECORD_COLLECTION</span><span class="p">),</span> <span class="s">"r"</span>
+        <span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">detection_json_str_to_record_collection</span><span class="p">(</span><span class="n">f</span><span class="p">.</span><span class="n">read</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">handle_return</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_collection_obj</span><span class="p">:</span> <span class="n">RecordCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="s">"""Write to artifact store"""</span>
+        <span class="nb">super</span><span class="p">().</span><span class="n">handle_return</span><span class="p">(</span><span class="n">record_collection_obj</span><span class="p">)</span>
+
+        <span class="n">json_string</span> <span class="o">=</span> <span class="n">detection_record_collection_to_json</span><span class="p">(</span><span class="n">record_collection_obj</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">fileio</span><span class="p">.</span><span class="nb">open</span><span class="p">(</span>
+            <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">artifact</span><span class="p">.</span><span class="n">uri</span><span class="p">,</span> <span class="n">DEFAULT_RECORD_COLLECTION</span><span class="p">),</span> <span class="s">"w"</span>
+        <span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">json_string</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>As you can see, there’s a decent amount going on here. In my custom materialiser, I have a <code class="language-plaintext highlighter-rouge">detection_record_collection_to_json</code> method that constructs the JSON representation of my custom <code class="language-plaintext highlighter-rouge">RecordCollection</code> object. I use <a href="https://github.com/explosion/srsly">Explosion’s handy <code class="language-plaintext highlighter-rouge">srsly</code> package</a> for their forks + bundling together of various Python serialisation libraries. For the rest, that requires a bit more knowledge of how IceVision handles things like <code class="language-plaintext highlighter-rouge">BBox</code> objects and COCO Records under the hood, but you can get the idea that it’s not completely trivial.</p>
+
+<h2 id="-serialisation-is-for-everyone">
+<a class="anchor" href="#-serialisation-is-for-everyone" aria-hidden="true"><span class="octicon octicon-link"></span></a>🥳 Serialisation is for Everyone!</h2>
+
+<p>It’s also not completely impossible to implement either, though, lest you feel like I’m leaving you without hope. My aim with this article was to guide you to the point where you feel you can understand why serialisation is important and to know why you might well encounter it during your data science journey. The moment you need to do something just slightly longer-lasting than an ephemeral training run that is tracked nowhere and just lives in a Colab notebook, that’s when you’ll hit serialisation.</p>
+
+<p>Moreover, I showed how you can incrementally build up your pipelines with a tool like ZenML to handle lots of parts of the complexity that come with your modelling work.</p>
+
+<p>[<em>Image credit</em>: Photo by <a href="https://unsplash.com/@fabioha?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">fabio</a> on <a href="https://unsplash.com/s/photos/data?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a>]</p>
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="strickvl/ml-blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/redactionmodel/computervision/mlops/python/tools/zenml/2022/09/07/serialisation.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>A place to share my technical learnings.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
