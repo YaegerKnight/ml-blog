@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Avoiding BIDMAS, or how J does notation | mlops.systems</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Avoiding BIDMAS, or how J does notation" />
+<meta name="author" content="Alex Strick van Linschoten" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="I learned about prefix, postfix and infix notation, and how J evaluates mathematical expressions which makes the BIDMAS rules unnecessary." />
+<meta property="og:description" content="I learned about prefix, postfix and infix notation, and how J evaluates mathematical expressions which makes the BIDMAS rules unnecessary." />
+<link rel="canonical" href="https://mlops.systems/j/mathematics/mu123/q31/notation/2022/10/16/notational-precedence.html" />
+<meta property="og:url" content="https://mlops.systems/j/mathematics/mu123/q31/notation/2022/10/16/notational-precedence.html" />
+<meta property="og:site_name" content="mlops.systems" />
+<meta property="og:image" content="https://mlops.systems/images/notational-precedence/j-precedence.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-10-16T00:00:00-05:00" />
+<script type="application/ld+json">
+{"datePublished":"2022-10-16T00:00:00-05:00","url":"https://mlops.systems/j/mathematics/mu123/q31/notation/2022/10/16/notational-precedence.html","@type":"BlogPosting","dateModified":"2022-10-16T00:00:00-05:00","image":"https://mlops.systems/images/notational-precedence/j-precedence.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://mlops.systems/j/mathematics/mu123/q31/notation/2022/10/16/notational-precedence.html"},"author":{"@type":"Person","name":"Alex Strick van Linschoten"},"headline":"Avoiding BIDMAS, or how J does notation","description":"I learned about prefix, postfix and infix notation, and how J evaluates mathematical expressions which makes the BIDMAS rules unnecessary.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://mlops.systems/feed.xml" title="mlops.systems" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script
+  defer
+  data-domain="mlops.systems"
+  src="https://plausible.io/js/plausible.js"
+></script>
+
+
+<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">mlops.systems</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About Me</a><a class="page-link" href="/search/">Search</a><a class="page-link" href="/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Avoiding BIDMAS, or how J does notation</h1><p class="page-description">I learned about prefix, postfix and infix notation, and how J evaluates mathematical expressions which makes the BIDMAS rules unnecessary.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-10-16T00:00:00-05:00" itemprop="datePublished">
+        Oct 16, 2022
+      </time>• 
+          <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+            <span class="p-author h-card" itemprop="name">Alex Strick van Linschoten</span></span>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      3 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/categories/#j">j</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#mathematics">mathematics</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#mu123">mu123</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#q31">q31</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#notation">notation</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>One of the topics that comes up early on in Open University’s <a href="https://www.open.ac.uk/courses/modules/mu123">MU123 mathematics course</a> is precedence. Those who grew up in English-speaking countries will probably know this as <a href="https://www.bbc.co.uk/bitesize/topics/zxqnsk7/articles/znm8cmn">BODMAS or BIDMAS</a>. The order of precedence for execution of a mathematical expression gives us an idea for how to resolve expressions that don’t make sense. For example, <code class="language-plaintext highlighter-rouge">3 + 1 x 4</code> can  either amount to 7 or 16, depending on how when you do the multiplication step.</p>
+
+<p>Brackets are one way to make things more precise, and that’s probably why they’re the B in BIDMAS and that they go first. We could write <code class="language-plaintext highlighter-rouge">3 + (1 x 4)</code> to make it really clear that we wanted the <code class="language-plaintext highlighter-rouge">1 x 4</code> sub-expression to be evaluated first.</p>
+
+<p>With the rules of precedence, we technically wouldn’t need to add in any brackets because we could (likely) assume that people would follow the standard rules and they would know that we have to evaluate multiplications before we evaluate the additions. So we have a way, but it maybe feels a bit unsatisfactory.</p>
+
+<p>Some languages or domains, however, have notational rules which don’t rely on a meta-schema of precedence rules like BIDMAS to tell you which expressions should be evaluated first. Instead, the order is determined in other ways, with the option of brackets when needed.</p>
+
+<p>Several of the languages in the APL family, like J, simply evaluate from right to left in the order that expressions are encountered. See this example in J:</p>
+
+<pre><code class="language-j">   3 + 1 * 4
+7
+   4 * 3 + 1
+16
+</code></pre>
+
+<p>The order in which the expressions are evaluated determines the answer.</p>
+
+<p>Thinking and reading a bit about these orders of precedence brought me to learn a bit about other traditions of mathematical notation. The one most used and that you’ll be most familiar with is called <em>infix notation</em> i.e. <code class="language-plaintext highlighter-rouge">3 + 4</code>.</p>
+
+<p>Prefix notation (AKA Polish notation) is when we write <code class="language-plaintext highlighter-rouge">+ 3 4</code> (to the same end) and postfix notation (AKA reverse Polish notation) is when we write <code class="language-plaintext highlighter-rouge">3 4 +</code>. (The Polish part relates back to <a href="https://en.wikipedia.org/wiki/Jan_Łukasiewicz">Jan Łukasiewicz</a>, who invented it in 1924.) These kinds of notation are used in Lisp and Clojure, for example.</p>
+
+<p>Why would you want to use a notation style like this? Some possible reasons:</p>
+
+<ul>
+  <li>the operands in the expressions can handle arbitrary numbers of arguments, making them more efficient to write</li>
+  <li>they are consistent with the syntax used for functions in computer programming (which can be easier to get your mind round)</li>
+  <li>they’re clearer to read and (mostly) unambiguous, unlike infix notation which (see above) requires a whole order of precedence if you’re not using brackets</li>
+  <li>there’s no confusion or need for precedence rules</li>
+  <li>it’s faster for a machine to evaluate, since the way expressions are formulated is much easier to translate into computer code.</li>
+</ul>
+
+<p>So there you go. I’m unclear whether there are more fundamental benefits to living in the world of post-/prefix notation, and perhaps it’s a little like the people who argue that <a href="https://gizmodo.com/why-we-should-switch-to-a-base-12-counting-system-5977095">we’d all be better off</a> if we lived in a base-12 world instead of base-10, but that’s beside the point for now.</p>
+
+<p>I’ll try to share some more diversions from my mathematics study along the way, hopefully powered by <a href="https://www.jsoftware.com">J</a> which I’m trying to get back into.</p>
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="strickvl/ml-blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/j/mathematics/mu123/q31/notation/2022/10/16/notational-precedence.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>A place to share my technical learnings.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
