@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Deep learning tricks all the way down, with a bit of mathematics for good measure | mlops.systems</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Deep learning tricks all the way down, with a bit of mathematics for good measure" />
+<meta name="author" content="Alex Strick van Linschoten" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Notes and reflections based on the first lesson (aka ‘lesson 9’) of the FastAI Part II course. This covers the fundamentals of Stable Diffusion, how it works and some core concepts or techniques." />
+<meta property="og:description" content="Notes and reflections based on the first lesson (aka ‘lesson 9’) of the FastAI Part II course. This covers the fundamentals of Stable Diffusion, how it works and some core concepts or techniques." />
+<link rel="canonical" href="https://mlops.systems/computervision/fastai/parttwo/2022/10/17/fastai-part-2-lesson-9-stable-diffusion.html" />
+<meta property="og:url" content="https://mlops.systems/computervision/fastai/parttwo/2022/10/17/fastai-part-2-lesson-9-stable-diffusion.html" />
+<meta property="og:site_name" content="mlops.systems" />
+<meta property="og:image" content="https://mlops.systems/images/fastai-lesson-9/sd-dutch-nn.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-10-17T00:00:00-05:00" />
+<script type="application/ld+json">
+{"datePublished":"2022-10-17T00:00:00-05:00","url":"https://mlops.systems/computervision/fastai/parttwo/2022/10/17/fastai-part-2-lesson-9-stable-diffusion.html","@type":"BlogPosting","dateModified":"2022-10-17T00:00:00-05:00","image":"https://mlops.systems/images/fastai-lesson-9/sd-dutch-nn.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://mlops.systems/computervision/fastai/parttwo/2022/10/17/fastai-part-2-lesson-9-stable-diffusion.html"},"author":{"@type":"Person","name":"Alex Strick van Linschoten"},"headline":"Deep learning tricks all the way down, with a bit of mathematics for good measure","description":"Notes and reflections based on the first lesson (aka ‘lesson 9’) of the FastAI Part II course. This covers the fundamentals of Stable Diffusion, how it works and some core concepts or techniques.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://mlops.systems/feed.xml" title="mlops.systems" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script
+  defer
+  data-domain="mlops.systems"
+  src="https://plausible.io/js/plausible.js"
+></script>
+
+
+<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">mlops.systems</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About Me</a><a class="page-link" href="/search/">Search</a><a class="page-link" href="/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Deep learning tricks all the way down, with a bit of mathematics for good measure</h1><p class="page-description">Notes and reflections based on the first lesson (aka 'lesson 9') of the FastAI Part II course. This covers the fundamentals of Stable Diffusion, how it works and some core concepts or techniques.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-10-17T00:00:00-05:00" itemprop="datePublished">
+        Oct 17, 2022
+      </time>• 
+          <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+            <span class="p-author h-card" itemprop="name">Alex Strick van Linschoten</span></span>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      19 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/categories/#computervision">computervision</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#fastai">fastai</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#parttwo">parttwo</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h1"><a href="#-stable-diffusion-101">💬🌄 Stable Diffusion 101</a></li>
+<li class="toc-entry toc-h1"><a href="#-core-takeaways-how-does-it-work">🛠 Core Takeaways: How does it work?</a>
+<ul>
+<li class="toc-entry toc-h2"><a href="#fundamentals-still-count">Fundamentals still count</a></li>
+<li class="toc-entry toc-h2"><a href="#the-tricks-are-the-way">The tricks are the way</a></li>
+<li class="toc-entry toc-h2"><a href="#-what-happens-when-we-train-the-diffusion-model">💪 What happens when we train the diffusion model</a></li>
+<li class="toc-entry toc-h2"><a href="#-what-happens-when-we-generate-an-image">🎨 What happens when we generate an image</a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h1"><a href="#-how-to-play--practice-for-part-ii">🎺 How to play &amp; practice for part II</a></li>
+<li class="toc-entry toc-h1"><a href="#-glossary-of-core-terms">📖 Glossary of Core Terms</a></li>
+<li class="toc-entry toc-h1"><a href="#️-new-mathematical-symbols">✖️➗ New Mathematical Symbols</a></li>
+<li class="toc-entry toc-h1"><a href="#-enduring-questions">❓ Enduring Questions</a></li>
+</ul><p><em>(This is part of a series of blog posts relating to and responding to the live FastAI course (part 2) being taught October-December 2022. To read others, see the ones listed for <a href="https://mlops.systems/categories/#parttwo">the ‘parttwo’ tag</a>.)</em></p>
+
+<p>Much awaited and anticipated, the <a href="https://www.fast.ai/posts/part2-2022.html">second part of the FastAI course</a> is being taught live again. If part one is about getting solid foundations and learning how to get going in a practical/useful way, part two is about approaching things from the foundations but with research or ‘impractical’ questions kept in mind. The backdrop of the current iteration is the breakthroughs happening in the world of generative computer vision models like <a href="https://huggingface.co/CompVis/stable-diffusion-v1-4">Stable Diffusion</a>, which we’ll explore and deconstruct (and reconstruct?!) over the coming weeks.</p>
+
+<p>Diving into the details of how things work means that along the way we’re much more likely to encounter (legitimate) specialist vocabulary and techniques as well as a decent dose of jargon. Whereas bringing up the intricacies of particular algorithms, architectures or mathematical methods was unnecessary during part one, it seems like part two is a little bit more of a venue for that kind of material. I will use these blogs as a way of reviewing materials and concepts introduced during the lectures as well as keeping track of the big questions I have.</p>
+
+<p>In this blog, in particular, I’ll keep a glossary at the bottom for some new terms which were introduced. I may repeat this for subsequent blog reviews, depending on what’s covered in those lessons. I’ll also keep a section containing new mathematical symbols that are introduced. (This blog mainly relates to the core lecture given during week 1. I’ll update it later with some small extras that came up from the 9A and 9B videos, or expand those into separate posts on their own.)</p>
+
+<p>Stable Diffusion isn’t, in itself, a model that I’m especially interested in, except insofar as it teaches me fundamental principles about the craft of deep learning or about doing research in this field. As such, my plan and current intention is to stick to documenting core mental models or bigger-picture lessons that I’m taking away from the lessons rather than each individual step that Jeremy made along the way.</p>
+
+<h1 id="-stable-diffusion-101">
+<a class="anchor" href="#-stable-diffusion-101" aria-hidden="true"><span class="octicon octicon-link"></span></a>💬🌄 Stable Diffusion 101</h1>
+
+<p>If you’ve been on the internet at all during the past 6-12 months, you’ll almost certainly have been exposed to examples of images that have been generated using techniques grounded in deep learning. Here is one that I generated just now:</p>
+
+<p><img src="/images/fastai-lesson-9/sd-dutch-nn.png" alt="" title="This used the prompt 'a Dutch male AI researcher trying to understand how neural networks work. looking at a computer screen on his desk'"></p>
+
+<p>These images are generated by passing in a prompt into the model which then uses that to come up with something that represents the text you passed in. (Shoutout to the creators and maintainers of <a href="https://github.com/fastai/diffusion-nbs">the tremendously useful <code class="language-plaintext highlighter-rouge">diffusion-nbs</code> notebooks</a>.) The interface between the text and the image is still not as seamless as might be hoped, and a discipline of ‘prompt engineering’ has grown around finding the best ways to coax certain kinds of images out of the model. (See <a href="http://dallery.gallery/wp-content/uploads/2022/07/The-DALL%C2%B7E-2-prompt-book-v1.02.pdf">this book</a> to learn more about what works with DALL-E 2, for example. Or visit <a href="https://lexica.art">Lexica</a> to search images based on the prompts that were used to create them.)</p>
+
+<p>There are some obvious interim questions that result from the existence of such models and their outputs, notably what this allows in terms of creativity and how it might transform the kinds of tools we use for image editing and creation. The advances are certainly impressive, but outside the field, (and without being moving on too quickly from the unquestioned achievement of these types of models) what does it mean for the rest of deep learning?</p>
+
+<p>The first thing that is maybe interesting for the field is the way that these models are multi-modal, or in other words they aren’t stuck in the silo of being text-only, or image-only, and so on. We are able to translate (to a greater or lesser degree) between language and images with these models, which seems like it might open up a whole universe of interactions and behaviours that are interesting to explore.</p>
+
+<p>At a very (very) high level, what’s going on with stable diffusion is that it starts with generating an image that is more or less purely random noise, and then (with subsequent iterations) slowly reveals an image and coherence that was contained within the random noise. Similar to how Michelangelo said of sculpture (“It is already there, I just have to chisel away the superfluous material”), what happens here is that we have to remove the superfluous noise.</p>
+
+<h1 id="-core-takeaways-how-does-it-work">
+<a class="anchor" href="#-core-takeaways-how-does-it-work" aria-hidden="true"><span class="octicon octicon-link"></span></a>🛠 Core Takeaways: How does it work?</h1>
+
+<p>Those of you not taking the course live will have to wait a few months for the lectures to be released and in any case I don’t want to parrot the order and progression of how Jeremy explained how Stable Diffusion works. With that said, I was pleasantly surprised by how much I was able to follow along given what is a fairly technically involved topic. (Note to self: the fundamentals continue to be important!)</p>
+
+<h2 id="fundamentals-still-count">
+<a class="anchor" href="#fundamentals-still-count" aria-hidden="true"><span class="octicon octicon-link"></span></a>Fundamentals still count</h2>
+
+<p>Even though there are a hundred and one small innovations and technologies which make something like Stable Diffusion possible, in the end we’re still dealing with Deep Learning and we’re still dealing with finding ways of converting things into numbers which can be used by machines to update weights by way of evaluating loss functions. So many of the individual pieces that make up how you build something like Stable Diffusion amount to:</p>
+
+<ul>
+  <li>figure out how to get this non-number-like thing into a numeric representation (ideally a vector of some kind)</li>
+  <li>do all the usual deep learning things that we’ve done a thousand times and that we know work</li>
+  <li>at the end, maybe find a way to convert the numeric representation that our model learned into some kind of form that is useful to us</li>
+</ul>
+
+<p>Obviously the details are important and nobody is creating magical generative art with this very high-level hand-wavy explanation, but for someone at the earlier end of their journey into deep learning it is reassuring that the fundamentals continue to have relevance and that those mental models remain useful as a way of thinking about new developments.</p>
+
+<h2 id="the-tricks-are-the-way">
+<a class="anchor" href="#the-tricks-are-the-way" aria-hidden="true"><span class="octicon octicon-link"></span></a>The tricks <em>are</em> the way</h2>
+
+<p>The other pleasant surprise was the enduring relevance of ‘tricks’. In chapter one of the FastAI book, Jeremy &amp; Sylvain showcase a number of examples where clever approaches are taken to solve problems with Deep Learning:</p>
+
+<ul>
+  <li>a malware classification program is made by converting malware code into an image which is used to train a model</li>
+  <li>a fraud detection algorithm is trained by converting images of computer mouse movements</li>
+  <li>…and so on</li>
+</ul>
+
+<p>Even amongst the Delft FastAI study group, Kurian trained <a href="https://kurianbenoy.com/ml-blog/fastai/fastaicourse/2022/05/01/AudioCNNDemo.html">a classifier to detect genre in music samples</a> using a similar method (i.e. using images as an intermediary form for the samples which were used in training). The book emphasises:</p>
+
+<blockquote>
+  <p>“In general, you’ll find that a small number of general approaches in deep learning can go a long way, if you’re a bit creative in how you represent your data! You shouldn’t think of approaches like the ones described here as “hacky workarounds,” because actually they often (as here) beat previously state-of-the-art results. These really are the right ways to think about these problem domains.”</p>
+</blockquote>
+
+<p>Most of these ‘tricks’ seem to relate to either performance improvements (i.e. how can we get this training to happen faster, or with fewer compute needs) or ways of getting your problem domain into a form that we can use deep learning techniques on them. In the case of Stable Diffusion, one of the problems we have to address is how to work in this multi-modal manner, where text is used to represent a particular idea (which in turn needs a vector/numeric representation) but where we also want to represent that same idea in image form.</p>
+
+<p>At the same time, we have the whole autoencoder part of the story — whereby we use an encoder to turn a large image into a (smaller-sized) latent representation which can be used in training, and then we use a decoder to turn a noisy latent into a full-sized image — which seems to mainly be about making the training process more efficient.</p>
+
+<p>Each of these techniques come with their own complexities and histories, but it’s just notable to me how the story of the development of machine learning techniques seems somehow to be a succession of these small incremental innovations that progressively accrue. That’s not to say that there aren’t big breakthroughs in either understanding why things work the way they do, or in the more tactical method space, but it just seemed very apparent in the unpacking of Stable Diffusion that a great deal of creative stitching together of ideas had taken place.</p>
+
+<p>The historian in me is fascinated by the different pathways that the field has explored, or the reasons why certain techniques emerged when they did, or how hardware improvements gave tried-and-rejected techniques a new lease of life, but I’m guessing that probably doesn’t help much with the work of research.</p>
+
+<h2 id="-what-happens-when-we-train-the-diffusion-model">
+<a class="anchor" href="#-what-happens-when-we-train-the-diffusion-model" aria-hidden="true"><span class="octicon octicon-link"></span></a>💪 What happens when we train the diffusion model</h2>
+
+<p>A diffusion model is a neural network that we train. The way it works is that it removes noise from an image (passed in as input along with a text prompt) such that the output more closely resembles the prompt. When we are training our network, we pass in the vectorised words along with the latent forms of the images (since those are much smaller file sizes and thus faster / more efficient to train). We use the encoder to get a latent representation of the image that we use for training.</p>
+
+<p>For the text caption, we want a way to represent the association of images with text captions in vector space. In other words, if there are various phrases that all represent more or less the same image if you were to translate those phrases into an image, then those should be similar when represented as a vector. The technique or trick for this is to use ‘contrastive loss’, a particular kind of loss function which allows us to calculate the relative similarity of two vectors. This contrastive loss is what gives us the first two letters of <a href="https://openai.com/blog/clip/">‘CLIP’</a>, a neural network developed by OpenAI.</p>
+
+<p>The CLIP model takes some text and outputs an embedding, i.e. some features in vector form that our unet can use for training along with the images in their latent representation form.</p>
+
+<h2 id="-what-happens-when-we-generate-an-image">
+<a class="anchor" href="#-what-happens-when-we-generate-an-image" aria-hidden="true"><span class="octicon octicon-link"></span></a>🎨 What happens when we generate an image</h2>
+
+<p>When generating our image we can use the neural network we trained to progressively remove noise from our candidate image. We start off with a more or less completely noisy image, then apply the unet to it and it returns the noise that it calculates is sitting on top of a latent representation that approximates the vectorised version of our prompt. We take a fraction of that, remove it, and repeat a few times. (Currently that can take as many as 50 iterations before we reach a really impressive image, but new techniques are in review which would dramatically reduce the need for so many iterations.)</p>
+
+<p>Note that it is during the inference stage where we need the decoder part of our (VAE) encoder to turn a latent tensor representation of an image into a fully-fledged large picture.</p>
+
+<h1 id="-how-to-play--practice-for-part-ii">
+<a class="anchor" href="#-how-to-play--practice-for-part-ii" aria-hidden="true"><span class="octicon octicon-link"></span></a>🎺 How to play &amp; practice for part II</h1>
+
+<p>I also wanted to briefly take a second to reflect on what might be useful as ways to get practically involved during the coming weeks. In part one, the instruction was fairly simple: “train lots of models”. In part two, the practicality is initially still there, it seems, but there will be other areas of emphasis. The things that seem to make sense to me currently are:</p>
+
+<ul>
+  <li>continue to blog as a way of reflecting and developing my understanding</li>
+  <li>understand and digest the core concepts that are introduced</li>
+  <li>whenever the ‘code everything from scratch’ part of the course starts, make sure to at least attempt this on my own alongside whatever is being showcased in lectures</li>
+  <li>discuss areas where concepts are unclear during the weekly <a href="https://www.meetup.com/delft-fast-ai-study-group/">Delft FastAI study group</a> calls that I organise</li>
+</ul>
+
+<p>I suspect that the discipline of the coding will be most instructive, once we
+get to it, though by extension probably also one that comes with the most
+struggle.</p>
+
+<p>Following a session of the Delft Study Group, I gathered some more suggestions for how to get the most out of this part 2:</p>
+
+<ul>
+  <li>get hands-on as much as possible</li>
+  <li>‘the details matter’ and try to go above and beyond with the course and you’ll be rewarded</li>
+  <li>blog and explain what you’re learning</li>
+  <li>answer questions on the forums as a way of cementing your learning</li>
+  <li>don’t let yourself get blocked by ideas that you don’t understand along the way. Keep following along with the course and more likely than not these things will clear themselves up</li>
+</ul>
+
+<h1 id="-glossary-of-core-terms">
+<a class="anchor" href="#-glossary-of-core-terms" aria-hidden="true"><span class="octicon octicon-link"></span></a>📖 Glossary of Core Terms</h1>
+
+<p>(Listed alphabetically, not in the order of exposition. Also these reflect my current understanding which is not always complete, so I’ll keep this updated as my understanding grows.)</p>
+
+<ul>
+  <li>
+<strong>Analytic derivatives</strong> — This is a faster way of calculating the gradients for our image, such that we calculate the whole set at once. This is what PyTorch uses under the hood in conjunction with a GPU to speed up the training process.</li>
+  <li>
+<strong>Autoencoder (model)</strong> — This is a combination of an encoder and a decoder. This model is a neural network with a series of layers that progressively ‘compress’ an image (through convolutions) until the point where it is much smaller. At this point the representation is called a ‘latent’. Then (in the full autoencoder) the image is progressively scaled back up into its full version.</li>
+  <li>
+<strong>CLIP</strong> — This is a model that turns text into images, powered by ‘contrastive loss’. It was developed by OpenAI.</li>
+  <li>
+<strong>Contrastive loss</strong> — This is a loss function that allows us to compare the similarity of two vectors. We multiply them together and sum up all the values. (This process is also known as the dot product.) If the two vectors are similar, we would expect the number to be large. Contrastive loss is used in CLIP.</li>
+  <li>
+<strong>Convolutional layer</strong> — This is a key part of computer vision and it is a way of representing images at different resolutions. Images are either scaled up or down through a convolutional layer (which seems to be some way of averaging the values of an image). Convolutional is the C in CNN.</li>
+  <li>
+<strong>Decoder</strong> — This is the part of an autoencoder that takes a latent representation and scales it back up (i.e. ‘decompresses’ it) to its full representation.</li>
+  <li>
+<strong>Differential equations</strong> — This is a part of mathematics which is really important for Stable Diffusion and whose language forms the context and backdrop for discussions around this technique, but it is a fairly different set of vocabulary from what we use for deep learning.</li>
+  <li>
+<strong>Diffusion sampler</strong> — This is the part of the process which relates to adding or subtracting noise from an image.</li>
+  <li>
+<strong>Dot product</strong> — This is the process by which we multiply two vectors by each other and sum up the values. It is used when we are calculating contrastive loss, but it is a common linear algebra calculation.</li>
+  <li>
+<strong>Embedding</strong> — This is a representation of something as a vector, particularly useful for deep learning. In particularly, it’s useful for areas like text where we might, for example have semantic fields that we want to represent as being similar to each other, but we need to do so in such a way as is comprehensible and processable by a machine. Embeddings allow us to do this in vector space.</li>
+  <li>
+<strong>Encoder</strong> — This is one part of an autoencoder that takes a full sized image and passes it through a series of convolutions such that at the end we have a significantly reduced tensor that is known as a latent.</li>
+  <li>
+<strong>Finite differentiation</strong> — This is one way of calculating the gradients for our image, but it is done pixel by pixel. It is quite slow. (Contrast with analytic derivative.)</li>
+  <li>
+<strong>Guidance + guidance scale</strong> — This is the prompt that we pass into our Stable Diffusion model. The guidance scale is what we can pass in to our generation function call to specify how much we want the prompt to be strictly followed.</li>
+  <li>
+<strong>Latent representation(s)</strong> — This is the intermediate product in the middle of an autoencoder. It is what is produced by an encoder, and it is what is consumed by a decoder. It is sort of a compressed version of all the important pieces of information relating to a particular image, for example.</li>
+  <li>
+<strong>Momentum</strong> — This is a technique used by optimizers in which if we increase the same parameters (or weights) several times in a row, then it seems likely that we’ll do that again so we can increase the learning rate for those parameters so that we don’t have to make so many iterations.</li>
+  <li>
+<strong>Negative prompts</strong> — You can pass in a negative prompt along with your prompt and it is a way somehow of ensuring that the resulting image does not correspond to whatever was in the negative prompt. (Think of it as ‘subtracting’ from the main prompt, which seems to be what is going on under the hood, in vector space).</li>
+  <li>
+<strong>Noise</strong> — Noise is random data, with no meaning as such. It is important in the world of Stable Diffusion because the work of generating the image is the work of removing noise.</li>
+  <li>
+<strong>Perceptual loss</strong> — This is another kind of loss function that may play a role in Stable Diffusion going forward int he course.</li>
+  <li>
+<strong>Pipeline</strong> — This is the concept that is used by the <a href="https://github.com/huggingface/diffusers">HuggingFace Diffusers library</a>, out of which our images are generated.</li>
+  <li>
+<strong>Score function</strong> — This is another way of stating the gradients for our image. I.e. the representation of what needs adjusting (and by how much) in order to remove noise from our image.</li>
+  <li>
+<strong>Step</strong> — This is one iteration of the inference process.</li>
+  <li>
+<strong>Textual Inversion</strong> — This is the process of creating a new embedding for a single specific concept or item. (i.e. the Indian watercolour example in the course)</li>
+  <li>
+<strong>Time step</strong> — This is a concept from the way the original Stable Diffusion creators thought about things. It represents a way to go from a value to an amount of noise that gets added to an image.</li>
+  <li>
+<strong>VAE</strong> — This is the specific kind of autoencoder used in Stable Diffusion.</li>
+</ul>
+
+<h1 id="️-new-mathematical-symbols">
+<a class="anchor" href="#%EF%B8%8F-new-mathematical-symbols" aria-hidden="true"><span class="octicon octicon-link"></span></a>✖️➗ New Mathematical Symbols</h1>
+
+<ul>
+  <li>∑ — means to sum up</li>
+  <li>∇ — we use this symbol instead of something else (d something?) in representing the gradient because we are talking about the gradients of many pixel values and not just a single one</li>
+  <li>β — (beta) — used in relation to the time steps to represent the amount of noise or variance. I think this is used instead of the letter σ (sigma), but I might be wrong on that.</li>
+</ul>
+
+<h1 id="-enduring-questions">
+<a class="anchor" href="#-enduring-questions" aria-hidden="true"><span class="octicon octicon-link"></span></a>❓ Enduring Questions</h1>
+
+<p>Some of the questions which I have in my mind following the class include:</p>
+
+<ul>
+  <li>These ‘generative’ models intersect with the field of art and creativity, at least nominally, but to what extent can we even say that they are generating something versus simply repeating things that they’ve already seen? (see also, <a href="https://dl.acm.org/doi/10.1145/3442188.3445922">the ‘stochastic parrots’ paper</a>)</li>
+  <li>SKILL: are there tricks or best practices when deciphering jargon-rich papers down to their core and, in doing so, being able to see the parts of the paper that are new (versus the parts that are just standard practice)?</li>
+  <li>SKILL: what does it mean to be ‘impractical’ i.e. do research in this field? What is involved and how is it generally or most usefully done?</li>
+  <li>What are the useful or fundamental innovations involved in Stable Diffusion?</li>
+  <li>What are the parts of ML/DL and/or Stable Diffusion that we do because of time or hardware or cost limitations as opposed to the things that we do because they are the right way to approach this particular problem? (provoked by the whole detour down into autoencoders that seems mainly to be there to improve iteration speed.)</li>
+  <li>What’s the bigger takeaway for the field as a whole? In other words, what things can we think about doing now with these new techniques?</li>
+  <li>Why does the whole ‘time steps’ conversion stage happen at all? i.e. why can’t we just choose a random number to represent how much or little noise we apply to an image for our training data.</li>
+  <li>The autoencoder / compression step seems like an amazing technique all to its
+own. Is it really lossless, or is some information lost along the way?</li>
+</ul>
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="strickvl/ml-blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/computervision/fastai/parttwo/2022/10/17/fastai-part-2-lesson-9-stable-diffusion.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>A place to share my technical learnings.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
