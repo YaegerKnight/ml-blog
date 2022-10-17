@@ -17,7 +17,7 @@ Diving into the details of how things work means that along the way we're much m
 
 In this blog, in particular, I'll keep a glossary at the bottom for some new terms which were introduced. I may repeat this for subsequent blog reviews, depending on what's covered in those lessons. I'll also keep a section containing new mathematical symbols that are introduced. (This blog mainly relates to the core lecture given during week 1. I'll update it later with some small extras that came up from the 9A and 9B videos, or expand those into separate posts on their own.)
 
-Stable Diffusion isn't, in itself, a model that I'm especially interested in, except insofar as it teaches me fundamental principles about the craft of deep learning or about doing research in this field. As such, my plan and current intention is to stick to documenting core mental models or bigger-picture lessons that I'm taking away from the lessons rather than each individual step that Jeremy made along the way.
+Stable Diffusion isn't, in itself, a model that I'm especially interested in, except insofar as it teaches me fundamental principles about the craft of deep learning or about doing research in this field. As such, my plan and current intention is to stick to documenting core mental models or bigger-picture lessons that I'm taking away from the lessons rather than each individual step that Jeremy made along the way. (This seems to be the motivation behind including it in the course at all. Stable Diffusion touches so many topics (big and small) and getting to grips with this one thing will help understand many other things about machine learning and the world of research.)
 
 # 💬🌄 Stable Diffusion 101
 
