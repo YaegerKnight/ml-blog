@@ -9,7 +9,7 @@ title: "Using J for simple calculation"
 image: images/mu123-unit1/jblue.png
 ---
 
-I'm curious to see if I can improve my command of [some J idioms and syntax](https://www.jsoftware.com) while working on [my mathematics study](https://www.open.ac.uk/courses/maths/degrees/bsc-mathematics-q31) at the Open University. People sometimes (pejoratively) say that J is just a calculator on steroids. I happen to need a calculator from time to time doing [MU123](https://www.open.ac.uk/courses/modules/mu123), so I figure I'll just learn as I go.
+I'm curious to see if I can improve my command of [some J idioms and syntax](https://www.jsoftware.com) while working on [my mathematics study](https://www.open.ac.uk/courses/maths/degrees/bsc-mathematics-q31) at the Open University. People sometimes (pejoratively) say that J is just a calculator on steroids. I happen to need a calculator from time to time doing [MU123](https://www.open.ac.uk/courses/modules/mu123), so I figure I'll just learn as I go. (This comes with a huge caveat to everything I write in these blogs: I could be completely wrong in how they're working, or the language I use to describe things etc. I welcome corrections and comments below.)
 
 I [wrote last week](https://mlops.systems/j/mathematics/mu123/q31/notation/2022/10/16/notational-precedence.html) about orders of precedence and notation in J (and for mathematics in general) so I won't repeat myself here. The summary of that all is that J evaluates from right to left in the order that expressions are encountered.
 
