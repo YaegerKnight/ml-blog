@@ -1,0 +1,1835 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>From the foundation up: Fashion-MNIST basics from Lesson 10 | mlops.systems</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="From the foundation up: Fashion-MNIST basics from Lesson 10" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Notes and some personal exploration following through the lesson 10 course materials from FastAI part 2. We cover the basics of loading in our data and generating our matrix." />
+<meta property="og:description" content="Notes and some personal exploration following through the lesson 10 course materials from FastAI part 2. We cover the basics of loading in our data and generating our matrix." />
+<link rel="canonical" href="https://mlops.systems/computervision/fastai/parttwo/2022/10/24/foundations-mnist-basics.html" />
+<meta property="og:url" content="https://mlops.systems/computervision/fastai/parttwo/2022/10/24/foundations-mnist-basics.html" />
+<meta property="og:site_name" content="mlops.systems" />
+<meta property="og:image" content="https://mlops.systems/images/fashion-mnist-part-2/fashion-mnist-cover.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-10-24T00:00:00-05:00" />
+<script type="application/ld+json">
+{"datePublished":"2022-10-24T00:00:00-05:00","url":"https://mlops.systems/computervision/fastai/parttwo/2022/10/24/foundations-mnist-basics.html","@type":"BlogPosting","dateModified":"2022-10-24T00:00:00-05:00","image":"https://mlops.systems/images/fashion-mnist-part-2/fashion-mnist-cover.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://mlops.systems/computervision/fastai/parttwo/2022/10/24/foundations-mnist-basics.html"},"headline":"From the foundation up: Fashion-MNIST basics from Lesson 10","description":"Notes and some personal exploration following through the lesson 10 course materials from FastAI part 2. We cover the basics of loading in our data and generating our matrix.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://mlops.systems/feed.xml" title="mlops.systems" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script
+  defer
+  data-domain="mlops.systems"
+  src="https://plausible.io/js/plausible.js"
+></script>
+
+
+<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">mlops.systems</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About Me</a><a class="page-link" href="/search/">Search</a><a class="page-link" href="/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">From the foundation up: Fashion-MNIST basics from Lesson 10</h1><p class="page-description">Notes and some personal exploration following through the lesson 10 course materials from FastAI part 2. We cover the basics of loading in our data and generating our matrix.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-10-24T00:00:00-05:00" itemprop="datePublished">
+        Oct 24, 2022
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      17 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/categories/#computervision">computervision</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#fastai">fastai</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/categories/#parttwo">parttwo</a>
+        
+      
+      </p>
+    
+
+    
+      
+        <div class="pb-5 d-flex flex-wrap flex-justify-end">
+          <div class="px-2">
+
+    <a href="https://github.com/strickvl/ml-blog/tree/master/_notebooks/2022-10-24-foundations-mnist-basics.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://mybinder.org/v2/gh/strickvl/ml-blog/master?filepath=_notebooks%2F2022-10-24-foundations-mnist-basics.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/assets/badges/binder.svg" alt="Open In Binder"/>
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/strickvl/ml-blog/blob/master/_notebooks/2022-10-24-foundations-mnist-basics.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h1"><a href="#Downloading-MNIST">Downloading MNIST </a></li>
+<li class="toc-entry toc-h1"><a href="#Unzip-the-files-and-separate-out-the-data">Unzip the files and separate out the data </a></li>
+<li class="toc-entry toc-h1"><a href="#Load-the-data-into-memory">Load the data into memory </a></li>
+<li class="toc-entry toc-h1"><a href="#Plot-some-examples-using-matplotlib">Plot some examples using matplotlib </a></li>
+<li class="toc-entry toc-h1"><a href="#Chunking-with-iterators-and-generators">Chunking with iterators and generators </a></li>
+<li class="toc-entry toc-h1"><a href="#Define-a-matrix-class">Define a matrix class </a></li>
+<li class="toc-entry toc-h1"><a href="#Find-the-shape,-min-and-max-values">Find the shape, min and max values </a></li>
+<li class="toc-entry toc-h1"><a href="#Generate-some-random-numbers">Generate some random numbers </a></li>
+<li class="toc-entry toc-h1"><a href="#Profile-our-code">Profile our code </a></li>
+<li class="toc-entry toc-h1"><a href="#"Things-Jeremy-says-to-do"">&quot;Things Jeremy says to do&quot; </a></li>
+</ul><!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2022-10-24-foundations-mnist-basics.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In lesson 10 of the FastAI course, we began by examining some new research that had just been released (<a href="https://arxiv.org/abs/2210.09276">the iMagic paper</a>) along with one of the key insights ('progressive distillation') of the paper. I'll maybe return to that in a separate blogpost but I wanted to focus on the second half of the lesson where we start the work of actually building up our library of tools to replicate all the pieces of Stable Diffusion.</p>
+<p>To make things more complicated, we're allowed to use only a basic set of building blocks (at least in the first iteration) so as to really understand how things are working. This includes:</p>
+<ul>
+<li>Python</li>
+<li>The Python standard library</li>
+<li>matplotlib</li>
+<li>Jupyter notebooks and nbdev</li>
+</ul>
+<p>This notebook will showcase some of my experimentation and learnings around the things we went through in this lesson. I've also compiled a table showing the various pieces we got to in the lesson, pairing the specific task we were trying to do along with the associated skill or part of the Python standard library.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Task</th>
+<th>Skill / Library</th>
+<th>Docs link</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>Download Fashion MNIST</strong></td>
+<td>urllib.requests.urlretrieve</td>
+<td><a href="https://docs.python.org/3/library/urllib.request.html#urllib.request.urlretrieve">link</a></td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Unzip &amp; separate out the parts</strong></td>
+<td>gzip</td>
+<td><a href="https://docs.python.org/3/library/gzip.html">link</a></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>pickle</td>
+<td><a href="https://docs.python.org/3/library/pickle.html">link</a></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>destructuring</td>
+<td></td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Turn the list into a matrix</strong></td>
+<td>chunking into a list of lists</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>yield / next (generators)</td>
+<td><a href="https://docs.python.org/3/reference/expressions.html#yieldexpr">link</a></td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Plot out the image using matplotlib</strong></td>
+<td>matplotlib</td>
+<td><a href="https://matplotlib.org">link</a></td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>Define a matrix class</strong></td>
+<td><strong>init</strong></td>
+<td><a href="https://docs.python.org/3/reference/datamodel.html?highlight=init#object.__init__">link</a></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td><strong>getitem</strong></td>
+<td><a href="https://docs.python.org/3/reference/datamodel.html?highlight=init#object.__getitem__">link</a></td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>Access tensor values</strong></td>
+<td>Pytorch Tensor</td>
+<td><a href="https://pytorch.org/docs/stable/tensors.html">link</a></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>map</td>
+<td><a href="https://docs.python.org/3/library/functions.html#map">link</a></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>tensor().reshape()</td>
+<td><a href="https://pytorch.org/docs/stable/generated/torch.Tensor.reshape.html#torch.Tensor.reshape">link</a></td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>Find the shape, min and max values</strong></td>
+<td>tensor().shape</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>tensor().min()</td>
+<td><a href="https://pytorch.org/docs/stable/generated/torch.min.html#torch.min">link</a></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>tensor().max()</td>
+<td><a href="https://pytorch.org/docs/stable/generated/torch.max.html#torch.max">link</a></td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>Generate some random numbers</strong></td>
+<td>random.random</td>
+<td><a href="https://docs.python.org/3/library/random.html#random.random">link</a></td>
+</tr>
+<tr>
+<td>9</td>
+<td><strong>Profile your code</strong></td>
+<td>%timeit</td>
+<td>
+<a href="https://docs.python.org/3/library/timeit.html">link1</a> / <a href="https://ipython.org/ipython-doc/dev/interactive/magics.html#magic-timeit">link2</a>
+</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>At the bottom of the post, I'll also include my collation of the "Things Jeremy says to do" which has <a href="https://forums.fast.ai/t/podcast-writeup-summaries-things-jeremy-says-to-do-qs/66194">a bit of a precedent on the fastai forums</a> so I thought I'd share them as well.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Downloading-MNIST">
+<a class="anchor" href="#Downloading-MNIST" aria-hidden="true"><span class="octicon octicon-link"></span></a>Downloading MNIST<a class="anchor-link" href="#Downloading-MNIST"> </a>
+</h1>
+<p>We start by downloading our dataset. I'm going to replicate the work we do in class while using Zalando's alternative version of MNIST, entitled <a href="https://github.com/zalandoresearch/fashion-mnist">Fashion-MNIST</a>. I previously used it on this blog (<a href="https://mlops.systems/fastai/computervision/pytorch/2022/05/11/fashion-mnist-pixel-similarity.html">here</a>, for example, but also elsewhere) while working through part 1 of the course, albeit at a much higher level using PyTorch to do similar things that we'll be doing this time round. It's comparable but also different, so I'm looking forward to working through whatever challenges are raised.</p>
+<p>The URLs are specified <a href="https://github.com/zalandoresearch/fashion-mnist">on the Github Repo</a>, so I'll include those as constants here first:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">BASE_URL</span> <span class="o">=</span> <span class="s2">"http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/"</span>
+
+<span class="n">TRAINING_IMAGES</span> <span class="o">=</span> <span class="n">BASE_URL</span> <span class="o">+</span> <span class="s2">"train-images-idx3-ubyte.gz"</span>
+<span class="n">TRAINING_IMAGES_LABELS</span> <span class="o">=</span> <span class="n">BASE_URL</span> <span class="o">+</span> <span class="s2">"train-labels-idx1-ubyte.gz"</span>
+<span class="n">TEST_IMAGES</span> <span class="o">=</span> <span class="n">BASE_URL</span> <span class="o">+</span> <span class="s2">"t10k-images-idx3-ubyte.gz"</span>
+<span class="n">TEST_IMAGES_LABELS</span> <span class="o">=</span> <span class="n">BASE_URL</span> <span class="o">+</span> <span class="s2">"t10k-labels-idx1-ubyte.gz"</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We now want a place where we can save them, so we'll use <code>pathlib</code> to create a <code>data</code> directory in our current working directory, but only if it doesn't already exist. We also set up the final locations of the data for when we download it:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="n">LOCAL_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"data"</span><span class="p">)</span>
+<span class="c1"># check whether the path exists; create it if it doesn't exist</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">LOCAL_PATH</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="n">LOCAL_PATH</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    
+<span class="n">training_images_path</span> <span class="o">=</span> <span class="n">LOCAL_PATH</span> <span class="o">/</span> <span class="s2">"train-images-idx3-ubyte.gz"</span>
+<span class="n">training_images_labels_path</span> <span class="o">=</span> <span class="n">LOCAL_PATH</span> <span class="o">/</span> <span class="s2">"train-labels-idx1-ubyte.gz"</span>
+<span class="n">test_images_path</span> <span class="o">=</span> <span class="n">LOCAL_PATH</span> <span class="o">/</span> <span class="s2">"t10k-images-idx3-ubyte.gz"</span>
+<span class="n">test_images_labels_path</span> <span class="o">=</span> <span class="n">LOCAL_PATH</span> <span class="o">/</span> <span class="s2">"t10k-labels-idx1-ubyte.gz"</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>There's probably a more elegant way to do this where we loop over a list, but the way I set up the URLs and the filenames didn't lend itself to that approach so here I just download them one by one, but only if they don't already exist.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <span class="n">urlretrieve</span>
+
+<span class="k">if</span> <span class="ow">not</span> <span class="n">training_images_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="n">urlretrieve</span><span class="p">(</span><span class="n">TRAINING_IMAGES</span><span class="p">,</span> <span class="n">training_images_path</span><span class="p">)</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">training_images_labels_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="n">urlretrieve</span><span class="p">(</span><span class="n">TRAINING_IMAGES_LABELS</span><span class="p">,</span> <span class="n">training_images_labels_path</span><span class="p">)</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">test_images_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="n">urlretrieve</span><span class="p">(</span><span class="n">TEST_IMAGES</span><span class="p">,</span> <span class="n">test_images_path</span><span class="p">)</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">test_images_labels_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="n">urlretrieve</span><span class="p">(</span><span class="n">TEST_IMAGES_LABELS</span><span class="p">,</span> <span class="n">test_images_labels_path</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Here you can see that we have downloaded four files as expected:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>ls -l data
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>total 60328
+-rw-r--r--  1 strickvl  staff   4422102 22 Oct 16:12 t10k-images-idx3-ubyte.gz
+-rw-r--r--  1 strickvl  staff      5148 22 Oct 16:12 t10k-labels-idx1-ubyte.gz
+-rw-r--r--  1 strickvl  staff  26421880 22 Oct 16:12 train-images-idx3-ubyte.gz
+-rw-r--r--  1 strickvl  staff     29515 22 Oct 16:12 train-labels-idx1-ubyte.gz
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Unzip-the-files-and-separate-out-the-data">
+<a class="anchor" href="#Unzip-the-files-and-separate-out-the-data" aria-hidden="true"><span class="octicon octicon-link"></span></a>Unzip the files and separate out the data<a class="anchor-link" href="#Unzip-the-files-and-separate-out-the-data"> </a>
+</h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In the lesson, Jeremy downloads a pre-made MNIST file which contains a tuple of tuples. With Fashion-MNIST, we have four separate files representing our training and test data and our labels for each. Now our task is to unzip those files and grab the data as arrays.</p>
+<p>Note that there are convenience functions provided for both MNIST and Fashion-MNIST to do much of what we do below, since most people want the data as numpy arrays, not Python arrays.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">gzip</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We have one elephant in the room which is this <code>parse_idx</code> function that I'm showing below in a collapsed cell. This was one part that I didn't want to get too lost in so I simply went to the source code of one of these helper functions, <a href="https://github.com/datapythonista/mnist/blob/master/mnist/__init__.py">specifically that written by <code>datapythonista</code></a> for MNIST.</p>
+<p>This still all is standard library imports so I think technically I'm ok including this code here since the MNIST download Jeremy used in the lesson comes pre-parsed, it seems. After inspecting the data in the files, it seems that we have a series of bytes that need to be parsed somehow if they're going to be used as an array. The original function returned a numpy array, but I modified it slightly such that it returns a nested array instead. I consider this not a very interesting part of the process so I'm hiding it away.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<details class="description">
+      <summary class="btn btn-sm" data-open="Hide Code" data-close="Show Code"></summary>
+        <p></p>
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># taken from https://github.com/datapythonista/mnist/blob/master/mnist/__init__.py</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+<span class="kn">import</span> <span class="nn">struct</span>
+<span class="kn">import</span> <span class="nn">array</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+
+<span class="k">def</span> <span class="nf">parse_idx</span><span class="p">(</span><span class="n">fd</span><span class="p">):</span>
+    <span class="sd">"""Parse an IDX file, and return it as an array of arrays.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fd : file</span>
+<span class="sd">        File descriptor of the IDX file to parse</span>
+<span class="sd">    endian : str</span>
+<span class="sd">        Byte order of the IDX file. See [1] for available options</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    data : array</span>
+<span class="sd">        Numpy array with the dimensions and the data in the IDX file</span>
+<span class="sd">    1. https://docs.python.org/3/library/struct.html</span>
+<span class="sd">        #byte-order-size-and-alignment</span>
+<span class="sd">    """</span>
+    <span class="n">DATA_TYPES</span> <span class="o">=</span> <span class="p">{</span><span class="mh">0x08</span><span class="p">:</span> <span class="s1">'B'</span><span class="p">,</span>  <span class="c1"># unsigned byte</span>
+                  <span class="mh">0x09</span><span class="p">:</span> <span class="s1">'b'</span><span class="p">,</span>  <span class="c1"># signed byte</span>
+                  <span class="mh">0x0b</span><span class="p">:</span> <span class="s1">'h'</span><span class="p">,</span>  <span class="c1"># short (2 bytes)</span>
+                  <span class="mh">0x0c</span><span class="p">:</span> <span class="s1">'i'</span><span class="p">,</span>  <span class="c1"># int (4 bytes)</span>
+                  <span class="mh">0x0d</span><span class="p">:</span> <span class="s1">'f'</span><span class="p">,</span>  <span class="c1"># float (4 bytes)</span>
+                  <span class="mh">0x0e</span><span class="p">:</span> <span class="s1">'d'</span><span class="p">}</span>  <span class="c1"># double (8 bytes)</span>
+
+    <span class="n">header</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">IdxDecodeError</span><span class="p">(</span><span class="s1">'Invalid IDX file, '</span>
+                             <span class="s1">'file empty or does not contain a full header.'</span><span class="p">)</span>
+
+    <span class="n">zeros</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">num_dimensions</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">'&gt;HBB'</span><span class="p">,</span> <span class="n">header</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">zeros</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">IdxDecodeError</span><span class="p">(</span><span class="s1">'Invalid IDX file, '</span>
+                             <span class="s1">'file must start with two zero bytes. '</span>
+                             <span class="s1">'Found 0x</span><span class="si">%02x</span><span class="s1">'</span> <span class="o">%</span> <span class="n">zeros</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">data_type</span> <span class="o">=</span> <span class="n">DATA_TYPES</span><span class="p">[</span><span class="n">data_type</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">IdxDecodeError</span><span class="p">(</span><span class="s1">'Unknown data type '</span>
+                             <span class="s1">'0x</span><span class="si">%02x</span><span class="s1"> in IDX file'</span> <span class="o">%</span> <span class="n">data_type</span><span class="p">)</span>
+
+    <span class="n">dimension_sizes</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">'&gt;'</span> <span class="o">+</span> <span class="s1">'I'</span> <span class="o">*</span> <span class="n">num_dimensions</span><span class="p">,</span>
+                                    <span class="n">fd</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">num_dimensions</span><span class="p">))</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data_type</span><span class="p">,</span> <span class="n">fd</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">byteswap</span><span class="p">()</span>  <span class="c1"># looks like array.array reads data as little endian</span>
+
+    <span class="n">expected_items</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">mul</span><span class="p">,</span> <span class="n">dimension_sizes</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">!=</span> <span class="n">expected_items</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">IdxDecodeError</span><span class="p">(</span><span class="s1">'IDX file has wrong number of items. '</span>
+                             <span class="s1">'Expected: </span><span class="si">%d</span><span class="s1">. Found: </span><span class="si">%d</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">expected_items</span><span class="p">,</span>
+                                                          <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">data</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+    </details>
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>There's one final piece of the process which comes from the fact that the array (i.e. the <code>data</code> local variable inside the <code>parse_idx</code> function) that gets returned is a single array (i.e. all the pixel values for all 60,000 images just listed one after another). We'll want to split these up into separate chunks:</p>
+<ul>
+<li>splitting each image into a separate array of 784 values (because our images are 28x28 size)</li>
+<li>then splitting each image into an array of arrays giving us our 28x28 matrix.</li>
+</ul>
+<p>I'll include the code that we use for this in the class, a <code>chunks</code> function, but I'll return to how it works once everything is loaded.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">chunks</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">size</span><span class="p">):</span> 
+        <span class="k">yield</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="n">size</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Load-the-data-into-memory">
+<a class="anchor" href="#Load-the-data-into-memory" aria-hidden="true"><span class="octicon octicon-link"></span></a>Load the data into memory<a class="anchor-link" href="#Load-the-data-into-memory"> </a>
+</h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We use the chunks function here to turn our array of 47,040,000 values into matrices. To start with, something like <code>x_train</code> will have 60,000 separate arrays of 784 pixels, as we can see when we get the lengths of the initial array and then the length of the first item.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">with</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">training_images_path</span><span class="p">,</span> <span class="s1">'rb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">pixels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">parse_idx</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+    <span class="n">x_train</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">chunks</span><span class="p">(</span><span class="n">pixels</span><span class="p">,</span> <span class="mi">784</span><span class="p">))</span>
+
+<span class="k">with</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">training_images_labels_path</span><span class="p">,</span> <span class="s1">'rb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">y_train</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">parse_idx</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+    
+<span class="k">with</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">test_images_path</span><span class="p">,</span> <span class="s1">'rb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">pixels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">parse_idx</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+    <span class="n">x_valid</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">chunks</span><span class="p">(</span><span class="n">pixels</span><span class="p">,</span> <span class="mi">784</span><span class="p">))</span>
+    
+<span class="k">with</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">test_images_labels_path</span><span class="p">,</span> <span class="s1">'rb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">y_valid</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">parse_idx</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">x_train</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">x_train</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(60000, 784)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The labels are in a slightly different format, containing single integer values indicating which item the image refers to. We can check and show that we have 60,000 of those values, as we'd expect, and we can even see what values those refer to with a simple conversion:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">y_train</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>60000</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">y_train</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[9, 0, 0, 3, 0, 2, 7, 2, 5, 5]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># https://github.com/zalandoresearch/fashion-mnist</span>
+<span class="n">index_to_label</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="mi">0</span><span class="p">:</span> <span class="s2">"T-shirt/top"</span><span class="p">,</span>
+    <span class="mi">1</span><span class="p">:</span> <span class="s2">"Trouser"</span><span class="p">,</span>
+    <span class="mi">2</span><span class="p">:</span> <span class="s2">"Pullover"</span><span class="p">,</span>
+    <span class="mi">3</span><span class="p">:</span> <span class="s2">"Dress"</span><span class="p">,</span>
+    <span class="mi">4</span><span class="p">:</span> <span class="s2">"Coat"</span><span class="p">,</span>
+    <span class="mi">5</span><span class="p">:</span> <span class="s2">"Sandal"</span><span class="p">,</span>
+    <span class="mi">6</span><span class="p">:</span> <span class="s2">"Shirt"</span><span class="p">,</span>
+    <span class="mi">7</span><span class="p">:</span> <span class="s2">"Sneaker"</span><span class="p">,</span>
+    <span class="mi">8</span><span class="p">:</span> <span class="s2">"Bag"</span><span class="p">,</span>
+    <span class="mi">9</span><span class="p">:</span> <span class="s2">"Ankle boot"</span>
+<span class="p">}</span>
+
+<span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">index_to_label</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">y_train</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">]))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>['Ankle boot',
+ 'T-shirt/top',
+ 'T-shirt/top',
+ 'Dress',
+ 'T-shirt/top',
+ 'Pullover',
+ 'Sneaker',
+ 'Pullover',
+ 'Sandal',
+ 'Sandal']</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Plot-some-examples-using-matplotlib">
+<a class="anchor" href="#Plot-some-examples-using-matplotlib" aria-hidden="true"><span class="octicon octicon-link"></span></a>Plot some examples using <code>matplotlib</code><a class="anchor-link" href="#Plot-some-examples-using-matplotlib"> </a>
+</h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We can plot out one or two of our images to confirm that we're seeing the right images and that everything's as expected:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span><span class="o">,</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This is the first image, which should be an ankle boot as per the labels above.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">'image.cmap'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'gray'</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">chunks</span><span class="p">(</span><span class="n">x_train</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">28</span><span class="p">)));</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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Z/DFF18EQRAEzz//fNC/f/9g7dq1we7du4M77rgjGDZsWNDQ0GC88vi60Hmora0NHnvssWDLli3BwYMHg/fffz/4wQ9+EIwcOTJobGy0XnrczJ8/P4hEIsHGjRuDo0ePtm/19fXt+zz88MPB4MGDgw0bNgTbt28PioqKgqKiIsNVx9/FzsP+/fuDX/3qV8H27duDgwcPBmvXrg2GDx8eTJkyxXjlHXWLAgqCIPjDH/4QDB48OEhJSQkmTZoUbN261XpJnW7OnDlBXl5ekJKSElxxxRXBnDlzgv3791svK+E++OCDQNJZ29y5c4MgOPNW7KeeeirIyckJwuFwMHXq1GDv3r22i06AC52H+vr6YNq0acHAgQOD3r17B0OGDAkefPDBHvc/aef675cUrFixon2fhoaG4Kc//Wnwve99L+jbt29w5513BkePHrVbdAJc7DwcOnQomDJlSpCZmRmEw+HgyiuvDH7xi18E0WjUduHfwq9jAACY6PKvAQEAeiYKCABgggICAJiggAAAJiggAIAJCggAYIICAgCYoIAAACYoIACACQoIAGCCAgIAmKCAAAAm/h+r5MpJjoz0fwAAAABJRU5ErkJggg==%0A">
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This is the fourth image, which should be a dress as per the labels above:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">'image.cmap'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'gray'</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">chunks</span><span class="p">(</span><span class="n">x_train</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="mi">28</span><span class="p">)));</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAaAAAAGdCAYAAABU0qcqAAAAOXRFWHRTb2Z0d2FyZQBNYXRwbG90bGliIHZlcnNpb24zLjYuMSwgaHR0cHM6Ly9tYXRwbG90bGliLm9yZy/av/WaAAAACXBIWXMAAA9hAAAPYQGoP6dpAAAgFklEQVR4nO3df2xV9f3H8Vdb2lsK5ZZS+gsLFkSZlrKMCSMi4mgonVFRsqj4BxgD0RU3QKfroqJuS/fVZCMahv9sdCbir0Qg6sKiFUqcBQPKCHFroCtQpC0/tL393dKe7x/EbpXy43O4t+/28nwkJ6H33lfPp4cDr57e2/eN8TzPEwAAgyzWegEAgKsTBQQAMEEBAQBMUEAAABMUEADABAUEADBBAQEATFBAAAATI6wX8F29vb06ceKEkpOTFRMTY70cAIAjz/PU3Nys7OxsxcZe+DpnyBXQiRMnlJOTY70MAMAVqq2t1TXXXHPB+4dcASUnJ1svAZdp4sSJzpm5c+c6Z+644w7nzNdff+2ckaS33nrLOfPPf/7TOXP99dc7Z+666y7nzG233eackaT29nbnjJ9jV1ZW5pzB8HGp/88jVkAbNmzQSy+9pPr6es2YMUOvvPKKZs2adckcP3YbPi52aX0hCQkJzpmkpCTnjJ//QCVpxAj3fxJ+ztm4uDjnTGJionNm9OjRzhlp8P5uEd0u9W8jIi9CeOutt7R27VqtW7dOn3/+uWbMmKHCwkKdPHkyErsDAAxDESmgP/zhD1qxYoUeeugh3XjjjXr11VeVlJSkv/zlL5HYHQBgGAp7AXV1dWnfvn0qKCj4705iY1VQUKDKysrzHt/Z2alQKNRvAwBEv7AX0OnTp9XT06OMjIx+t2dkZKi+vv68x5eWlioYDPZtvAIOAK4O5r+IWlJSoqampr6ttrbWekkAgEEQ9lfBpaWlKS4uTg0NDf1ub2hoUGZm5nmPDwQCCgQC4V4GAGCIC/sVUEJCgmbOnKny8vK+23p7e1VeXq45c+aEe3cAgGEqIr8HtHbtWi1btkw//OEPNWvWLK1fv16tra166KGHIrE7AMAwFJECuu+++3Tq1Ck9++yzqq+v1/e//31t3779vBcmAACuXjGe53nWi/hfoVBIwWDQehnDVlFRkXNmzZo1vvblZ9qAn9+W7+jocM74HemUl5fnnPHzjdWRI0ecM2fPnnXO1NXVOWckqampyTnj57ncCRMmOGf+98f7l+vnP/+5cwZXrqmpSWPGjLng/eavggMAXJ0oIACACQoIAGCCAgIAmKCAAAAmKCAAgAkKCABgggICAJiggAAAJiggAIAJCggAYIICAgCYYBjpEDZlyhTnzHPPPeec+e6bB16upKQk50xsrPv3PL29vc4ZP4M7JQ3aW8L7+Zr8ZPwMFZX8Hb/u7m7nzNdff+2c8TPAtLGx0TkjSU888YSvHM5hGCkAYEiigAAAJiggAIAJCggAYIICAgCYoIAAACYoIACACQoIAGCCAgIAmKCAAAAmKCAAgAkKCABgggICAJgYYb0AXNjjjz/unDl16lQEVjIwP5OtExMTnTN+JjP7nYZdU1PjnPEzcdrPcfAzDTsQCDhn/Orp6XHOjBjh/l/Q0aNHnTN5eXnOGUm64447nDMffPCBr31djbgCAgCYoIAAACYoIACACQoIAGCCAgIAmKCAAAAmKCAAgAkKCABgggICAJiggAAAJiggAIAJCggAYIJhpENYWVmZc2bNmjXOGb8DTBsaGpwzycnJzpnu7m7njF9dXV3OmbS0tAis5HyhUMg5097eHoGVhI+f4x0MBp0ztbW1zhmJwaKRxhUQAMAEBQQAMEEBAQBMUEAAABMUEADABAUEADBBAQEATFBAAAATFBAAwAQFBAAwQQEBAExQQAAAEwwjHcI+++wz50xlZaVz5q677nLOSNKePXucMyNGuJ9ySUlJzpkzZ844ZyR/wzFPnz7tnOno6HDO+DkOfo635G/w6fjx433ty5Wf4/CrX/0qAivBleIKCABgggICAJgIewE999xziomJ6bdNmzYt3LsBAAxzEXkO6KabbtJHH3303534/Dk0ACB6RaQZRowYoczMzEh8agBAlIjIc0CHDh1Sdna2Jk+erAcffFDHjh274GM7OzsVCoX6bQCA6Bf2Apo9e7bKysq0fft2bdy4UTU1Nbr11lvV3Nw84ONLS0sVDAb7tpycnHAvCQAwBIW9gIqKivTTn/5U+fn5Kiws1N/+9jc1Njbq7bffHvDxJSUlampq6ttqa2vDvSQAwBAU8VcHpKSk6Prrr9fhw4cHvD8QCCgQCER6GQCAISbivwfU0tKi6upqZWVlRXpXAIBhJOwF9MQTT6iiokJHjhzRp59+qnvuuUdxcXF64IEHwr0rAMAwFvYfwR0/flwPPPCAzpw5o/Hjx2vu3LnavXv3oM2JAgAMDzGe53nWi/hfoVBIwWDQehlXlerqal+5iooK58ypU6ecM729vc6ZlpYW54ykC75aM9zi4uKcM93d3c4Zv78EHh8f75zxMyTUz7/1HTt2OGfee+895wyuXFNTk8aMGXPB+5kFBwAwQQEBAExQQAAAExQQAMAEBQQAMEEBAQBMUEAAABMUEADABAUEADBBAQEATFBAAAATFBAAwETE35AO/vkZJHn27FnnzNy5c50zkvS73/3OV85VW1ubc8bPcZCkkSNHOmfa29udM37+bv1kOjs7nTOSFBs7ON+b+tkPg0WjB1dAAAATFBAAwAQFBAAwQQEBAExQQAAAExQQAMAEBQQAMEEBAQBMUEAAABMUEADABAUEADBBAQEATFBAAAATTMMewvxOdHZVV1fnK1ddXe2cyc3Ndc50dHQ4Z5qbm50zktTb2+uc8bM+P1OgW1panDPjx493zkj+zj0/X9PRo0edM4geXAEBAExQQAAAExQQAMAEBQQAMEEBAQBMUEAAABMUEADABAUEADBBAQEATFBAAAATFBAAwAQFBAAwwTBS+OZn+GRycrJzxs+A0EAg4JyRpFAo5JxJSEhwzvgZYNrV1eWc8WuwBuGePHlyUPaDoYkrIACACQoIAGCCAgIAmKCAAAAmKCAAgAkKCABgggICAJiggAAAJiggAIAJCggAYIICAgCYoIAAACYYRhpl/AwI9TPsU5KOHz/unMnPz3fO+PmaOjs7nTOS5HmecyY+Pt4509PT45xJTEx0zrS3tztnJH/DUtPS0pwzX331lXPGjxEj/P1XN1hDWa9WXAEBAExQQAAAE84FtGvXLt15553Kzs5WTEyMtm7d2u9+z/P07LPPKisrSyNHjlRBQYEOHToUrvUCAKKEcwG1trZqxowZ2rBhw4D3v/jii3r55Zf16quvas+ePRo1apQKCwt9/UwZABC9nJ+ZKyoqUlFR0YD3eZ6n9evX6+mnn9bdd98tSXrttdeUkZGhrVu36v7777+y1QIAokZYnwOqqalRfX29CgoK+m4LBoOaPXu2KisrB8x0dnYqFAr12wAA0S+sBVRfXy9JysjI6Hd7RkZG333fVVpaqmAw2Lfl5OSEc0kAgCHK/FVwJSUlampq6ttqa2utlwQAGARhLaDMzExJUkNDQ7/bGxoa+u77rkAgoDFjxvTbAADRL6wFlJubq8zMTJWXl/fdFgqFtGfPHs2ZMyecuwIADHPOr4JraWnR4cOH+z6uqanR/v37lZqaqokTJ2r16tX67W9/q6lTpyo3N1fPPPOMsrOztXjx4nCuGwAwzDkX0N69e3X77bf3fbx27VpJ0rJly1RWVqYnn3xSra2tWrlypRobGzV37lxt377d1xwrAED0ci6g+fPnX3RgY0xMjF544QW98MILV7QwDH1HjhxxzvgZLJqQkOCcGTt2rHNG8vc1+RlYOW7cOOfMN99845zxO0zTzzBXP3+3DPu8upm/Cg4AcHWigAAAJiggAIAJCggAYIICAgCYoIAAACYoIACACQoIAGCCAgIAmKCAAAAmKCAAgAkKCABgggICAJhwnoYNfKu9vd0509vbG4GVhG8/cXFxzhk/bzXiZ31+pmGnpaU5ZyQpOTnZV85VfHz8oOwHQxNXQAAAExQQAMAEBQQAMEEBAQBMUEAAABMUEADABAUEADBBAQEATFBAAAATFBAAwAQFBAAwQQEBAEwwjDTKDNawT0k6e/asc+bUqVPOma6uLueMn8GdfvnZl5+vaeTIkc6ZkydPOmckafz48c6ZlpYWX/vC1YsrIACACQoIAGCCAgIAmKCAAAAmKCAAgAkKCABgggICAJiggAAAJiggAIAJCggAYIICAgCYoIAAACYYRhplYmPdv6fwO8A0OTnZOTN27FjnTFtbm3MmNTXVOePX6dOnnTNJSUnOmWAw6JzxM/TUr5iYGOfMpEmTIrCS8/kZnIvI4woIAGCCAgIAmKCAAAAmKCAAgAkKCABgggICAJiggAAAJiggAIAJCggAYIICAgCYoIAAACYoIACACYaRRhm/g0X9OHXqlHPm4MGDzpna2lrnjJ9hn5LU0dHhnMnIyHDO+BkSeuTIEeeMn69H8jf4tK6uzjmTnZ3tnEH04AoIAGCCAgIAmHAuoF27dunOO+9Udna2YmJitHXr1n73L1++XDExMf22RYsWhWu9AIAo4VxAra2tmjFjhjZs2HDBxyxatEh1dXV92xtvvHFFiwQARB/nFyEUFRWpqKjooo8JBALKzMz0vSgAQPSLyHNAO3fuVHp6um644QY9+uijOnPmzAUf29nZqVAo1G8DAES/sBfQokWL9Nprr6m8vFz/93//p4qKChUVFamnp2fAx5eWlioYDPZtOTk54V4SAGAICvvvAd1///19f54+fbry8/M1ZcoU7dy5UwsWLDjv8SUlJVq7dm3fx6FQiBICgKtAxF+GPXnyZKWlpenw4cMD3h8IBDRmzJh+GwAg+kW8gI4fP64zZ84oKysr0rsCAAwjzj+Ca2lp6Xc1U1NTo/379ys1NVWpqal6/vnntWTJEmVmZqq6ulpPPvmkrrvuOhUWFoZ14QCA4c25gPbu3avbb7+97+Nvn79ZtmyZNm7cqAMHDuivf/2rGhsblZ2drYULF+o3v/mNAoFA+FYNABj2nAto/vz58jzvgvf//e9/v6IFYfi49dZbnTP/+c9/nDNHjx51zvgdwunn1wD8PG/pZ9hne3u7c8bP0FNJg/Yjcz+/L5ienu6cOXnypHNGkmJj3Z+lGMyBwMMds+AAACYoIACACQoIAGCCAgIAmKCAAAAmKCAAgAkKCABgggICAJiggAAAJiggAIAJCggAYIICAgCYoIAAACbC/pbcCJ/BmsTr9y3Qb7zxRueMn2nYKSkpzpm0tDTnjKQLvnPvxYwaNco5k5ub65xpbGx0zgz1dxhuaWlxzixdutQ5s379eueMxGTrSOMKCABgggICAJiggAAAJiggAIAJCggAYIICAgCYoIAAACYoIACACQoIAGCCAgIAmKCAAAAmKCAAgAmGkQ5hgzUIsbCw0Ffuyy+/dM4kJiY6Z0KhkHPm2muvdc5I0ldffeWcmTZtmnPGz9/t8ePHnTP5+fnOGUlqaGhwzowbN84588033zhnJkyY4Jy57rrrnDOSv+G0uHxcAQEATFBAAAATFBAAwAQFBAAwQQEBAExQQAAAExQQAMAEBQQAMEEBAQBMUEAAABMUEADABAUEADDBMFL4Hlh54MAB50xcXJxzJiEhwTkTCAScM375+Zr88DPA1O9A246ODudMTk6Oc8bPoNnBHE7LMNLI4goIAGCCAgIAmKCAAAAmKCAAgAkKCABgggICAJiggAAAJiggAIAJCggAYIICAgCYoIAAACYoIACACYaRRhk/Qxfr6up87SsxMdE509LS4pwZMcL9ND179qxzRpJGjhzpK+fKz/r8DBYdzKGsbW1tzpmMjAznzFdffeWcGT9+vHMGkccVEADABAUEADDhVEClpaW6+eablZycrPT0dC1evFhVVVX9HtPR0aHi4mKNGzdOo0eP1pIlS9TQ0BDWRQMAhj+nAqqoqFBxcbF2796tDz/8UN3d3Vq4cKFaW1v7HrNmzRq99957euedd1RRUaETJ07o3nvvDfvCAQDDm9Ozu9u3b+/3cVlZmdLT07Vv3z7NmzdPTU1N+vOf/6zNmzfrxz/+sSRp06ZN+t73vqfdu3frRz/6UfhWDgAY1q7oOaCmpiZJUmpqqiRp37596u7uVkFBQd9jpk2bpokTJ6qysnLAz9HZ2alQKNRvAwBEP98F1Nvbq9WrV+uWW25RXl6eJKm+vl4JCQlKSUnp99iMjAzV19cP+HlKS0sVDAb7Nj/vKw8AGH58F1BxcbEOHjyoN99884oWUFJSoqampr6ttrb2ij4fAGB48PWLqKtWrdL777+vXbt26Zprrum7PTMzU11dXWpsbOx3FdTQ0KDMzMwBP1cgEBjUX5YDAAwNTldAnudp1apV2rJliz7++GPl5ub2u3/mzJmKj49XeXl5321VVVU6duyY5syZE54VAwCigtMVUHFxsTZv3qxt27YpOTm573mdYDCokSNHKhgM6uGHH9batWuVmpqqMWPG6LHHHtOcOXN4BRwAoB+nAtq4caMkaf78+f1u37Rpk5YvXy5J+uMf/6jY2FgtWbJEnZ2dKiws1J/+9KewLBYAED2cCsjzvEs+JjExURs2bNCGDRt8Lwr+TZw40TnjZ8il5G9IaEJCgnPGz9DTnp4e54zk72vyY+zYsc4ZPwNM/X49fnI1NTXOmalTpzpn/ExWCQaDzhnpv79i4uLrr7/2ta+rEbPgAAAmKCAAgAkKCABgggICAJiggAAAJiggAIAJCggAYIICAgCYoIAAACYoIACACQoIAGCCAgIAmKCAAAAmBmf0LwZNXFyccyY21t/3IW1tbc6ZpKQk50x8fLxzpquryzkj+ZsMfjlT4r9r9OjRzhk/07A7OzudM5I0YcIE58zevXudM/PmzXPO1NXVOWf8TgX3M7WcadiXjysgAIAJCggAYIICAgCYoIAAACYoIACACQoIAGCCAgIAmKCAAAAmKCAAgAkKCABgggICAJiggAAAJhhGGmXS0tKcMwkJCb72derUKedMXl6ecyYxMdE5EwqFnDOSv2PhZ0hocnKyc8bP2jo6OpwzkpSfn++c+eCDD5wzjY2Nzhk/x8HPUFHJ/xBTXB6ugAAAJiggAIAJCggAYIICAgCYoIAAACYoIACACQoIAGCCAgIAmKCAAAAmKCAAgAkKCABgggICAJhg0l6U8TOMNDbW3/chZ86ccc4Eg0HnjJ+BkHV1dc4Zyd+gy2+++cY509ra6pzx+/c0WFpaWpwzfo5db2+vc8bP8ZakrKws50xVVZWvfV2NhvYZDQCIWhQQAMAEBQQAMEEBAQBMUEAAABMUEADABAUEADBBAQEATFBAAAATFBAAwAQFBAAwQQEBAEwwjDTKjB492jnT1tbma19jx471lXOVmJjonOnq6vK1Lz+DT8ePH++cOXXqlHNm1KhRzhk/a5P8DbWdMmWKc8bPYFE/Q1n97EeSkpOTfeVwebgCAgCYoIAAACacCqi0tFQ333yzkpOTlZ6ersWLF5/33hfz589XTExMv+2RRx4J66IBAMOfUwFVVFSouLhYu3fv1ocffqju7m4tXLjwvDd7WrFiherq6vq2F198MayLBgAMf07PuG7fvr3fx2VlZUpPT9e+ffs0b968vtuTkpKUmZkZnhUCAKLSFT0H1NTUJElKTU3td/vrr7+utLQ05eXlqaSk5KKvsurs7FQoFOq3AQCin++XYff29mr16tW65ZZblJeX13f70qVLNWnSJGVnZ+vAgQN66qmnVFVVpXfffXfAz1NaWqrnn3/e7zIAAMOU7wIqLi7WwYMH9cknn/S7feXKlX1/nj59urKysrRgwQJVV1cP+HsCJSUlWrt2bd/HoVBIOTk5fpcFABgmfBXQqlWr9P7772vXrl265pprLvrY2bNnS5IOHz48YAEFAgEFAgE/ywAADGNOBeR5nh577DFt2bJFO3fuVG5u7iUz+/fvlyRlZWX5WiAAIDo5FVBxcbE2b96sbdu2KTk5WfX19ZKkYDCokSNHqrq6Wps3b9ZPfvITjRs3TgcOHNCaNWs0b9485efnR+QLAAAMT04FtHHjRknnftn0f23atEnLly9XQkKCPvroI61fv16tra3KycnRkiVL9PTTT4dtwQCA6OD8I7iLycnJUUVFxRUtCABwdWAadpSZOnWqc6ampsbXvvxMqfbDz/TjpKQkX/vq6Ohwznz66afOmaVLlzpn/EzqLi8vd85I/o65n0xKSopz5ruTVy6H33N8x44dvnK4PAwjBQCYoIAAACYoIACACQoIAGCCAgIAmKCAAAAmKCAAgAkKCABgggICAJiggAAAJiggAIAJCggAYCLGu9SI60EWCoUUDAatlzFs+RlYefbsWV/78jN8sre31zkz0DvpXsrRo0edM5Iu+Q6/Azly5IivfQHRrqmpSWPGjLng/VwBAQBMUEAAABMUEADABAUEADBBAQEATFBAAAATFBAAwAQFBAAwQQEBAExQQAAAExQQAMCE++CwCBtio+mGncE8foO1Lz/z4/yuzc++AAzsUv8Oh1wBNTc3Wy9hWOvp6Rm0fQ1WAdXU1AzKfiTp2LFjg7YvINo1NzdfdLj0kJuG3dvbqxMnTig5OVkxMTH97guFQsrJyVFtbe1FJ6xGO47DORyHczgO53AczhkKx8HzPDU3Nys7O/uiU/OH3BVQbGzsJUfijxkz5qo+wb7FcTiH43AOx+EcjsM51sfhct5WhxchAABMUEAAABPDqoACgYDWrVunQCBgvRRTHIdzOA7ncBzO4TicM5yOw5B7EQIA4OowrK6AAADRgwICAJiggAAAJiggAICJYVNAGzZs0LXXXqvExETNnj1bn332mfWSBt1zzz2nmJiYftu0adOslxVxu3bt0p133qns7GzFxMRo69at/e73PE/PPvussrKyNHLkSBUUFOjQoUM2i42gSx2H5cuXn3d+LFq0yGaxEVJaWqqbb75ZycnJSk9P1+LFi1VVVdXvMR0dHSouLta4ceM0evRoLVmyRA0NDUYrjozLOQ7z588/73x45JFHjFY8sGFRQG+99ZbWrl2rdevW6fPPP9eMGTNUWFiokydPWi9t0N10002qq6vr2z755BPrJUVca2urZsyYoQ0bNgx4/4svvqiXX35Zr776qvbs2aNRo0apsLBQHR0dg7zSyLrUcZCkRYsW9Ts/3njjjUFcYeRVVFSouLhYu3fv1ocffqju7m4tXLhQra2tfY9Zs2aN3nvvPb3zzjuqqKjQiRMndO+99xquOvwu5zhI0ooVK/qdDy+++KLRii/AGwZmzZrlFRcX933c09PjZWdne6WlpYarGnzr1q3zZsyYYb0MU5K8LVu29H3c29vrZWZmei+99FLfbY2NjV4gEPDeeOMNgxUOju8eB8/zvGXLlnl33323yXqsnDx50pPkVVRUeJ537u8+Pj7ee+edd/oe869//cuT5FVWVlotM+K+exw8z/Nuu+027xe/+IXdoi7DkL8C6urq0r59+1RQUNB3W2xsrAoKClRZWWm4MhuHDh1Sdna2Jk+erAcffPCqn95cU1Oj+vr6fudHMBjU7Nmzr8rzY+fOnUpPT9cNN9ygRx99VGfOnLFeUkQ1NTVJklJTUyVJ+/btU3d3d7/zYdq0aZo4cWJUnw/fPQ7fev3115WWlqa8vDyVlJSora3NYnkXNOSGkX7X6dOn1dPTo4yMjH63Z2Rk6N///rfRqmzMnj1bZWVluuGGG1RXV6fnn39et956qw4ePKjk5GTr5Zmor6+XpAHPj2/vu1osWrRI9957r3Jzc1VdXa1f//rXKioqUmVlpeLi4qyXF3a9vb1avXq1brnlFuXl5Uk6dz4kJCQoJSWl32Oj+XwY6DhI0tKlSzVp0iRlZ2frwIEDeuqpp1RVVaV3333XcLX9DfkCwn8VFRX1/Tk/P1+zZ8/WpEmT9Pbbb+vhhx82XBmGgvvvv7/vz9OnT1d+fr6mTJminTt3asGCBYYri4zi4mIdPHjwqnge9GIudBxWrlzZ9+fp06crKytLCxYsUHV1taZMmTLYyxzQkP8RXFpamuLi4s57FUtDQ4MyMzONVjU0pKSk6Prrr9fhw4etl2Lm23OA8+N8kydPVlpaWlSeH6tWrdL777+vHTt29Hv7lszMTHV1damxsbHf46P1fLjQcRjI7NmzJWlInQ9DvoASEhI0c+ZMlZeX993W29ur8vJyzZkzx3Bl9lpaWlRdXa2srCzrpZjJzc1VZmZmv/MjFAppz549V/35cfz4cZ05cyaqzg/P87Rq1Spt2bJFH3/8sXJzc/vdP3PmTMXHx/c7H6qqqnTs2LGoOh8udRwGsn//fkkaWueD9asgLsebb77pBQIBr6yszPvyyy+9lStXeikpKV59fb310gbV448/7u3cudOrqanx/vGPf3gFBQVeWlqad/LkSeulRVRzc7P3xRdfeF988YUnyfvDH/7gffHFF97Ro0c9z/O83//+915KSoq3bds278CBA97dd9/t5ebmeu3t7cYrD6+LHYfm5mbviSee8CorK72amhrvo48+8n7wgx94U6dO9To6OqyXHjaPPvqoFwwGvZ07d3p1dXV9W1tbW99jHnnkEW/ixInexx9/7O3du9ebM2eON2fOHMNVh9+ljsPhw4e9F154wdu7d69XU1Pjbdu2zZs8ebI3b94845X3NywKyPM875VXXvEmTpzoJSQkeLNmzfJ2795tvaRBd99993lZWVleQkKCN2HCBO++++7zDh8+bL2siNuxY4cn6bxt2bJlnuedeyn2M88842VkZHiBQMBbsGCBV1VVZbvoCLjYcWhra/MWLlzojR8/3ouPj/cmTZrkrVixIuq+SRvo65fkbdq0qe8x7e3t3s9+9jNv7NixXlJSknfPPfd4dXV1douOgEsdh2PHjnnz5s3zUlNTvUAg4F133XXeL3/5S6+pqcl24d/B2zEAAEwM+eeAAADRiQICAJiggAAAJiggAIAJCggAYIICAgCYoIAAACYoIACACQoIAGCCAgIAmKCAAAAmKCAAgIn/B2P+VVnYD18DAAAAAElFTkSuQmCC%0A">
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Everything looks good!</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Chunking-with-iterators-and-generators">
+<a class="anchor" href="#Chunking-with-iterators-and-generators" aria-hidden="true"><span class="octicon octicon-link"></span></a>Chunking with iterators and generators<a class="anchor-link" href="#Chunking-with-iterators-and-generators"> </a>
+</h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>I promised I'd return to the <code>chunks</code> function defined above. There's a way to define it in a simpler fashion without using generators that goes something like this:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">chunks</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">size</span><span class="p">):</span>
+        <span class="n">subarray</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="n">size</span><span class="p">]</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">subarray</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Functionally this does almost the same thing as what we have above, but this simpler version is less ideal because we're iteratively building up our array in memory on the fly.</p>
+<p>The advantage of using a generator (which we create when we use <code>yield</code>) is that it only grabs the number of items we need at once, so it's far more memory efficient. (In other words, instead of grabbing all 60,000 images at once, we only make one image (i.e. 784 items / pixels) available at any one time.) With our generator, we can see the next set of items by calling <code>next</code> until we reach a <code>StopIterationError</code>.</p>
+<p>In our implementation, we don't get so many of those benefits since we're still going to store everything in memory anyway. We wrap all our chunk generator functions in <code>list()</code> which causes the interpreter to unfurl or unwrap our chunks into an array of arrays.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Define-a-matrix-class">
+<a class="anchor" href="#Define-a-matrix-class" aria-hidden="true"><span class="octicon octicon-link"></span></a>Define a matrix class<a class="anchor-link" href="#Define-a-matrix-class"> </a>
+</h1>
+<p>In standard Python if we want to index into one of our array image we'd normally have to do something like <code>image[0][15]</code> whereas in machine learning we generally prefer to do something like <code>image[0, 15]</code>. So our next step in manually implementing these things would be to create a <code>Matrix</code> class that allows us to do this.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">Matrix</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vals</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vals</span> <span class="o">=</span> <span class="n">vals</span>
+        
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vals</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">[</span><span class="n">vals</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">vals</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">img</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">chunks</span><span class="p">(</span><span class="n">x_train</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="mi">28</span><span class="p">))</span>
+<span class="n">Matrix</span><span class="p">(</span><span class="n">img</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="n">img</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(175, 175)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now we have a function that does what we want. You can see we used the built-in <code>__getitem__</code> function which we over-wrote. This is what Python uses under the hood when you use square brackets to get values from an array, so by overwriting it we can achieve the behaviour we're looking for.</p>
+<p>In reality, this implementation probably leaves a bit to be desired, so now that we've implemented it from scratch, we can discard our own version and just use a <code>tensor</code> object from PyTorch:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">tensor</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">tensor</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">chunks</span><span class="p">(</span><span class="n">x_train</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="mi">28</span><span class="p">)))</span>
+<span class="n">t</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>torch.Size([28, 28])</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now that we know it works, we can map all our values and turn them into tensor objects.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">x_valid</span><span class="p">,</span> <span class="n">y_valid</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">x_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">))</span>
+<span class="n">x_train</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>torch.Size([60000, 784])</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>As mentioned above, using tensors comes with a bunch of extra benefits.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Find-the-shape,-min-and-max-values">
+<a class="anchor" href="#Find-the-shape,-min-and-max-values" aria-hidden="true"><span class="octicon octicon-link"></span></a>Find the shape, min and max values<a class="anchor-link" href="#Find-the-shape,-min-and-max-values"> </a>
+</h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Our <code>x_train</code> is in the shape [60000, 784] and our y_train is just 60,000 individual values. So we still need to chunk our images into 28x28 matrices.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">y_train</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>torch.Size([60000])</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>For the chunking process, instead of our own function we can use PyTorch's <code>reshape</code> method. Note that we pass in the desired new shape, so in our case that could be <code>(60000,28,28)</code>. It is more common, however, to use and see the number -1 for the first value, which implies that PyTorch should figure out what the value for that first dimension should be. In our case, we have 60,000 items so that's how big it should be and these two options are both equivalent.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">train_imgs</span> <span class="o">=</span> <span class="n">x_train</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">28</span><span class="p">,</span><span class="mi">28</span><span class="p">))</span>
+<span class="n">train_imgs</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>torch.Size([60000, 28, 28])</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We can find out the minimum and maximum value found inside one of our images by using Python's <code>min</code>, but this is an inbuilt method on the tensor object as well so we can use that now:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">train_imgs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">train_imgs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(tensor(0), tensor(255))</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>As expected, our pixel values represent the 256 shades of grey available. Our labels represent the 10 possible clothing types listed above, so we'd expect our minimum and maximum to be zero and nine respectively:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">y_train</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">y_train</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(tensor(0), tensor(9))</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Generate-some-random-numbers">
+<a class="anchor" href="#Generate-some-random-numbers" aria-hidden="true"><span class="octicon octicon-link"></span></a>Generate some random numbers<a class="anchor-link" href="#Generate-some-random-numbers"> </a>
+</h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We finished out the lesson with a brief discussion of random number generators, how to implement them and how this might be important for deep learning work. As we learned, there is no way for computers to generate truly random numbers. People go to interesting lengths to create their own random numbers, such as <a href="https://www.cloudflare.com/en-gb/learning/ssl/lava-lamp-encryption/">the infamous lava lamp wall</a> at Cloudflare, but we are left with being able to create only pseudo-random numbers.</p>
+<p>In the class we see a way based on the Wichmann Hill algorithm used before Python 2.3, which goes as follows:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">rnd_state</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="k">def</span> <span class="nf">seed</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">rnd_state</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">30268</span><span class="p">)</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">30306</span><span class="p">)</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">30322</span><span class="p">)</span>
+    <span class="n">rnd_state</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">z</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+
+<span class="k">def</span> <span class="nf">rand</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">rnd_state</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">rnd_state</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="mi">171</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="o">%</span> <span class="mi">30269</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="mi">172</span> <span class="o">*</span> <span class="n">y</span><span class="p">)</span> <span class="o">%</span> <span class="mi">30307</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="p">(</span><span class="mi">170</span> <span class="o">*</span> <span class="n">z</span><span class="p">)</span> <span class="o">%</span> <span class="mi">30323</span>
+    <span class="n">rnd_state</span> <span class="o">=</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="mi">30269</span> <span class="o">+</span> <span class="n">y</span><span class="o">/</span><span class="mi">30307</span> <span class="o">+</span> <span class="n">z</span><span class="o">/</span><span class="mi">30323</span><span class="p">)</span> <span class="o">%</span> <span class="mf">1.0</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We have two functions. It's important to note that the <code>seed</code> is an important part of these pseudo-random number generators. The seed gives us a number that our generator starts with. Note also how we use global state to store the <code>rnd_state</code> variable, and how we are continually updating our values in that state as we generate. Also note that the process of generating the values is fairly simple, but also eminently reproducible.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">seed</span><span class="p">(</span><span class="mi">2349873456787298</span><span class="p">)</span> <span class="c1"># some number I came up with by mashing my keyboard numbers</span>
+<span class="n">rnd_state</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(24775, 23862, 14675)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">rand</span><span class="p">(),</span><span class="n">rand</span><span class="p">(),</span><span class="n">rand</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(0.6580068826155674, 0.669616116835976, 0.9249613879702964)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We now have a function which generates pseudo-random numbers, but as we'll see, it's not the fastest bit of code around...</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Profile-our-code">
+<a class="anchor" href="#Profile-our-code" aria-hidden="true"><span class="octicon octicon-link"></span></a>Profile our code<a class="anchor-link" href="#Profile-our-code"> </a>
+</h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Python has a handy <a href="https://docs.python.org/3/library/timeit.html"><code>timeit</code> module</a> which allows you to calculate how long your code takes to run. What's more, it'll run your code hundreds or thousands of times to get average run times. Here we can see how fast our pseudo-random number generator takes to run, on average:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">timeit</span> -n 10 list(chunks([rand() for _ in range(7840)], 10))
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>4.05 ms ± 500 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>If we compare it against PyTorch's random number generator, we can see a distinct difference, however:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">timeit</span> -n 10 torch.randn(784,10)
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>56.1 µs ± 23.5 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now we're talking about microseconds vs miliseconds, which is a big difference, so we should probably stick to how PyTorch does it.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span>torch.randn<span class="o">??</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea ">
+<pre><span class="ansi-red-fg">Docstring:</span>
+randn(*size, *, out=None, dtype=None, layout=torch.strided, device=None, requires_grad=False) -&gt; Tensor
+
+Returns a tensor filled with random numbers from a normal distribution
+with mean `0` and variance `1` (also called the standard normal
+distribution).
+
+.. math::
+    \text{out}_{i} \sim \mathcal{N}(0, 1)
+
+The shape of the tensor is defined by the variable argument :attr:`size`.
+
+Args:
+    size (int...): a sequence of integers defining the shape of the output tensor.
+        Can be a variable number of arguments or a collection like a list or tuple.
+
+Keyword args:
+    generator (:class:`torch.Generator`, optional): a pseudorandom number generator for sampling
+    out (Tensor, optional): the output tensor.
+    dtype (:class:`torch.dtype`, optional): the desired data type of returned tensor.
+        Default: if ``None``, uses a global default (see :func:`torch.set_default_tensor_type`).
+    layout (:class:`torch.layout`, optional): the desired layout of returned Tensor.
+        Default: ``torch.strided``.
+    device (:class:`torch.device`, optional): the desired device of returned tensor.
+        Default: if ``None``, uses the current device for the default tensor type
+        (see :func:`torch.set_default_tensor_type`). :attr:`device` will be the CPU
+        for CPU tensor types and the current CUDA device for CUDA tensor types.
+    requires_grad (bool, optional): If autograd should record operations on the
+        returned tensor. Default: ``False``.
+
+Example::
+
+    &gt;&gt;&gt; torch.randn(4)
+    tensor([-2.1436,  0.9966,  2.3426, -0.6366])
+    &gt;&gt;&gt; torch.randn(2, 3)
+    tensor([[ 1.5954,  2.8929, -1.0923],
+            [ 1.1719, -0.4709, -0.1996]])
+<span class="ansi-red-fg">Type:</span>      builtin_function_or_method
+</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>PyTorch has <a href="https://pytorch.org/docs/stable/notes/randomness.html">an interesting document entitled 'Reproducibility'</a> in which they state the things that you can try to do to make your code as non-deterministic (i.e. non-random) as possible. This is important if you want to be able to reproduce your work. At the top, however, and as I learned during the Sunday Delft FastAI Study Group discussion, it's not as simple as setting seed values; sometimes even the hardware used needs to be identical in order to achieve reproducibility:</p>
+<blockquote>
+<p>"Completely reproducible results are not guaranteed across PyTorch releases, individual commits, or different platforms. Furthermore, results may not be reproducible between CPU and GPU executions, even when using identical seeds."</p>
+</blockquote>
+<p>But why do we care about random values in deep learning to start with? We care because we are often doing things like augmentations in parallel. Augmentations are randomly generated, so if all the parallel processes use the same random number sequences then all the processes will generate the same augmented images.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We saw the nice example in the lesson of how our function runs into exactly this problem:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">fork</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'In parent: </span><span class="si">{</span><span class="n">rand</span><span class="p">()</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'In child: </span><span class="si">{</span><span class="n">rand</span><span class="p">()</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">_exit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">EX_OK</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>In parent: 0.17354408428968426
+In child: 0.17354408428968426
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We create two forked processes, which are identical copies of each other. Then we call our pseudo-random number generator. You would expect that these two values would be different, but because we've copied the entire state then we get identical values. What we'd need to do is to set a new seed at the beginning of each process.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">fork</span><span class="p">():</span>
+    <span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'In parent: </span><span class="si">{</span><span class="n">rand</span><span class="p">()</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">seed</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'In child: </span><span class="si">{</span><span class="n">rand</span><span class="p">()</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">_exit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">EX_OK</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>In parent: 0.01693090619965683
+In child: 0.02258025041320865
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id='"Things-Jeremy-says-to-do"'>
+<a class="anchor" href="#" things-jeremy-says-to-do aria-hidden="true"><span class="octicon octicon-link"></span></a>"Things Jeremy says to do"<a class="anchor-link" href="#%22Things-Jeremy-says-to-do%22"> </a>
+</h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>I thought I'd gather some of the core 'things Jeremy says to do' comments from the video lecture for this part of the lecture.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>show the function signature with <code>shift-Tab</code>
+</li>
+<li>use <code>?</code> and <code>??</code> at the end of a method or function to show the docs and the source code respectively</li>
+<li>read all the docs for every Python function you use<ul>
+<li>look at all the arguments it takes</li>
+<li>practice with that function inside a notebook</li>
+</ul>
+</li>
+<li>(sometimes) read the full source code</li>
+<li>pause the video when something in Jeremy's code is unfamiliar and experiment around with it in a notebook<ul>
+<li>read the docs and example code for those new concepts</li>
+</ul>
+</li>
+<li>(at some point) read through all the docs for the <code>Tensor</code> object / concept</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Note that there's a bit more when it comes to the imagic demonstration which I'll try to cover in a separate blogpost.</p>
+<p>In any case, there was a lot in this lecture. This week is all about matrix multiplication which I'm looking forward to getting to implement myself!</p>
+
+</div>
+</div>
+</div>
+</div>
+
+
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="strickvl/ml-blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/computervision/fastai/parttwo/2022/10/24/foundations-mnist-basics.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>A place to share my technical learnings.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/strickvl" target="_blank" title="strickvl"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
